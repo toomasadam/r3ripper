@@ -23,14 +23,14 @@ describe FreedbRecordParser do
 
   context "Before parsing the disc" do
     it "should set some default values" do
-      parser.md.artist.should == 'Unknown'
-      parser.md.album.should == 'Unknown'
-      parser.md.genre.should == 'Unknown'
-      parser.md.year.should == '0'
-      parser.md.extraDiscInfo.should == ''
-      parser.md.discid.should == ''
-      parser.md.trackname(12).should == 'Track 12'
-      parser.md.getVarArtist(12).should == 'Unknown'
+      expect(parser.md.artist).to eq('Unknown')
+      expect(parser.md.album).to eq('Unknown')
+      expect(parser.md.genre).to eq('Unknown')
+      expect(parser.md.year).to eq('0')
+      expect(parser.md.extraDiscInfo).to eq('')
+      expect(parser.md.discid).to eq('')
+      expect(parser.md.trackname(12)).to eq('Track 12')
+      expect(parser.md.getVarArtist(12)).to eq('Unknown')
     end
   end
 
@@ -39,14 +39,14 @@ describe FreedbRecordParser do
       nonUTF8 = "hello red \xE8".force_encoding("UTF-8")
       parser.parse(nonUTF8)
 
-      parser.status.should == 'noValidEncoding'
+      expect(parser.status).to eq('noValidEncoding')
     end
 
     it "should detect if the encoding is not UTF-8 and abort" do
       latin1 = "some_crazy_text".encode('ISO-8859-1')
       parser.parse(latin1)
 
-      parser.status.should == 'noUTF8Encoding'
+      expect(parser.status).to eq('noUTF8Encoding')
     end
   end
 
@@ -55,10 +55,10 @@ describe FreedbRecordParser do
       record = "DGENRE=Gothic\n#DISCID=98113b0e\nDYEAR=1993".encode('UTF-8')
       parser.parse(record)
 
-      parser.status.should == 'ok'
-      parser.md.genre.should == 'Gothic'
-      parser.md.discid.should == ''
-      parser.md.year.should == '1993'
+      expect(parser.status).to eq('ok')
+      expect(parser.md.genre).to eq('Gothic')
+      expect(parser.md.discid).to eq('')
+      expect(parser.md.year).to eq('1993')
     end
 
     it "should parse all standard info" do
@@ -67,47 +67,47 @@ Kisses\nDYEAR=1993\nDGENRE=Gothic\nTTITLE0=Machine Screw\n\
 TTITLE1=Christian Woman".encode('UTF-8')
       parser.parse(record)
 
-      parser.status.should == 'ok'
-      parser.md.discid.should == '98113b0e'
-      parser.md.artist.should == 'Type O Negative'
-      parser.md.album.should == 'Bloody Kisses'
-      parser.md.genre.should == 'Gothic'
-      parser.md.trackname(1).should == 'Machine Screw'
-      parser.md.trackname(2).should == 'Christian Woman'
+      expect(parser.status).to eq('ok')
+      expect(parser.md.discid).to eq('98113b0e')
+      expect(parser.md.artist).to eq('Type O Negative')
+      expect(parser.md.album).to eq('Bloody Kisses')
+      expect(parser.md.genre).to eq('Gothic')
+      expect(parser.md.trackname(1)).to eq('Machine Screw')
+      expect(parser.md.trackname(2)).to eq('Christian Woman')
     end
 
     it "should parse extra disc info" do
       record = "EXTD=What a wonderfull show!".encode('UTF-8')
       parser.parse(record)
 
-      parser.status.should == 'ok'
-      parser.md.extraDiscInfo.should == 'What a wonderfull show!'
+      expect(parser.status).to eq('ok')
+      expect(parser.md.extraDiscInfo).to eq('What a wonderfull show!')
     end
 
     it "should recognize a trackname of two lines and add a space in between" do
       record = "TTITLE9=Part1\nTTITLE9=Part2".encode('UTF-8')
       parser.parse(record)
 
-      parser.status.should == 'ok'
-      parser.md.trackname(10).should == 'Part1 Part2'
+      expect(parser.status).to eq('ok')
+      expect(parser.md.trackname(10)).to eq('Part1 Part2')
     end
 
     it "should recognize the album if the title has two lines" do
       record = "DTITLE=Artist / Album\nDTITLE=with a longer name".encode('UTF-8')
       parser.parse(record)
 
-      parser.status.should == 'ok'
-      parser.md.artist.should == 'Artist'
-      parser.md.album.should == 'Album with a longer name'
+      expect(parser.status).to eq('ok')
+      expect(parser.md.artist).to eq('Artist')
+      expect(parser.md.album).to eq('Album with a longer name')
     end
 
     it "should recognize the artist if it spins two lines as well" do
       record = "DTITLE=Artist\nDTITLE=with a long name / Album".encode('UTF-8')
       parser.parse(record)
 
-      parser.status.should == 'ok'
-      parser.md.artist.should == 'Artist with a long name'
-      parser.md.album.should == 'Album'
+      expect(parser.status).to eq('ok')
+      expect(parser.md.artist).to eq('Artist with a long name')
+      expect(parser.md.album).to eq('Album')
     end
 
     context "When a various artist disc is expected" do
@@ -116,11 +116,11 @@ TTITLE1=Christian Woman".encode('UTF-8')
 EASYBEATS / Friday on my Mind".encode('UTF-8')
         parser.parse(record)
 
-        parser.status.should == 'ok'
-        parser.md.getVarArtist(3).should == 'MUNGO JERRY'
-        parser.md.getVarArtist(4).should == 'THE EASYBEATS'
-        parser.md.trackname(3).should == 'In The Summertime'
-        parser.md.trackname(4).should == 'Friday on my Mind'
+        expect(parser.status).to eq('ok')
+        expect(parser.md.getVarArtist(3)).to eq('MUNGO JERRY')
+        expect(parser.md.getVarArtist(4)).to eq('THE EASYBEATS')
+        expect(parser.md.trackname(3)).to eq('In The Summertime')
+        expect(parser.md.trackname(4)).to eq('Friday on my Mind')
       end
 
       it "should recognize a various artist disc separated by a '-'" do
@@ -128,11 +128,11 @@ EASYBEATS / Friday on my Mind".encode('UTF-8')
 EASYBEATS - Friday on my Mind".encode('UTF-8')
         parser.parse(record)
 
-        parser.status.should == 'ok'
-        parser.md.getVarArtist(3).should == 'MUNGO JERRY'
-        parser.md.getVarArtist(4).should == 'THE EASYBEATS'
-        parser.md.trackname(3).should == 'In The Summertime'
-        parser.md.trackname(4).should == 'Friday on my Mind'
+        expect(parser.status).to eq('ok')
+        expect(parser.md.getVarArtist(3)).to eq('MUNGO JERRY')
+        expect(parser.md.getVarArtist(4)).to eq('THE EASYBEATS')
+        expect(parser.md.trackname(3)).to eq('In The Summertime')
+        expect(parser.md.trackname(4)).to eq('Friday on my Mind')
       end
 
       it "should recognize a various artist disc separated by a ':'" do
@@ -140,11 +140,11 @@ EASYBEATS - Friday on my Mind".encode('UTF-8')
 EASYBEATS : Friday on my Mind".encode('UTF-8')
         parser.parse(record)
 
-        parser.status.should == 'ok'
-        parser.md.getVarArtist(3).should == 'MUNGO JERRY'
-        parser.md.getVarArtist(4).should == 'THE EASYBEATS'
-        parser.md.trackname(3).should == 'In The Summertime'
-        parser.md.trackname(4).should == 'Friday on my Mind'
+        expect(parser.status).to eq('ok')
+        expect(parser.md.getVarArtist(3)).to eq('MUNGO JERRY')
+        expect(parser.md.getVarArtist(4)).to eq('THE EASYBEATS')
+        expect(parser.md.trackname(3)).to eq('In The Summertime')
+        expect(parser.md.trackname(4)).to eq('Friday on my Mind')
       end
 
       it "should recognize a various artist disc separated by different splitters" do
@@ -152,13 +152,13 @@ EASYBEATS : Friday on my Mind".encode('UTF-8')
 EASYBEATS - Friday on my Mind\nTTITLE4=THE EASYBEATS / Friday on my Mind".encode('UTF-8')
         parser.parse(record)
 
-        parser.status.should == 'ok'
-        parser.md.getVarArtist(3).should == 'MUNGO JERRY'
-        parser.md.getVarArtist(4).should == 'THE EASYBEATS'
-        parser.md.getVarArtist(5).should == 'THE EASYBEATS'
-        parser.md.trackname(3).should == 'In The Summertime'
-        parser.md.trackname(4).should == 'Friday on my Mind'
-        parser.md.trackname(5).should == 'Friday on my Mind'
+        expect(parser.status).to eq('ok')
+        expect(parser.md.getVarArtist(3)).to eq('MUNGO JERRY')
+        expect(parser.md.getVarArtist(4)).to eq('THE EASYBEATS')
+        expect(parser.md.getVarArtist(5)).to eq('THE EASYBEATS')
+        expect(parser.md.trackname(3)).to eq('In The Summertime')
+        expect(parser.md.trackname(4)).to eq('Friday on my Mind')
+        expect(parser.md.trackname(5)).to eq('Friday on my Mind')
       end
 
       it "should allow to revert to the old tracknames before splitting" do
@@ -167,8 +167,8 @@ EASYBEATS / Friday on my Mind".encode('UTF-8')
         parser.parse(record)
         parser.undoVarArtist()
 
-        parser.md.trackname(3).should == 'MUNGO JERRY / In The Summertime'
-        parser.md.trackname(4).should == 'THE EASYBEATS / Friday on my Mind'
+        expect(parser.md.trackname(3)).to eq('MUNGO JERRY / In The Summertime')
+        expect(parser.md.trackname(4)).to eq('THE EASYBEATS / Friday on my Mind')
       end
 
       it "should allow to redo the various artist splitting" do
@@ -180,10 +180,10 @@ EASYBEATS / Friday on my Mind".encode('UTF-8')
         parser.undoVarArtist()
         parser.redoVarArtist()
 
-        parser.md.getVarArtist(3).should == 'MUNGO JERRY'
-        parser.md.getVarArtist(4).should == 'THE EASYBEATS'
-        parser.md.trackname(3).should == 'In The Summertime'
-        parser.md.trackname(4).should == 'Friday on my Mind'
+        expect(parser.md.getVarArtist(3)).to eq('MUNGO JERRY')
+        expect(parser.md.getVarArtist(4)).to eq('THE EASYBEATS')
+        expect(parser.md.trackname(3)).to eq('In The Summertime')
+        expect(parser.md.trackname(4)).to eq('Friday on my Mind')
       end
     end
   end

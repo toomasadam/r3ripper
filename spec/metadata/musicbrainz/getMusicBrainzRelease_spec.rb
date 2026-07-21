@@ -23,7 +23,7 @@ describe GetMusicBrainzRelease do
   def setQueryReply(query=nil)
     query ||= File.read('spec/metadata/musicbrainz/data/oneReleaseFound.xml')
     @releaseId = 'f15d1f3a-5bf4-3a96-95be-a801b3889dc6'
-    http.should_receive(:get).with(@query_disc).and_return query
+    expect(http).to receive(:get).with(@query_disc).and_return query
   end
 
   before(:all) do
@@ -37,142 +37,142 @@ describe GetMusicBrainzRelease do
 
   context "Given some existing inclusion parameters in the lookup path" do
     before(:each) do
-      prefs.stub!(:debug).and_return false
-      http.should_receive(:path).at_least(:once).and_return "/ws/2/"
+      allow(prefs).to receive(:debug).and_return false
+      expect(http).to receive(:path).at_least(:once).and_return "/ws/2/"
     end
 
     it "should not remove the existing parameters" do
-      prefs.should_receive(:useEarliestDate).at_least(:once).and_return false
-      http.should_receive(:get).with("/ws/2/#{@disc}&inc=something-else+artists+recordings+artist-credits").and_return '<ok/>'
+      expect(prefs).to receive(:useEarliestDate).at_least(:once).and_return false
+      expect(http).to receive(:get).with("/ws/2/#{@disc}&inc=something-else+artists+recordings+artist-credits").and_return '<ok/>'
       getMusicBrainz.queryDisc(@disc + '&inc=something-else')
     end
 
     it "should not duplicate any existing parameters" do
-      prefs.should_receive(:useEarliestDate).at_least(:once).and_return false
-      http.should_receive(:get).with("/ws/2/#{@disc}&inc=recordings+artists+artist-credits").and_return '<ok/>'
+      expect(prefs).to receive(:useEarliestDate).at_least(:once).and_return false
+      expect(http).to receive(:get).with("/ws/2/#{@disc}&inc=recordings+artists+artist-credits").and_return '<ok/>'
       getMusicBrainz.queryDisc(@disc + '&inc=recordings')
     end
 
     it "should add the release-groups parameter if useEarliestDate is set" do
-      prefs.should_receive(:useEarliestDate).at_least(:once).and_return true
-      http.should_receive(:get).with("/ws/2/#{@disc}&inc=recordings+artists+artist-credits+release-groups").and_return '<ok/>'
+      expect(prefs).to receive(:useEarliestDate).at_least(:once).and_return true
+      expect(http).to receive(:get).with("/ws/2/#{@disc}&inc=recordings+artists+artist-credits+release-groups").and_return '<ok/>'
       getMusicBrainz.queryDisc(@disc + '&inc=recordings')
     end
 
     it "should not duplicate the release-groups parameter if useEarliestDate is set" do
-      prefs.should_receive(:useEarliestDate).at_least(:once).and_return true
-      http.should_receive(:get).with("/ws/2/#{@disc}&inc=recordings+release-groups+artists+artist-credits").and_return '<ok/>'
+      expect(prefs).to receive(:useEarliestDate).at_least(:once).and_return true
+      expect(http).to receive(:get).with("/ws/2/#{@disc}&inc=recordings+release-groups+artists+artist-credits").and_return '<ok/>'
       getMusicBrainz.queryDisc(@disc + '&inc=recordings+release-groups')
     end
   end
 
   context "Given there is only an empty instance" do
     it "should not crash if there are no choices but the caller still chooses" do
-      prefs.stub!(:debug).and_return false
+      allow(prefs).to receive(:debug).and_return false
       getMusicBrainz.choose(0)
-      getMusicBrainz.status.should == 'noChoices'
-      getMusicBrainz.musicbrainzRelease.should == nil
+      expect(getMusicBrainz.status).to eq('noChoices')
+      expect(getMusicBrainz.musicbrainzRelease).to eq(nil)
     end
   end
 
   context "After firing a query for a disc to the MusicBrainz web service" do
 
     before(:each) do
-      prefs.stub!(:debug).and_return false
-      http.should_receive(:path).at_least(:once).and_return "/ws/2/"
-      prefs.should_receive(:useEarliestDate).at_least(:once).and_return false
+      allow(prefs).to receive(:debug).and_return false
+      expect(http).to receive(:path).at_least(:once).and_return "/ws/2/"
+      expect(prefs).to receive(:useEarliestDate).at_least(:once).and_return false
     end
 
     it "should handle the response in case no disc is reported" do
       setQueryReply(File.read('spec/metadata/musicbrainz/data/noReleasesFound.xml'))
       getMusicBrainz.queryDisc(@disc)
 
-      getMusicBrainz.status.should == 'noMatches'
-      getMusicBrainz.musicbrainzRelease.should == nil
-      getMusicBrainz.choices.should == nil
+      expect(getMusicBrainz.status).to eq('noMatches')
+      expect(getMusicBrainz.musicbrainzRelease).to eq(nil)
+      expect(getMusicBrainz.choices).to eq(nil)
     end
 
     it "should handle the response in case 1 release is reported" do
       setQueryReply()
       getMusicBrainz.queryDisc(@disc)
 
-      getMusicBrainz.status.should == 'ok'
-      getMusicBrainz.musicbrainzRelease.attributes['id'].should == @releaseId
-      getMusicBrainz.choices.should == nil
+      expect(getMusicBrainz.status).to eq('ok')
+      expect(getMusicBrainz.musicbrainzRelease.attributes['id']).to eq(@releaseId)
+      expect(getMusicBrainz.choices).to eq(nil)
     end
 
     it "should adhere to country preferences for multiple results if specified" do
       # Only rely on country preferences.
-      prefs.stub(:preferMusicBrainzCountries).and_return 'AU'
-      prefs.stub(:preferMusicBrainzDate).and_return 'no'
+      allow(prefs).to receive(:preferMusicBrainzCountries).and_return 'AU'
+      allow(prefs).to receive(:preferMusicBrainzDate).and_return 'no'
       setQueryReply(File.read('spec/metadata/musicbrainz/data/multipleReleasesFound.xml'))
       @releaseId = '0923a33a-45c4-3eed-aae8-8b50e1a545de'
       getMusicBrainz.queryDisc(@disc)
 
-      getMusicBrainz.status.should == 'ok'
-      getMusicBrainz.musicbrainzRelease.attributes['id'].should == @releaseId
-      getMusicBrainz.choices.length.should == 1
+      expect(getMusicBrainz.status).to eq('ok')
+      expect(getMusicBrainz.musicbrainzRelease.attributes['id']).to eq(@releaseId)
+      expect(getMusicBrainz.choices.length).to eq(1)
     end
 
     it "should adhere to date preferences for multiple results if specified" do
       # Only rely on date preferences.
-      prefs.stub(:preferMusicBrainzCountries).and_return ''
-      prefs.stub(:preferMusicBrainzDate).and_return 'earlier'
+      allow(prefs).to receive(:preferMusicBrainzCountries).and_return ''
+      allow(prefs).to receive(:preferMusicBrainzDate).and_return 'earlier'
       setQueryReply(File.read('spec/metadata/musicbrainz/data/multipleReleasesFound.xml'))
       @releaseId = '6bb3793b-f991-378e-9bff-0bd3117f2298'
       getMusicBrainz.queryDisc(@disc)
 
-      getMusicBrainz.status.should == 'ok'
-      getMusicBrainz.musicbrainzRelease.attributes['id'].should == @releaseId
-      getMusicBrainz.choices.length.should == 1
+      expect(getMusicBrainz.status).to eq('ok')
+      expect(getMusicBrainz.musicbrainzRelease.attributes['id']).to eq(@releaseId)
+      expect(getMusicBrainz.choices.length).to eq(1)
     end
 
     it "should adhere to both preferences for multiple results if specified together" do
       # Only rely on date preferences.
-      prefs.stub(:preferMusicBrainzCountries).and_return 'US'
-      prefs.stub(:preferMusicBrainzDate).and_return 'later'
+      allow(prefs).to receive(:preferMusicBrainzCountries).and_return 'US'
+      allow(prefs).to receive(:preferMusicBrainzDate).and_return 'later'
       setQueryReply(File.read('spec/metadata/musicbrainz/data/multipleReleasesFound.xml'))
       getMusicBrainz.queryDisc(@disc)
 
-      getMusicBrainz.status.should == 'ok'
-      getMusicBrainz.musicbrainzRelease.attributes['id'].should == @releaseId
-      getMusicBrainz.choices.length.should == 1
+      expect(getMusicBrainz.status).to eq('ok')
+      expect(getMusicBrainz.musicbrainzRelease.attributes['id']).to eq(@releaseId)
+      expect(getMusicBrainz.choices.length).to eq(1)
     end
 
     context "when multiple records are reported and preferences cannot pick a 'best'" do
       before(:each) do
-        prefs.stub(:preferMusicBrainzCountries).and_return ''
-        prefs.stub(:preferMusicBrainzDate).and_return 'no'
+        allow(prefs).to receive(:preferMusicBrainzCountries).and_return ''
+        allow(prefs).to receive(:preferMusicBrainzDate).and_return 'no'
         setQueryReply(File.read('spec/metadata/musicbrainz/data/multipleReleasesFound.xml'))
         getMusicBrainz.queryDisc(@disc)
       end
 
       it "should allow choosing the first disc" do
-        getMusicBrainz.status.should == 'multipleRecords'
-        getMusicBrainz.musicbrainzRelease.should == nil
-        getMusicBrainz.choices.length.should == 9
+        expect(getMusicBrainz.status).to eq('multipleRecords')
+        expect(getMusicBrainz.musicbrainzRelease).to eq(nil)
+        expect(getMusicBrainz.choices.length).to eq(9)
 
         # choose the first disc
         @releaseId = '0923a33a-45c4-3eed-aae8-8b50e1a545de'
         getMusicBrainz.choose(0)
-        getMusicBrainz.status.should == 'ok'
-        getMusicBrainz.musicbrainzRelease.attributes['id'].should == @releaseId
+        expect(getMusicBrainz.status).to eq('ok')
+        expect(getMusicBrainz.musicbrainzRelease.attributes['id']).to eq(@releaseId)
       end
 
       it "should allow choosing the second disc" do
         # choose the second disc
         @releaseId = '105975c7-0e63-3874-8ef7-261d6aebcb49'
         getMusicBrainz.choose(1)
-        getMusicBrainz.status.should == 'ok'
-        getMusicBrainz.musicbrainzRelease.attributes['id'].should == @releaseId
+        expect(getMusicBrainz.status).to eq('ok')
+        expect(getMusicBrainz.musicbrainzRelease.attributes['id']).to eq(@releaseId)
       end
 
       it "should allow choosing an invalid choice without crashing" do
         # choose an unknown
-        getMusicBrainz.status.should == 'multipleRecords'
+        expect(getMusicBrainz.status).to eq('multipleRecords')
         getMusicBrainz.choose(9)
-        getMusicBrainz.status.should == 'choiceNotValid: 9'
-        getMusicBrainz.musicbrainzRelease.should == nil
+        expect(getMusicBrainz.status).to eq('choiceNotValid: 9')
+        expect(getMusicBrainz.musicbrainzRelease).to eq(nil)
       end
     end
   end

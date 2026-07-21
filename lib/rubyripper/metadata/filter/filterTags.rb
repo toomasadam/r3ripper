@@ -25,11 +25,12 @@ module Metadata
     end
     
     def filter(item)
+      # ensure we work on a copy to avoid side effects
+      result = item.dup
       #Add a slash before the double quote chars,
       #otherwise the shell will complain
-      item.gsub!('"', '\"')
-      item = super(item)
-      return "\"#{item}\""
+      result.gsub!('"', '\"')
+      "\"#{super(result)}\""
     end
   end
 end

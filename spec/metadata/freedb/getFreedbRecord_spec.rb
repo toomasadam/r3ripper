@@ -22,12 +22,12 @@ describe GetFreedbRecord do
 
   # helper function to return the query message in the stub
   def setQueryReply(query=nil)
-    prefs.stub!(:debug).and_return false
-    prefs.stub!(:site).and_return 'http://freedb.freedb.org/~cddb/cddb.cgi'
+    allow(prefs).to receive(:debug).and_return false
+    allow(prefs).to receive(:site).and_return 'http://freedb.freedb.org/~cddb/cddb.cgi'
     query ||= '200 blues 7F087C0A Some random artist / Some random album'
-    network.should_receive(:startCgiConnection).once.with('http://freedb.freedb.org/~cddb/cddb.cgi')
-    network.should_receive(:encode).at_least(:once).with(anything()).and_return {|a| CGI.escape(a)}
-    network.should_receive(:get).with(@query_disc).and_return query
+    expect(network).to receive(:startCgiConnection).once.with('http://freedb.freedb.org/~cddb/cddb.cgi')
+    expect(network).to receive(:encode).at_least(:once).with(anything()) { |a| CGI.escape(a)}
+    expect(network).to receive(:get).with(@query_disc).and_return query
   end
 
   # helper function to return the read message in the stub
@@ -36,7 +36,7 @@ describe GetFreedbRecord do
 Joe+fakestation+rubyripper+test&proto=6"
     response ||= "210 metal 7F087C01\n" + @file + "\n."
 
-    network.should_receive(:get).with(request).and_return response
+    expect(network).to receive(:get).with(request).and_return response
   end
 
   before(:all) do
@@ -48,16 +48,16 @@ fakestation+rubyripper+test&proto=6"
     @file = 'A fake freedb record file'
   end
 
-  let(:prefs) {double('Preferences').as_null_object}
+  let(:prefs) {double('Preferences').as_null_object }
   let(:network) {double('Network').as_null_object}
   let(:getFreedb) {GetFreedbRecord.new(network, prefs)}
 
   context "Given there is only an empty instance" do
     it "should not crash if there are no choices but the caller still chooses" do
       getFreedb.choose(0)
-      getFreedb.status.should == 'noChoices'
-      getFreedb.freedbRecord.should == nil
-      getFreedb.category.should == nil
+      expect(getFreedb.status).to eq('noChoices')
+      expect(getFreedb.freedbRecord).to eq(nil)
+      expect(getFreedb.category).to eq(nil)
       getFreedb.finalDiscId == nil
     end
   end
@@ -65,19 +65,19 @@ fakestation+rubyripper+test&proto=6"
   context "After firing a query for a disc to the freedb server" do
 
     before(:each) do
-      prefs.should_receive(:hostname).at_least(:once).and_return 'fakestation'
-      prefs.should_receive(:username).at_least(:once).and_return 'Joe'
-      network.should_receive(:path).at_least(:once).and_return "/~cddb/cddb.cgi"
+      expect(prefs).to receive(:hostname).at_least(:once).and_return 'fakestation'
+      expect(prefs).to receive(:username).at_least(:once).and_return 'Joe'
+      expect(network).to receive(:path).at_least(:once).and_return "/~cddb/cddb.cgi"
     end
 
     it "should handle the response in case no disc is reported" do
       setQueryReply('202 No match found')
       getFreedb.queryDisc(@disc)
 
-      getFreedb.status.should == 'noMatches'
-      getFreedb.freedbRecord.should == nil
-      getFreedb.choices.should == nil
-      getFreedb.category.should == nil
+      expect(getFreedb.status).to eq('noMatches')
+      expect(getFreedb.freedbRecord).to eq(nil)
+      expect(getFreedb.choices).to eq(nil)
+      expect(getFreedb.category).to eq(nil)
       getFreedb.finalDiscId == nil
     end
 
@@ -85,10 +85,10 @@ fakestation+rubyripper+test&proto=6"
       setQueryReply('403 Database entry is corrupt')
       getFreedb.queryDisc(@disc)
 
-      getFreedb.status.should == 'databaseCorrupt'
-      getFreedb.freedbRecord.should == nil
-      getFreedb.choices.should == nil
-      getFreedb.category.should == nil
+      expect(getFreedb.status).to eq('databaseCorrupt')
+      expect(getFreedb.freedbRecord).to eq(nil)
+      expect(getFreedb.choices).to eq(nil)
+      expect(getFreedb.category).to eq(nil)
       getFreedb.finalDiscId == nil
     end
 
@@ -96,10 +96,10 @@ fakestation+rubyripper+test&proto=6"
       setQueryReply('666 The number of the beast')
       getFreedb.queryDisc(@disc)
 
-      getFreedb.status.should == 'unknownReturnCode: 666'
-      getFreedb.freedbRecord.should == nil
-      getFreedb.choices.should == nil
-      getFreedb.category.should == nil
+      expect(getFreedb.status).to eq('unknownReturnCode: 666')
+      expect(getFreedb.freedbRecord).to eq(nil)
+      expect(getFreedb.choices).to eq(nil)
+      expect(getFreedb.category).to eq(nil)
       getFreedb.finalDiscId == nil
     end
 
@@ -108,15 +108,15 @@ fakestation+rubyripper+test&proto=6"
       setReadReply()
       getFreedb.queryDisc(@disc)
 
-      getFreedb.status.should == 'ok'
-      getFreedb.freedbRecord.should == @file
-      getFreedb.choices.should == nil
-      getFreedb.category.should == 'metal'
+      expect(getFreedb.status).to eq('ok')
+      expect(getFreedb.freedbRecord).to eq(@file)
+      expect(getFreedb.choices).to eq(nil)
+      expect(getFreedb.category).to eq('metal')
       getFreedb.finalDiscId == '7F087C01'
     end
 
     it "should get the first response if multiple are reported when firstHit preference is true" do
-      prefs.stub(:firstHit).and_return true
+      allow(prefs).to receive(:firstHit).and_return true
       choices = "blues 7F087C0A Artist A / Album A\nrock 7F087C0B Artist B / Album \
 B\n\jazz 7F087C0C Artist C / Album C\n\country 7F087C0D Artist D / Album D\n."
 
@@ -124,16 +124,16 @@ B\n\jazz 7F087C0C Artist C / Album C\n\country 7F087C0D Artist D / Album D\n."
       setReadReply()
       getFreedb.queryDisc(@disc)
 
-      getFreedb.status.should == 'ok'
-      getFreedb.freedbRecord.should == @file
-      getFreedb.choices.should == choices[0..-3].split("\n")
-      getFreedb.choices.length.should == 4
-      getFreedb.category.should == 'metal'
+      expect(getFreedb.status).to eq('ok')
+      expect(getFreedb.freedbRecord).to eq(@file)
+      expect(getFreedb.choices).to eq(choices[0..-3].split("\n"))
+      expect(getFreedb.choices.length).to eq(4)
+      expect(getFreedb.category).to eq('metal')
       getFreedb.finalDiscId == '7F087C01'
     end
 
     context "when multiple records are reported and the user wishes to choose" do
-      before(:each){prefs.stub(:firstHit).and_return false}
+      before(:each){allow(prefs).to receive(:firstHit).and_return false}
 
       it "should allow choosing the first disc" do
         choices = "blues 7F087C0A Artist A / Album A\nrock 7F087C0B Artist B / Album \
@@ -143,16 +143,16 @@ B\n\jazz 7F087C0C Artist C / Album C\n\country 7F087C0D Artist D / Album D\n."
         setReadReply()
         getFreedb.queryDisc(@disc)
 
-        getFreedb.status.should == 'multipleRecords'
-        getFreedb.freedbRecord.should == nil
-        getFreedb.choices.should == choices[0..-3].split("\n")
-        getFreedb.choices.length.should == 4
+        expect(getFreedb.status).to eq('multipleRecords')
+        expect(getFreedb.freedbRecord).to eq(nil)
+        expect(getFreedb.choices).to eq(choices[0..-3].split("\n"))
+        expect(getFreedb.choices.length).to eq(4)
 
         # choose the first disc
         getFreedb.choose(0)
-        getFreedb.status.should == 'ok'
-        getFreedb.freedbRecord.should == @file
-        getFreedb.category.should == 'metal'
+        expect(getFreedb.status).to eq('ok')
+        expect(getFreedb.freedbRecord).to eq(@file)
+        expect(getFreedb.category).to eq('metal')
         getFreedb.finalDiscId == '7F087C01'
       end
 
@@ -166,9 +166,9 @@ B\n\jazz 7F087C0C Artist C / Album C\n\country 7F087C0D Artist D / Album D\n."
 
         # choose the second disc
         getFreedb.choose(1)
-        getFreedb.status.should == 'ok'
-        getFreedb.freedbRecord.should == @file
-        getFreedb.category.should == 'metal'
+        expect(getFreedb.status).to eq('ok')
+        expect(getFreedb.freedbRecord).to eq(@file)
+        expect(getFreedb.category).to eq('metal')
         getFreedb.finalDiscId == '7F087C01'
       end
 
@@ -180,11 +180,11 @@ B\n\jazz 7F087C0C Artist C / Album C\n\country 7F087C0D Artist D / Album D\n."
         getFreedb.queryDisc(@disc)
 
         # choose an unknown
-        getFreedb.status.should == 'multipleRecords'
+        expect(getFreedb.status).to eq('multipleRecords')
         getFreedb.choose(4)
-        getFreedb.status.should == 'choiceNotValid: 4'
-        getFreedb.freedbRecord.should == nil
-        getFreedb.category.should == nil
+        expect(getFreedb.status).to eq('choiceNotValid: 4')
+        expect(getFreedb.freedbRecord).to eq(nil)
+        expect(getFreedb.category).to eq(nil)
         getFreedb.finalDiscId == nil
       end
     end
@@ -195,8 +195,8 @@ B\n\jazz 7F087C0C Artist C / Album C\n\country 7F087C0D Artist D / Album D\n."
         setReadReply('blues', '7F087C0A', '401 Cddb entry not found')
         getFreedb.queryDisc(@disc)
 
-        getFreedb.status.should == 'cddbEntryNotFound'
-        getFreedb.freedbRecord.should == nil
+        expect(getFreedb.status).to eq('cddbEntryNotFound')
+        expect(getFreedb.freedbRecord).to eq(nil)
       end
 
       it "should handle an unknown response code" do
@@ -204,8 +204,8 @@ B\n\jazz 7F087C0C Artist C / Album C\n\country 7F087C0D Artist D / Album D\n."
         setReadReply('blues', '7F087C0A', '666 The number of the beast')
         getFreedb.queryDisc(@disc)
 
-        getFreedb.status.should == 'unknownReturnCode: 666'
-        getFreedb.freedbRecord.should == nil
+        expect(getFreedb.status).to eq('unknownReturnCode: 666')
+        expect(getFreedb.freedbRecord).to eq(nil)
       end
 
       it "should handle a server (402) error response on the server" do
@@ -213,8 +213,8 @@ B\n\jazz 7F087C0C Artist C / Album C\n\country 7F087C0D Artist D / Album D\n."
         setReadReply('blues', '7F087C0A', '402 There is a temporary server error')
         getFreedb.queryDisc(@disc)
 
-        getFreedb.status.should == 'serverError'
-        getFreedb.freedbRecord.should == nil
+        expect(getFreedb.status).to eq('serverError')
+        expect(getFreedb.freedbRecord).to eq(nil)
       end
 
       it "should handle a database (403) error response on the server" do
@@ -222,8 +222,8 @@ B\n\jazz 7F087C0C Artist C / Album C\n\country 7F087C0D Artist D / Album D\n."
         setReadReply('blues', '7F087C0A', '403 Database inconsistency error')
         getFreedb.queryDisc(@disc)
 
-        getFreedb.status.should == 'databaseCorrupt'
-        getFreedb.freedbRecord.should == nil
+        expect(getFreedb.status).to eq('databaseCorrupt')
+        expect(getFreedb.freedbRecord).to eq(nil)
       end
     end
   end

@@ -75,7 +75,7 @@ rubyripper #{$rr_version}") + "&proto=6"
 
     case code
     when 200 ; oneRecordFound(reply)
-    when 211 || 210 ; multipleRecordsFound(reply)
+    when 211, 210 ; multipleRecordsFound(reply)
     when 202 ; noRecordsFound()
     when 403 ; databaseCorrupt()
     else ; unknownCode(code)

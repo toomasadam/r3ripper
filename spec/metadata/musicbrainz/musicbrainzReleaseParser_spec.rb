@@ -35,83 +35,83 @@ describe MusicBrainzReleaseParser do
 
   context "Before parsing the disc" do
     it "should set some default values" do
-      parser.md.artist.should == 'Unknown'
-      parser.md.album.should == 'Unknown'
-      parser.md.genre.should == 'Unknown'
-      parser.md.year.should == '0'
-      parser.md.extraDiscInfo.should == ''
-      parser.md.discid.should == ''
-      parser.md.trackname(12).should == 'Track 12'
-      parser.md.getVarArtist(12).should == 'Unknown'
+      expect(parser.md.artist).to eq('Unknown')
+      expect(parser.md.album).to eq('Unknown')
+      expect(parser.md.genre).to eq('Unknown')
+      expect(parser.md.year).to eq('0')
+      expect(parser.md.extraDiscInfo).to eq('')
+      expect(parser.md.discid).to eq('')
+      expect(parser.md.trackname(12)).to eq('Track 12')
+      expect(parser.md.getVarArtist(12)).to eq('Unknown')
     end
   end
 
   context "When parsing a MusicBrainz release XML element" do
     before(:each) do
-      prefs.stub(:useEarliestDate).and_return false
-      http.stub(:get).and_return File.read('spec/metadata/musicbrainz/data/noTags.xml')
-      http.stub(:path).and_return '/ws/2/'
+      allow(prefs).to receive(:useEarliestDate).and_return false
+      allow(http).to receive(:get).and_return File.read('spec/metadata/musicbrainz/data/noTags.xml')
+      allow(http).to receive(:path).and_return '/ws/2/'
     end
 
     it "should parse all standard info" do
       parser.parse(readRelease('spec/metadata/musicbrainz/data/standardRelease.xml'),
                    '4vi.H1hC7BRP18_a.7D4r4NOYL8-', 'e50b3c11')
 
-      parser.status.should == 'ok'
-      parser.md.discid.should == 'e50b3c11'
-      parser.md.artist.should == 'The Beatles'
-      parser.md.album.should == 'Abbey Road'
-      parser.md.year.should == '2009'
-      parser.md.trackname(1).should == 'Come Together'
-      parser.md.trackname(2).should == 'Something'
+      expect(parser.status).to eq('ok')
+      expect(parser.md.discid).to eq('e50b3c11')
+      expect(parser.md.artist).to eq('The Beatles')
+      expect(parser.md.album).to eq('Abbey Road')
+      expect(parser.md.year).to eq('2009')
+      expect(parser.md.trackname(1)).to eq('Come Together')
+      expect(parser.md.trackname(2)).to eq('Something')
     end
 
     it "should pick the correct disc of a multi-disc release" do
       parser.parse(readRelease('spec/metadata/musicbrainz/data/multiDiscRelease.xml'),
                    '0gLvTHxPtWugkT0Pf26t5Bjo0GQ-', 'b20b140d')
 
-      parser.status.should == 'ok'
-      parser.md.discid.should == 'b20b140d'
-      parser.md.artist.should == 'The Beatles'
-      parser.md.album.should == 'The Beatles'
-      parser.md.year.should == '2009'
-      parser.md.trackname(1).should == 'Birthday'
-      parser.md.trackname(2).should == 'Yer Blues'
+      expect(parser.status).to eq('ok')
+      expect(parser.md.discid).to eq('b20b140d')
+      expect(parser.md.artist).to eq('The Beatles')
+      expect(parser.md.album).to eq('The Beatles')
+      expect(parser.md.year).to eq('2009')
+      expect(parser.md.trackname(1)).to eq('Birthday')
+      expect(parser.md.trackname(2)).to eq('Yer Blues')
     end
 
     it "should use the earliest release date is useEarliestDate is set" do
-      prefs.stub(:useEarliestDate).and_return true
+      allow(prefs).to receive(:useEarliestDate).and_return true
       parser.parse(readRelease('spec/metadata/musicbrainz/data/standardRelease.xml'),
                    '4vi.H1hC7BRP18_a.7D4r4NOYL8-', 'e50b3c11')
 
-      parser.status.should == 'ok'
-      parser.md.year.should == '1969'
+      expect(parser.status).to eq('ok')
+      expect(parser.md.year).to eq('1969')
     end
 
     it "should never behave like a various artists disc if there is only one (non-Various Artists) album artist" do
       parser.parse(readRelease('spec/metadata/musicbrainz/data/oneAlbumArtist.xml'),
                    'cm9L.BbeuJ_zNOwr0C_e.K0.D0E-', '86099d0c')
 
-      parser.status.should == 'ok'
-      parser.md.artist.should == 'David Bowie'
-      parser.md.various?.should == false
+      expect(parser.status).to eq('ok')
+      expect(parser.md.artist).to eq('David Bowie')
+      expect(parser.md.various?).to eq(false)
     end
 
     context "when guessing the genre" do
       it "should guess the most popular artist tag which is also an ID3 genre name" do
-        http.should_receive(:get).with('/ws/2/artist/b10bbbfc-cf9e-42e0-be17-e2c3e1d2600d?inc=tags').and_return File.read('spec/metadata/musicbrainz/data/artistTags.xml')
+        expect(http).to receive(:get).with('/ws/2/artist/b10bbbfc-cf9e-42e0-be17-e2c3e1d2600d?inc=tags').and_return File.read('spec/metadata/musicbrainz/data/artistTags.xml')
         parser.parse(readRelease('spec/metadata/musicbrainz/data/multiDiscRelease.xml'),
                      '0gLvTHxPtWugkT0Pf26t5Bjo0GQ-', 'b20b140d')
 
-        parser.md.genre.should == 'Rock'
+        expect(parser.md.genre).to eq('Rock')
       end
 
       it "should prefer release-group tags for genre over artist tags" do
-        http.should_receive(:get).with('/ws/2/release-group/9162580e-5df4-32de-80cc-f45a8d8a9b1d?inc=tags').and_return File.read('spec/metadata/musicbrainz/data/releaseGroupTags.xml')
+        expect(http).to receive(:get).with('/ws/2/release-group/9162580e-5df4-32de-80cc-f45a8d8a9b1d?inc=tags').and_return File.read('spec/metadata/musicbrainz/data/releaseGroupTags.xml')
         parser.parse(readRelease('spec/metadata/musicbrainz/data/standardRelease.xml'),
                      '4vi.H1hC7BRP18_a.7D4r4NOYL8-', 'e50b3c11')
 
-        parser.md.genre.should == 'Rock'
+        expect(parser.md.genre).to eq('Rock')
       end
 
       it "should leave the default genre (Unknown) if no good tag is found" do
@@ -119,16 +119,16 @@ describe MusicBrainzReleaseParser do
         parser.parse(readRelease('spec/metadata/musicbrainz/data/oneAlbumArtist.xml'),
                      'cm9L.BbeuJ_zNOwr0C_e.K0.D0E-', '86099d0c')
 
-        parser.md.genre.should == 'Unknown'
+        expect(parser.md.genre).to eq('Unknown')
       end
 
       it "should map certain non-ID3-genre tags to ID3 genres" do
-        http.should_receive(:get).with('/ws/2/artist/7dbac7e6-f351-42da-9dce-b0249ca2dd03?inc=tags').and_return File.read('spec/metadata/musicbrainz/data/mapTags.xml')
+        expect(http).to receive(:get).with('/ws/2/artist/7dbac7e6-f351-42da-9dce-b0249ca2dd03?inc=tags').and_return File.read('spec/metadata/musicbrainz/data/mapTags.xml')
         parser.parse(readRelease('spec/metadata/musicbrainz/data/splitRelease.xml'),
                      'a2njxz76PKV7jgnudcTXDbV_OQs-', '79098308')
 
         # NOTE: Also shows capitalization
-        parser.md.genre.should == 'Folk/Rock'
+        expect(parser.md.genre).to eq('Folk/Rock')
       end
     end
 
@@ -137,35 +137,35 @@ describe MusicBrainzReleaseParser do
         parser.parse(readRelease('spec/metadata/musicbrainz/data/variousArtists.xml'),
                      'c.J3z3pava1oPzXD0K2e9q48lJc-', 'c70ecd0f')
 
-        parser.status.should == 'ok'
-        parser.md.artist.should == 'Various Artists'
-        parser.md.various?.should == true
-        parser.md.getVarArtist(4).should == 'Bon Iver'
-        parser.md.getVarArtist(5).should == 'Grizzly Bear'
-        parser.md.trackname(4).should == 'Brackett, WI'
-        parser.md.trackname(5).should == 'Deep Blue Sea'
+        expect(parser.status).to eq('ok')
+        expect(parser.md.artist).to eq('Various Artists')
+        expect(parser.md.various?).to eq(true)
+        expect(parser.md.getVarArtist(4)).to eq('Bon Iver')
+        expect(parser.md.getVarArtist(5)).to eq('Grizzly Bear')
+        expect(parser.md.trackname(4)).to eq('Brackett, WI')
+        expect(parser.md.trackname(5)).to eq('Deep Blue Sea')
       end
 
       it "should automatically join artist splits according to the joinphrase" do
         parser.parse(readRelease('spec/metadata/musicbrainz/data/variousArtists.xml'),
                      'c.J3z3pava1oPzXD0K2e9q48lJc-', 'c70ecd0f')
 
-        parser.md.getVarArtist(3).should == 'Feist and Ben Gibbard'
+        expect(parser.md.getVarArtist(3)).to eq('Feist and Ben Gibbard')
       end
 
       it "should automatically join artist splits with ' / ' if there's no joinphrase" do
         parser.parse(readRelease('spec/metadata/musicbrainz/data/variousArtists.xml'),
                      'c.J3z3pava1oPzXD0K2e9q48lJc-', 'c70ecd0f')
 
-        parser.md.getVarArtist(14).should == 'Grizzly Bear / Feist'
+        expect(parser.md.getVarArtist(14)).to eq('Grizzly Bear / Feist')
       end
 
       it "should rely on the track artists to pick the genre" do
-        http.should_receive(:get).with('/ws/2/artist/1270af14-9c17-4400-8ebb-3f0ac40dcfb0?inc=tags').and_return File.read('spec/metadata/musicbrainz/data/artistTags.xml')
+        expect(http).to receive(:get).with('/ws/2/artist/1270af14-9c17-4400-8ebb-3f0ac40dcfb0?inc=tags').and_return File.read('spec/metadata/musicbrainz/data/artistTags.xml')
         parser.parse(readRelease('spec/metadata/musicbrainz/data/variousArtists.xml'),
                      'c.J3z3pava1oPzXD0K2e9q48lJc-', 'c70ecd0f')
 
-        parser.md.genre.should == 'Rock'
+        expect(parser.md.genre).to eq('Rock')
       end
     end
 
@@ -174,43 +174,43 @@ describe MusicBrainzReleaseParser do
         parser.parse(readRelease('spec/metadata/musicbrainz/data/splitReleaseOneArtist.xml'),
                      '7K8x8VRn_7QehSNMqHrzDhjZV_k-', 'b10df50d')
 
-        parser.status.should == 'ok'
-        parser.md.artist.should == 'Iron & Wine and Calexico'
+        expect(parser.status).to eq('ok')
+        expect(parser.md.artist).to eq('Iron & Wine and Calexico')
       end
 
       it "should automatically join album artist splits with ' / ' if there's no joinphrase" do
         parser.parse(readRelease('spec/metadata/musicbrainz/data/splitRelease.xml'),
                      'a2njxz76PKV7jgnudcTXDbV_OQs-', '79098308')
 
-        parser.status.should == 'ok'
+        expect(parser.status).to eq('ok')
         # NOTE: also relies on name-credit rather than artist/name
-        parser.md.artist.should == 'Son, Ambulance / Bright Eyes'
+        expect(parser.md.artist).to eq('Son, Ambulance / Bright Eyes')
       end
 
       it "should behave like a various artists disc" do
         parser.parse(readRelease('spec/metadata/musicbrainz/data/splitRelease.xml'),
                      'a2njxz76PKV7jgnudcTXDbV_OQs-', '79098308')
 
-        parser.md.various?.should == true
-        parser.md.getVarArtist(3).should == 'Son Ambulance'
-        parser.md.getVarArtist(4).should == 'Bright Eyes'
-        parser.md.trackname(3).should == 'The Invention of Beauty'
-        parser.md.trackname(4).should == 'Oh, You Are the Roots That Sleep Beneath My Feet and Hold the Earth in Place'
+        expect(parser.md.various?).to eq(true)
+        expect(parser.md.getVarArtist(3)).to eq('Son Ambulance')
+        expect(parser.md.getVarArtist(4)).to eq('Bright Eyes')
+        expect(parser.md.trackname(3)).to eq('The Invention of Beauty')
+        expect(parser.md.trackname(4)).to eq('Oh, You Are the Roots That Sleep Beneath My Feet and Hold the Earth in Place')
       end
 
       it "should never behave like a various artists disc if all tracks have the same artist" do
         parser.parse(readRelease('spec/metadata/musicbrainz/data/splitReleaseOneArtist.xml'),
                      '7K8x8VRn_7QehSNMqHrzDhjZV_k-', 'b10df50d')
 
-        parser.md.various?.should == false
+        expect(parser.md.various?).to eq(false)
       end
 
       it "should rely on the album artists to pick the genre" do
-        http.should_receive(:get).with('/ws/2/artist/5e372a49-5672-4fb8-ba14-18c90780c4f9?inc=tags').and_return File.read('spec/metadata/musicbrainz/data/artistTags.xml')
+        expect(http).to receive(:get).with('/ws/2/artist/5e372a49-5672-4fb8-ba14-18c90780c4f9?inc=tags').and_return File.read('spec/metadata/musicbrainz/data/artistTags.xml')
         parser.parse(readRelease('spec/metadata/musicbrainz/data/splitReleaseOneArtist.xml'),
                      '7K8x8VRn_7QehSNMqHrzDhjZV_k-', 'b10df50d')
 
-        parser.md.genre.should == 'Rock'
+        expect(parser.md.genre).to eq('Rock')
       end
     end
   end

@@ -27,44 +27,44 @@ describe Metadata::FilterAll do
   context "The filter should return all values of metadata" do  
     it "should remove a backquote and replace it with a single quote" do
       data.artist = 'No ` allowed'
-      filter.artist.should == "No ' allowed"
+      expect(filter.artist).to eq("No ' allowed")
     end
     
     it "should replace underscores with spaces if noSpaces setting = false" do
       data.artist = 'Iron_Maiden'
-      prefs.should_receive(:noSpaces).and_return false
-      filter.artist.should == 'Iron Maiden'
+      expect(prefs).to receive(:noSpaces).and_return false
+      expect(filter.artist).to eq('Iron Maiden')
     end
     
     it "should keep the underscores if noSpaces setting = true" do
       data.artist = 'Iron_Maiden'
-      prefs.should_receive(:noSpaces).and_return true
-      filter.artist.should == 'Iron_Maiden'
+      expect(prefs).to receive(:noSpaces).and_return true
+      expect(filter.artist).to eq('Iron_Maiden')
     end
     
     it "should replace UTF-8 single quote with ASCII single quote" do
       data.artist = "single quote \342\200\230 1"
       data.album = "single quote \342\200\231 2"
-      filter.artist.should == "single quote ' 1"
-      filter.album.should == "single quote ' 2"
+      expect(filter.artist).to eq("single quote ' 1")
+      expect(filter.album).to eq("single quote ' 2")
     end
     
     it "should replace UTF-8 double quote with ASCII double quote" do
       data.artist = "double quote \342\200\234 1"
       data.album = "double quote \342\200\235 2"
-      filter.artist.should == 'double quote " 1'
-      filter.album.should == 'double quote " 2'
+      expect(filter.artist).to eq('double quote " 1')
+      expect(filter.album).to eq('double quote " 2')
     end
     
     it "should strip extra spaces" do
       data.artist = '  Random artist   '
-      filter.artist.should == 'Random artist'
+      expect(filter.artist).to eq('Random artist')
     end
     
     it "should be able to combine this logic" do
       data.tracklist = {1=>"  Don`t_won\342\200\230t_know  "}
-      prefs.should_receive(:noSpaces).and_return false
-      filter.trackname(1).should == "Don't won't know"
+      expect(prefs).to receive(:noSpaces).and_return false
+      expect(filter.trackname(1)).to eq("Don't won't know")
     end
   end
 end

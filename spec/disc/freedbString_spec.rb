@@ -29,41 +29,41 @@ describe CalcFreedbID do
     @freedb = CalcFreedbID.new(disc, prefs, deps, exec)
     @freedbString = "7F087C0A 10 150 13359 36689 53647 68322 81247 87332 \
 106882 122368 124230 2174"
-    prefs.should_receive(:cdrom).at_least(:once).and_return('/dev/cdrom')
+    expect(prefs).to receive(:cdrom).at_least(:once).and_return('/dev/cdrom')
   end
 
   context "When a help program for creating a freedbstring exists" do
     
     before(:each) do
-      deps.should_receive(:platform).twice.and_return('i686-linux')
+      expect(deps).to receive(:platform).twice.and_return('i686-linux')
     end
 
     it "should first try to use discid" do      
-      deps.should_receive(:installed?).with('discid').and_return true
-      exec.should_receive(:launch).with('discid /dev/cdrom').and_return [@freedbString]
-      @freedb.freedbString.should == @freedbString
-      @freedb.discid.should == "7F087C0A"
+      expect(deps).to receive(:installed?).with('discid').and_return true
+      expect(exec).to receive(:launch).with('discid /dev/cdrom').and_return [@freedbString]
+      expect(@freedb.freedbString).to eq(@freedbString)
+      expect(@freedb.discid).to eq("7F087C0A")
     end
 
     it "should then try to use cd-discid" do
-      deps.should_receive(:installed?).with('discid').and_return false
-      deps.should_receive(:installed?).with('cd-discid').and_return true
-      exec.should_receive(:launch).with('cd-discid /dev/cdrom').and_return [@freedbString]
-      @freedb.freedbString.should == @freedbString
-      @freedb.discid.should == "7F087C0A"
+      expect(deps).to receive(:installed?).with('discid').and_return false
+      expect(deps).to receive(:installed?).with('cd-discid').and_return true
+      expect(exec).to receive(:launch).with('cd-discid /dev/cdrom').and_return [@freedbString]
+      expect(@freedb.freedbString).to eq(@freedbString)
+      expect(@freedb.discid).to eq("7F087C0A")
     end
   end
 
   context "When the platform is DARWIN (a.k.a. OS X)" do
     it "should unmount the disc properly and mount it afterwards" do
-      deps.should_receive(:platform).twice.and_return('i686-darwin')
-      deps.should_receive(:installed?).with('discid').and_return true
-      exec.should_receive(:launch).with('diskutil unmount /dev/cdrom')
-      exec.should_receive(:launch).with('discid /dev/cdrom').and_return [@freedbString]
-      exec.should_receive(:launch).with('diskutil mount /dev/cdrom')
+      expect(deps).to receive(:platform).twice.and_return('i686-darwin')
+      expect(deps).to receive(:installed?).with('discid').and_return true
+      expect(exec).to receive(:launch).with('diskutil unmount /dev/cdrom')
+      expect(exec).to receive(:launch).with('discid /dev/cdrom').and_return [@freedbString]
+      expect(exec).to receive(:launch).with('diskutil mount /dev/cdrom')
 
-      @freedb.freedbString.should == @freedbString
-      @freedb.discid.should == "7F087C0A"
+      expect(@freedb.freedbString).to eq(@freedbString)
+      expect(@freedb.discid).to eq("7F087C0A")
     end
   end
 
@@ -71,20 +71,20 @@ describe CalcFreedbID do
     before(:each) do
       @start = {1=>0, 2=>13209, 3=>36539, 4=>53497, 5=>68172, 6=>81097,
 7=>87182, 8=>106732, 9=>122218, 10=>124080}
-      prefs.should_receive(:debug).and_return false
-      deps.should_receive(:installed?).twice.and_return false
-      disc.should_receive(:advancedTocScanner).once.and_return scanner
+      expect(prefs).to receive(:debug).and_return false
+      expect(deps).to receive(:installed?).twice.and_return false
+      expect(disc).to receive(:advancedTocScanner).once.and_return scanner
     end
 
     it "should use the provided toc scanner to calculate the disc" do
-      scanner.should_receive(:tracks).at_least(:once).and_return(10)
-      scanner.should_receive(:totalSectors).at_least(:once).and_return(162919)
+      expect(scanner).to receive(:tracks).at_least(:once).and_return(10)
+      expect(scanner).to receive(:totalSectors).at_least(:once).and_return(162919)
       (1..10).each do |number|
-        scanner.should_receive(:getStartSector).with(number).at_least(:once).and_return @start[number]
+        expect(scanner).to receive(:getStartSector).with(number).at_least(:once).and_return @start[number]
       end
 
-      @freedb.freedbString.should == @freedbString
-      @freedb.discid.should == "7F087C0A"
+      expect(@freedb.freedbString).to eq(@freedbString)
+      expect(@freedb.discid).to eq("7F087C0A")
     end
   end
 end

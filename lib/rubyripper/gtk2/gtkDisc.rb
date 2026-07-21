@@ -98,7 +98,7 @@ class GtkDisc
   end
 
   def setDiscValues()
-    @discInfoTable = Gtk::Table.new(4,4,false)
+    @discInfoTable = Gtk::Grid.new()
 
     @artistLabel = Gtk::Label.new(_('Artist:'))
     @albumLabel = Gtk::Label.new(_('Album:'))
@@ -117,20 +117,20 @@ class GtkDisc
   end
 
   def configDiscValues()
-    @discInfoTable.column_spacings = 5
-    @discInfoTable.row_spacings = 4
+    @discInfoTable.column_spacing = 5
+    @discInfoTable.row_spacing = 4
     @discInfoTable.border_width = 7
 
-    @artistLabel.set_alignment(0.0, 0.5)
-    @albumLabel.set_alignment(0.0, 0.5)
-    @genreLabel.set_alignment(0.0, 0.5)
-    @yearLabel.set_alignment(0.0, 0.5)
+    @artistLabel.halign = :start
+    @albumLabel.halign = :start
+    @genreLabel.halign = :start
+    @yearLabel.halign = :start
 
     @genreEntry.width_request = 100
     @yearEntry.width_request = 100
 
     @freezeCheckbox.tooltip_text = _("Use this option to keep the disc info\nfor albums that span multiple discs")
-    @discNumberLabel.set_alignment(0.0, 0.5)
+    @discNumberLabel.halign = :start
     @discNumberLabel.sensitive = false
     @discNumberSpin.value = 1.0
     @discNumberSpin.sensitive = false
@@ -148,26 +148,30 @@ class GtkDisc
   end
 
   def packDiscObjects()
-    @discInfoTable.attach(@artistLabel, 0,1,0,1, Gtk::FILL, Gtk::SHRINK, 0, 0) #1st column
-    @discInfoTable.attach(@albumLabel,0,1,1,2, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @discInfoTable.attach(@artistEntry, 1,2,0,1, Gtk::FILL|Gtk::EXPAND, Gtk::SHRINK, 0,0) #2nd column
-    @discInfoTable.attach(@albumEntry, 1, 2, 1, 2, Gtk::FILL|Gtk::EXPAND, Gtk::SHRINK, 0, 0)
-    @discInfoTable.attach(@genreLabel, 2, 3, 0, 1, Gtk::FILL, Gtk::SHRINK, 0, 0) #3rd column
-    @discInfoTable.attach(@yearLabel, 2, 3, 1, 2, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @discInfoTable.attach(@genreEntry, 3, 4, 0, 1, Gtk::SHRINK, Gtk::SHRINK, 0, 0) #4th column
-    @discInfoTable.attach(@yearEntry, 3 , 4, 1, 2, Gtk::SHRINK, Gtk::SHRINK, 0, 0)
-    @discInfoTable.attach(@varCheckbox, 0, 4, 3, 4, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @discInfoTable.attach(@freezeCheckbox, 0, 2, 2, 3, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @discInfoTable.attach(@discNumberLabel, 2, 3, 2, 3, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @discInfoTable.attach(@discNumberSpin, 3, 4, 2, 3, Gtk::FILL, Gtk::SHRINK, 0, 0)
+    # grid.attach(child, left, top, width, height)
+    @discInfoTable.attach(@artistLabel, 0, 0, 1, 1) #1st column
+    @discInfoTable.attach(@albumLabel, 0, 1, 1, 1)
+    @discInfoTable.attach(@artistEntry, 1, 0, 1, 1) #2nd column
+    @discInfoTable.attach(@albumEntry, 1, 1, 1, 1)
+    @artistEntry.hexpand = true
+    @albumEntry.hexpand = true
+
+    @discInfoTable.attach(@genreLabel, 2, 0, 1, 1) #3rd column
+    @discInfoTable.attach(@yearLabel, 2, 1, 1, 1)
+    @discInfoTable.attach(@genreEntry, 3, 0, 1, 1) #4th column
+    @discInfoTable.attach(@yearEntry, 3, 1, 1, 1)
+
+    @discInfoTable.attach(@varCheckbox, 0, 3, 4, 1)
+    @discInfoTable.attach(@freezeCheckbox, 0, 2, 2, 1)
+    @discInfoTable.attach(@discNumberLabel, 2, 2, 1, 1)
+    @discInfoTable.attach(@discNumberSpin, 3, 2, 1, 1)
   end
 
   def setTrackInfoTable()
     if not @trackInfoTable
-      @trackInfoTable = Gtk::Table.new(@disc.audiotracks + 1, 4, false)
+      @trackInfoTable = Gtk::Grid.new()
     else
-      @trackInfoTable.each{|child| @trackInfoTable.remove(child)}
-      @trackInfoTable.resize(@disc.audiotracks + 1, 4)
+      @trackInfoTable.children.each{|child| @trackInfoTable.remove(child)}
     end
   end
   
@@ -187,8 +191,8 @@ class GtkDisc
   end
 
   def configTrackValues
-    @trackInfoTable.column_spacings = 5
-    @trackInfoTable.row_spacings = 4
+    @trackInfoTable.column_spacing = 5
+    @trackInfoTable.row_spacing = 4
     @trackInfoTable.border_width = 7
 
     @allTracksButton.active = true
@@ -203,25 +207,28 @@ class GtkDisc
 
   # pack with or without support for various artists
   def packTrackObjects
-    @trackInfoTable.attach(@allTracksButton, 0, 1, 0, 1, Gtk::FILL, Gtk::SHRINK, 0, 0) #1st column, 1st row
-    @trackInfoTable.attach(@lengthLabel, 3, 4, 0, 1, Gtk::FILL, Gtk::SHRINK, 0, 0) #4th column, 1st row
+    @trackInfoTable.attach(@allTracksButton, 0, 0, 1, 1) #1st column, 1st row
+    @trackInfoTable.attach(@lengthLabel, 3, 0, 1, 1) #4th column, 1st row
 
-    if @md.various?
-      @trackInfoTable.attach(@varArtistLabel, 1, 2, 0, 1, Gtk::FILL, Gtk::SHRINK, 0, 0) #2nd column, 1st row
-      @trackInfoTable.attach(@tracknameLabel, 2, 3, 0, 1, Gtk::FILL, Gtk::SHRINK, 0, 0) #3rd column, 1st row
+    if @md && @md.various?
+      @trackInfoTable.attach(@varArtistLabel, 1, 0, 1, 1) #2nd column, 1st row
+      @trackInfoTable.attach(@tracknameLabel, 2, 0, 1, 1) #3rd column, 1st row
     else
-      @trackInfoTable.attach(@tracknameLabel, 1, 3, 0, 1, Gtk::FILL|Gtk::EXPAND, Gtk::SHRINK, 0, 0)
+      @trackInfoTable.attach(@tracknameLabel, 1, 0, 2, 1)
+      @tracknameLabel.hexpand = true
     end
 
     @disc.audiotracks.times do |index|
-      @trackInfoTable.attach(@checkTrackArray[index], 0, 1, 1 + index, 2 + index, Gtk::FILL, Gtk::SHRINK, 0, 0) #1st column, 2nd row till end
-      @trackInfoTable.attach(@lengthLabelArray[index],3, 4, 1 + index, 2 + index, Gtk::FILL, Gtk::SHRINK, 0, 0) #4th column, 2nd row till end
+      row = index + 1
+      @trackInfoTable.attach(@checkTrackArray[index], 0, row, 1, 1)
+      @trackInfoTable.attach(@lengthLabelArray[index], 3, row, 1, 1)
 
-      if @md.various?
-        @trackInfoTable.attach(@varArtistEntryArray[index], 1, 2, index + 1, index + 2, Gtk::FILL, Gtk::SHRINK, 0, 0)
-        @trackInfoTable.attach(@trackEntryArray[index], 2, 3, index + 1, index + 2, Gtk::FILL, Gtk::SHRINK, 0, 0)
+      if @md && @md.various?
+        @trackInfoTable.attach(@varArtistEntryArray[index], 1, row, 1, 1)
+        @trackInfoTable.attach(@trackEntryArray[index], 2, row, 1, 1)
       else
-        @trackInfoTable.attach(@trackEntryArray[index],1, 3, 1 + index, 2 + index, Gtk::FILL|Gtk::EXPAND, Gtk::SHRINK, 0, 0) #2nd + 3rd column, 2nd row till end
+        @trackInfoTable.attach(@trackEntryArray[index], 1, row, 2, 1)
+        @trackEntryArray[index].hexpand = true
       end
     end
   end
@@ -235,20 +242,20 @@ class GtkDisc
     @label20 = Gtk::Label.new()
     @frame20 = Gtk::Frame.new()
 
-    @display = Gtk::VBox.new #One VBox to rule them all
+    @display = Gtk::Box.new(:vertical) #One Box to rule them all
   end
 
   def configDisplayValues()
     @label10.set_markup(_("<b>Disc info</b>"))
-    @frame10.set_shadow_type(Gtk::SHADOW_ETCHED_IN)
+    @frame10.shadow_type = :etched_in
     @frame10.label_widget = @label10
     @frame10.border_width = 5
 
-    @scrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC)
-    @scrolledWindow.set_border_width(5)
+    @scrolledWindow.set_policy(:automatic, :automatic)
+    @scrolledWindow.border_width = 5
 
     @label20.set_markup(_("<b>Track selection</b>"))
-    @frame20.set_shadow_type(Gtk::SHADOW_ETCHED_IN)
+    @frame20.shadow_type = :etched_in
     @frame20.label_widget = @label20
     @frame20.border_width = 5
   end
@@ -256,19 +263,19 @@ class GtkDisc
   def packDisplayObjects()
     @frame10.add(@discInfoTable)
 
-    @scrolledWindow.add_with_viewport(@trackInfoTable)
+    @scrolledWindow.add(@trackInfoTable)
     @frame20.add(@scrolledWindow)
 
-    @display.pack_start(@frame10, false, false)
-    @display.pack_start(@frame20, true, true)
+    @display.pack_start(@frame10, expand: false, fill: false, padding: 0)
+    @display.pack_start(@frame20, expand: true, fill: true, padding: 0)
   end
 
   def updateDisc(firsttime=false)
     if @freezeCheckbox.active? == false
-      @artistEntry.text = @md.artist
-      @albumEntry.text = @md.album
-      @genreEntry.text = @md.genre
-      @yearEntry.text = @md.year
+      @artistEntry.text = @md.artist.to_s
+      @albumEntry.text = @md.album.to_s
+      @genreEntry.text = @md.genre.to_s
+      @yearEntry.text = @md.year.to_s
     else
       @discNumberSpin.value += 1.0 unless firsttime
     end
@@ -278,7 +285,7 @@ class GtkDisc
 
   def updateTracks
     (1..@disc.audiotracks).each do |track|
-      @trackEntryArray[track - 1].text = @md.trackname(track)
+      @trackEntryArray[track - 1].text = @md.trackname(track).to_s
     end
     setVarArtist() if @md.various?
     @trackInfoTable.show_all()
@@ -288,8 +295,8 @@ class GtkDisc
   def setVarArtist()
     return true if @md.various?
     @md.markVarArtist()
-    @disc.audiotracks.times{|index| @varArtistEntryArray[index].text = @md.getVarArtist(index + 1)}
-    @disc.audiotracks.times{|index| @trackEntryArray[index].text = @md.trackname(index + 1)}
+    @disc.audiotracks.times{|index| @varArtistEntryArray[index].text = @md.getVarArtist(index + 1).to_s}
+    @disc.audiotracks.times{|index| @trackEntryArray[index].text = @md.trackname(index + 1).to_s}
     updateTracksView()
   end
 
@@ -297,7 +304,7 @@ class GtkDisc
   def unsetVarArtist()
     return true unless @md.various?
     @md.unmarkVarArtist()
-    @disc.audiotracks.times{|index| @trackEntryArray[index].text = @md.trackname(index + 1)}
+    @disc.audiotracks.times{|index| @trackEntryArray[index].text = @md.trackname(index + 1).to_s}
     updateTracksView()
   end
   

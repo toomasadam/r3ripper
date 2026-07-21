@@ -34,10 +34,10 @@ class RipStatus
   def updateProgress(type, value)
     progress = "%.3g" % (value * 100)
     if type == 'encoding'
-      @encBar.text = _("Encoding progress %s \%") % [progress]
+      @encBar.text = _("Encoding progress %s %%") % [progress]
       @encBar.fraction = value
     else
-      @ripBar.text = _("Ripping progress %s \%") % progress
+      @ripBar.text = _("Ripping progress %s %%") % progress
       @ripBar.fraction = value
     end
   end
@@ -45,42 +45,45 @@ class RipStatus
   # Show the new text in the status window
   def logChange(text)
   # First parameter is the last character + 1 in the log
-    @textview.buffer.insert(@textview.buffer.end_iter, text)
+    @textview.buffer.insert(@textview.buffer.end_iter, text.to_s)
     @textview.scroll_to_iter(@textview.buffer.end_iter, 0, true, 1, 1)
   end
 
   def createObjects
     @textview = Gtk::TextView.new
     @textview.editable = false
-    @textview.wrap_mode = Gtk::TextTag::WRAP_WORD
+    @textview.wrap_mode = :word
     
     @scrolledWindow = Gtk::ScrolledWindow.new
-    @scrolledWindow.set_policy(Gtk::POLICY_NEVER,Gtk::POLICY_AUTOMATIC)
+    @scrolledWindow.set_policy(:never, :automatic)
     @scrolledWindow.border_width = 7
     @scrolledWindow.add(@textview)
 
     @encBar = Gtk::ProgressBar.new
     @ripBar = Gtk::ProgressBar.new
+    @encBar.show_text = true
+    @ripBar.show_text = true
     @encBar.pulse_step = 0.01
     @ripBar.pulse_step = 0.01
 
-    @hbox1 = Gtk::HBox.new(true,5)
-    @vbox1 = Gtk::VBox.new(false,5)
+    @hbox1 = Gtk::Box.new(:horizontal, 5)
+    @hbox1.homogeneous = true
+    @vbox1 = Gtk::Box.new(:vertical, 5)
     @vbox1.border_width = 5
 
     @label1 = Gtk::Label.new
     @label1.set_markup(_("<b>Ripping status</b>"))
     @display = Gtk::Frame.new
-    @display.set_shadow_type(Gtk::SHADOW_ETCHED_IN)
+    @display.shadow_type = :etched_in
     @display.label_widget = @label1
     @display.border_width = 5
   end
 
   def packObjects
-    @hbox1.pack_start(@ripBar)
-    @hbox1.pack_start(@encBar)
-    @vbox1.pack_start(@scrolledWindow)
-    @vbox1.pack_start(@hbox1,false,false)
+    @hbox1.pack_start(@ripBar, expand: true, fill: true, padding: 0)
+    @hbox1.pack_start(@encBar, expand: true, fill: true, padding: 0)
+    @vbox1.pack_start(@scrolledWindow, expand: true, fill: true, padding: 0)
+    @vbox1.pack_start(@hbox1, expand: false, fill: false, padding: 0)
     @display.add(@vbox1)
   end
 

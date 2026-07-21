@@ -24,11 +24,11 @@ describe ScanDiscCdinfo do
   let(:scan) {ScanDiscCdinfo.new(exec, prefs)}
 
   before(:each) do
-    prefs.should_receive(:cdrom).at_least(:once).and_return('/dev/cdrom')
+    expect(prefs).to receive(:cdrom).at_least(:once).and_return('/dev/cdrom')
   end
 
   def setQueryReply(answer)
-    exec.should_receive(:launch).with('cd-info -C /dev/cdrom -A --no-cddb').and_return(answer)
+    expect(exec).to receive(:launch).with('cd-info -C /dev/cdrom -A --no-cddb').and_return(answer)
   end
 
   def setStandardQueryReply
@@ -41,25 +41,25 @@ describe ScanDiscCdinfo do
     it "should detect if cd-info is not installed" do
       setQueryReply(nil)
       scan.scan()
-      scan.status.should == 'notInstalled'
+      expect(scan.status).to eq('notInstalled')
     end
 
     it "should detect if the drive is not valid" do
       setQueryReply(['++ WARN: Can\'t get file status for'])
       scan.scan()
-      scan.status.should == 'unknownDrive'
+      expect(scan.status).to eq('unknownDrive')
     end
 
     it "should detect a problem with parameters" do
       setQueryReply(['Usage: cd'])
       scan.scan()
-      scan.status.should == 'wrongParameters'
+      expect(scan.status).to eq('wrongParameters')
     end
 
     it "should detect if there is no disc inserted" do
       setQueryReply(['++ WARN: error in ioctl CDROMREADTOCHDR: No medium found'])
       scan.scan()
-      scan.status.should == 'noDiscInDrive'
+      expect(scan.status).to eq('noDiscInDrive')
     end
   end
 
@@ -67,14 +67,14 @@ describe ScanDiscCdinfo do
     it "should detect the cd-info version" do
       setQueryReply(["cd-info version 0.82 i686-pc-linux-gnu"])
       scan.scan()
-      scan.status.should == 'ok'
-      scan.version.should == 'cd-info version 0.82 i686-pc-linux-gnu'
+      expect(scan.status).to eq('ok')
+      expect(scan.version).to eq('cd-info version 0.82 i686-pc-linux-gnu')
     end
 
     it "should detect the discmode of the drive" do
       setQueryReply(['Disc mode is listed as: CD-DA'])
       scan.scan()
-      scan.discMode.should == 'CD-DA'
+      expect(scan.discMode).to eq('CD-DA')
     end
 
     it "should detect the devicename for the drive" do
@@ -82,75 +82,76 @@ describe ScanDiscCdinfo do
                      "Model                      : DVDRAM GH22NS40",
                      "Revision                    : NL01"])
       scan.scan()
-      scan.deviceName.should == 'HL-DT-ST DVDRAM GH22NS40 NL01'
+      expect(scan.deviceName).to eq('HL-DT-ST DVDRAM GH22NS40 NL01')
     end
 
     it "should detect the startsector for each track" do
       setStandardQueryReply()
       scan.scan()
-      scan.getStartSector(14).should == nil
-      scan.getStartSector(15).should == 164445
-      scan.getStartSector(16).should == 179535
-      scan.getStartSector(17).should == nil
+      expect(scan.getStartSector(14)).to eq(nil)
+      expect(scan.getStartSector(15)).to eq(164445)
+      expect(scan.getStartSector(16)).to eq(179535)
+      expect(scan.getStartSector(17)).to eq(nil)
     end
 
     it "should detect the length in sectors for each track" do
       setStandardQueryReply()
       scan.scan()
-      scan.getLengthSector(14).should == nil
-      scan.getLengthSector(15).should == 15090
-      scan.getLengthSector(16).should == 16320
-      scan.getLengthSector(17).should == nil
+      expect(scan.getLengthSector(14)).to eq(nil)
+      expect(scan.getLengthSector(15)).to eq(15090)
+      expect(scan.getLengthSector(16)).to eq(16320)
+      expect(scan.getLengthSector(17)).to eq(nil)
     end
 
     it "should detect the length in mm:ss for each track" do
       setStandardQueryReply()
       scan.scan()
-      scan.getLengthText(14).should == nil
-      scan.getLengthText(15).should == '03:21:15'
-      scan.getLengthText(16).should == '03:37:45'
-      scan.getLengthText(17).should == nil
+      expect(scan.getLengthText(14)).to eq(nil)
+      expect(scan.getLengthText(15)).to eq('03:21:15')
+      expect(scan.getLengthText(16)).to eq('03:37:45')
+      expect(scan.getLengthText(17)).to eq(nil)
     end
 
     it "should detect the total amount of sectors for the disc" do
       setQueryReply(["170: 43:33:30  195855 leadout"])
       scan.scan()
-      scan.totalSectors.should == 195855
+      expect(scan.totalSectors).to eq(195855)
     end
 
     it "should detect the playtime in mm:ss for the disc" do
       setQueryReply(["170: 43:33:30  195855 leadout"])
       scan.scan()
-      scan.playtime.should == '43:31' #minus 2 seconds offset, without frames
+      expect(scan.playtime).to eq('43:31') #minus 2 seconds offset, without frames
+
     end
 
     it "should detect the amount of audiotracks" do
       setStandardQueryReply()
       scan.scan()
-      scan.audiotracks.should == 2
+      expect(scan.audiotracks).to eq(2)
     end
 
     it "should detect the first audio track" do
       setStandardQueryReply()
       scan.scan()
-      scan.firstAudioTrack.should == 15
+      expect(scan.firstAudioTrack).to eq(15)
     end
 
     it "should detect if there are no data tracks on the disc" do
       setStandardQueryReply()
       scan.scan()
-      scan.audiotracks.should == 2
-      scan.dataTracks.should == []
-      scan.tracks.should == 2
+      expect(scan.audiotracks).to eq(2)
+      expect(scan.dataTracks).to eq([])
+      expect(scan.tracks).to eq(2)
     end
 
     it "should detect the data tracks on the disc" do
       setQueryReply([" 13: 61:11:22  275197 data   false  no",
                      "170: 73:47:31  331906 leadout (744 MB raw, 744 MB formatted)"])
       scan.scan()
-      scan.audiotracks.should == 0
-      scan.dataTracks.should == [13]
-      scan.tracks.should == 1
+      expect(scan.audiotracks).to eq(0)
+      expect(scan.dataTracks).to eq([13])
+      expect(scan.tracks).to eq(1)
     end
   end
 end

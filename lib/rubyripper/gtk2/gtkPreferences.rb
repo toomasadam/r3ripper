@@ -93,13 +93,13 @@ class GtkPreferences
   # Fill all objects with the right value
   def loadPreferences
 #ripping settings
-    @cdromEntry.text = @prefs.cdrom
+    @cdromEntry.text = @prefs.cdrom.to_s
     @cdromOffsetSpin.value = @prefs.offset.to_f
     @padMissingSamples.active = @prefs.padMissingSamples
     @allChunksSpin.value = @prefs.reqMatchesAll.to_f
     @errChunksSpin.value = @prefs.reqMatchesErrors.to_f
     @maxSpin.value = @prefs.maxTries.to_f
-    @ripEntry.text = @prefs.rippersettings
+    @ripEntry.text = @prefs.rippersettings.to_s
     @eject.active = @prefs.eject
     @noLog.active = @prefs.noLog
 #toc settings
@@ -121,38 +121,38 @@ class GtkPreferences
 #metadata
     @metadataChoice.active = loadMetadataProvider()
     @firstHit.active = @prefs.firstHit
-    @freedbServerEntry.text = @prefs.site
-    @freedbUsernameEntry.text = @prefs.username
-    @freedbHostnameEntry.text = @prefs.hostname
-    @entryPreferredCountry.text = @prefs.preferMusicBrainzCountries
+    @freedbServerEntry.text = @prefs.site.to_s
+    @freedbUsernameEntry.text = @prefs.username.to_s
+    @freedbHostnameEntry.text = @prefs.hostname.to_s
+    @entryPreferredCountry.text = @prefs.preferMusicBrainzCountries.to_s
     @chooseOriginalRelease.active = @prefs.preferMusicBrainzDate == 'earlier'
     @chooseLatestRelease.active = @prefs.preferMusicBrainzDate == 'later'
     @chooseOriginalYear.active = @prefs.useEarliestDate
     @chooseReleaseYear.active = !@prefs.useEarliestDate
 #other
-    @basedirEntry.text = @prefs.basedir
-    @namingNormalEntry.text = @prefs.namingNormal
-    @namingVariousEntry.text = @prefs.namingVarious
-    @namingImageEntry.text = @prefs.namingImage
+    @basedirEntry.text = @prefs.basedir.to_s
+    @namingNormalEntry.text = @prefs.namingNormal.to_s
+    @namingVariousEntry.text = @prefs.namingVarious.to_s
+    @namingImageEntry.text = @prefs.namingImage.to_s
     @verbose.active = @prefs.verbose
     @debug.active = @prefs.debug
-    @editorEntry.text = @prefs.editor
-    @filemanagerEntry.text = @prefs.filemanager
+    @editorEntry.text = @prefs.editor.to_s
+    @filemanagerEntry.text = @prefs.filemanager.to_s
   end
   
   def loadNormalizer
     case @prefs.normalizer
-      when 'none' then 0
       when 'replaygain' then 1
       when 'normalize' then 2
+      else 0
     end
   end
   
   def loadMetadataProvider
     case @prefs.metadataProvider
-      when 'freedb' then 0
       when 'musicbrainz' then 1
       when 'none' then 2
+      else 0
     end
   end
 
@@ -210,23 +210,23 @@ class GtkPreferences
   
   def saveNormalizer
     case @normalize.active
-      when 0 then 'none'
       when 1 then 'replaygain'
       when 2 then 'normalize'
+      else 'none'
     end
   end
   
   def saveMetadataProvider
     case @metadataChoice.active
-      when 0 then 'freedb'
       when 1 then 'musicbrainz'
       when 2 then 'none'
+      else 'freedb'
     end
   end
   
   # The interface can't handle threads nicely on old versions        
   def preventThreadProblemsOnOlderBindings
-    if Gtk::BINDING_VERSION[0] < 1 && 
+    if defined?(Gtk::BINDING_VERSION) && Gtk::BINDING_VERSION[0] < 1 && 
         Gtk::BINDING_VERSION[1] < 18 && @prefs.maxThreads > 0
       @prefs.maxThreads = 0
       puts "WARNING: Threads are not supported on ruby gtk2-bindings"
@@ -237,17 +237,19 @@ class GtkPreferences
   
   # helpfunction to create a table
   def newTable(rows, columns, homogeneous=false)
-    table = Gtk::Table.new(rows, columns, homogeneous)
-    table.column_spacings = DEFAULT_COLUMN_SPACINGS
-    table.row_spacings = DEFAULT_ROW_SPACINGS
-    table.border_width = DEFAULT_BORDER_WIDTH
-    table
+    grid = Gtk::Grid.new()
+    grid.column_homogeneous = homogeneous
+    grid.row_homogeneous = homogeneous
+    grid.column_spacing = DEFAULT_COLUMN_SPACINGS
+    grid.row_spacing = DEFAULT_ROW_SPACINGS
+    grid.border_width = DEFAULT_BORDER_WIDTH
+    grid
   end
   
   # helpfunction to create a frame
   def newFrame(label, child)
     frame = Gtk::Frame.new(label)
-    frame.set_shadow_type(Gtk::SHADOW_ETCHED_IN)
+    frame.shadow_type = :etched_in
     frame.border_width = DEFAULT_BORDER_WIDTH # was 5
     frame.add(child)
     frame
@@ -258,14 +260,13 @@ class GtkPreferences
     @table40 = newTable(rows=3, columns=3)
 #creating objects
     @cdrom_label = Gtk::Label.new(_("Cdrom device:"))
-    @cdrom_label.set_alignment(0.0, 0.5) # Align to the left
+    @cdrom_label.halign = :start
     @cdrom_offset_label = Gtk::Label.new(_("Cdrom offset:"))
-    @cdrom_offset_label.set_alignment(0.0, 0.5)
+    @cdrom_offset_label.halign = :start
     @cdromEntry = Gtk::Entry.new ; @cdromEntry.width_request = 120
     @cdromOffsetSpin = Gtk::SpinButton.new(-1500.0, 1500.0, 1.0)
     @cdromOffsetSpin.value = 0.0
-    @offset_button = Gtk::LinkButton.new(_('List with offsets'))
-    @offset_button.uri = "http://www.accuraterip.com/driveoffsets.htm"
+    @offset_button = Gtk::LinkButton.new("http://www.accuraterip.com/driveoffsets.htm", _('List with offsets'))
     @offset_button.tooltip_text = _("A website which lists the offset for most drives.\nYour drivename can be found in each logfile.")
 #pack objects
     @padMissingSamples = Gtk::CheckButton.new(_('Pad missing samples with zero\'s'))
@@ -275,13 +276,13 @@ track.\nThis option fills the rest with empty samples.\n\
 If disabled, the file will not have the correct size.\n\
 It is recommended to enable this option.")
     @padMissingSamples.sensitive = false
-    @table40.attach(@cdrom_label, 0, 1, 0, 1, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table40.attach(@cdrom_offset_label, 0, 1, 1, 2, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table40.attach(@cdromEntry, 1, 2, 0, 1, Gtk::SHRINK, Gtk::SHRINK, 0, 0)
-    @table40.attach(@cdromOffsetSpin, 1, 2, 1, 2, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table40.attach(@offset_button, 2, 3, 1, 2, Gtk::FILL, Gtk::SHRINK, 0, 0)
+    @table40.attach(@cdrom_label, 0, 0, 1, 1)
+    @table40.attach(@cdrom_offset_label, 0, 1, 1, 1)
+    @table40.attach(@cdromEntry, 1, 0, 1, 1)
+    @table40.attach(@cdromOffsetSpin, 1, 1, 1, 1)
+    @table40.attach(@offset_button, 2, 1, 1, 1)
 #connect signal
-    @table40.attach(@padMissingSamples, 0, 2, 2, 3, Gtk::FILL, Gtk::SHRINK, 0, 0)
+    @table40.attach(@padMissingSamples, 0, 2, 2, 1)
     @offset_button.signal_connect("clicked") {Thread.new{`#{@prefs.browser} #{@offset_button.uri}`}}
     @cdromOffsetSpin.signal_connect("value-changed"){enablePaddingOption?}
     @frame40 = newFrame(_('Cdrom device'), child=@table40)
@@ -301,9 +302,9 @@ It is recommended to enable this option.")
   def buildFrameRippingOptions
     @table50 = newTable(rows=3, columns=3)
 #create objects
-    @all_chunks = Gtk::Label.new(_("Match all chunks:")) ; @all_chunks.set_alignment(0.0, 0.5)
-    @err_chunks = Gtk::Label.new(_("Match erroneous chunks:")) ; @err_chunks.set_alignment(0.0, 0.5)
-    @max_label = Gtk::Label.new(_("Maximum trials (0 = unlimited):")) ; @max_label.set_alignment(0.0, 0.5)
+    @all_chunks = Gtk::Label.new(_("Match all chunks:")) ; @all_chunks.halign = :start
+    @err_chunks = Gtk::Label.new(_("Match erroneous chunks:")) ; @err_chunks.halign = :start
+    @max_label = Gtk::Label.new(_("Maximum trials (0 = unlimited):")) ; @max_label.halign = :start
     @allChunksSpin = Gtk::SpinButton.new(2.0,  100.0, 1.0)
     @errChunksSpin = Gtk::SpinButton.new(2.0, 100.0, 1.0)
     @maxSpin = Gtk::SpinButton.new(0.0, 100.0, 1.0)
@@ -311,15 +312,15 @@ It is recommended to enable this option.")
     @time2 = Gtk::Label.new(_("times"))
     @time3 = Gtk::Label.new(_("times"))
 #pack objects
-    @table50.attach(@all_chunks, 0, 1, 0, 1, Gtk::FILL, Gtk::SHRINK, 0, 0) #1st column
-    @table50.attach(@err_chunks, 0, 1, 1, 2, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table50.attach(@max_label, 0, 1, 2, 3, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table50.attach(@allChunksSpin, 1, 2, 0, 1, Gtk::FILL, Gtk::SHRINK, 0, 0) #2nd column
-    @table50.attach(@errChunksSpin, 1, 2, 1, 2, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table50.attach(@maxSpin, 1, 2, 2, 3, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table50.attach(@time1, 2, 3, 0, 1, Gtk::FILL, Gtk::SHRINK, 0, 0) #3rd column
-    @table50.attach(@time2, 2, 3, 1, 2, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table50.attach(@time3, 2, 3, 2, 3, Gtk::FILL, Gtk::SHRINK, 0, 0)
+    @table50.attach(@all_chunks, 0, 0, 1, 1) #1st column
+    @table50.attach(@err_chunks, 0, 1, 1, 1)
+    @table50.attach(@max_label, 0, 2, 1, 1)
+    @table50.attach(@allChunksSpin, 1, 0, 1, 1) #2nd column
+    @table50.attach(@errChunksSpin, 1, 1, 1, 1)
+    @table50.attach(@maxSpin, 1, 2, 1, 1)
+    @table50.attach(@time1, 2, 0, 1, 1) #3rd column
+    @table50.attach(@time2, 2, 1, 1, 1)
+    @table50.attach(@time3, 2, 2, 1, 1)
 #connect a signal to @all_chunks to make sure @err_chunks get always at least the same amount of rips as @all_chunks
     @allChunksSpin.signal_connect("value_changed") {if @errChunksSpin.value < @allChunksSpin.value ; @errChunksSpin.value = @allChunksSpin.value end ; @errChunksSpin.set_range(@allChunksSpin.value,100.0)} #ensure all_chunks cannot be smaller that err_chunks.
     @frame50= newFrame(_('Ripping options'), child=@table50)
@@ -328,19 +329,19 @@ It is recommended to enable this option.")
   def buildFrameRippingRelated
     @table60 = newTable(rows=2, columns=3)
 #create objects
-    @rip_label = Gtk::Label.new(_("Pass cdparanoia options:")) ; @rip_label.set_alignment(0.0, 0.5)
+    @rip_label = Gtk::Label.new(_("Pass cdparanoia options:")) ; @rip_label.halign = :start
     @eject= Gtk::CheckButton.new(_('Eject cd when finished'))
     @noLog = Gtk::CheckButton.new(_('Only keep logfile if correction is needed'))
     @ripEntry= Gtk::Entry.new ; @ripEntry.width_request = 120
 #pack objects
-    @table60.attach(@rip_label, 0, 1, 0, 1, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table60.attach(@ripEntry, 1, 2, 0, 1, Gtk::SHRINK, Gtk::SHRINK, 0, 0)
-    @table60.attach(@eject, 0, 2, 1, 2, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table60.attach(@noLog, 0, 2, 2, 3, Gtk::FILL|Gtk::SHRINK, Gtk::SHRINK, 0, 0)
+    @table60.attach(@rip_label, 0, 0, 1, 1)
+    @table60.attach(@ripEntry, 1, 0, 1, 1)
+    @table60.attach(@eject, 0, 1, 2, 1)
+    @table60.attach(@noLog, 0, 2, 2, 1)
     @frame60 = newFrame(_('Ripping related'), child=@table60)
 #pack all frames into a single page
-    @page1 = Gtk::VBox.new #One VBox to rule them all
-    [@frame40, @frame50, @frame60].each{|frame| @page1.pack_start(frame,false,false)}
+    @page1 = Gtk::Box.new(:vertical) #One Box to rule them all
+    [@frame40, @frame50, @frame60].each{|frame| @page1.pack_start(frame, expand: false, fill: false, padding: 0)}
     @page1_label = Gtk::Label.new(_("Secure Ripping"))
     @display.append_page(@page1, @page1_label)
   end
@@ -359,10 +360,10 @@ It is recommended to enable this option.")
     @markHiddenTrackLabel1.tooltip_text = text
     @markHiddenTrackLabel2.tooltip_text = text
 #pack objects
-    @tableToc1.attach(@ripHiddenAudio, 0, 1, 0, 1, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @tableToc1.attach(@markHiddenTrackLabel1, 0, 1, 1, 2, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @tableToc1.attach(@minLengthHiddenTrackSpin, 1, 2, 1, 2, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @tableToc1.attach(@markHiddenTrackLabel2, 2, 3, 1, 2, Gtk::FILL, Gtk::SHRINK, 0, 0)
+    @tableToc1.attach(@ripHiddenAudio, 0, 0, 1, 1)
+    @tableToc1.attach(@markHiddenTrackLabel1, 0, 1, 1, 1)
+    @tableToc1.attach(@minLengthHiddenTrackSpin, 1, 1, 1, 1)
+    @tableToc1.attach(@markHiddenTrackLabel2, 2, 1, 1, 1)
     @ripHiddenAudio.signal_connect("clicked"){@minLengthHiddenTrackSpin.sensitive = @ripHiddenAudio.active?}
     @frameToc1 = newFrame(_('Audio sectors before track 1'), child=@tableToc1)
   end
@@ -373,45 +374,45 @@ It is recommended to enable this option.")
     @createCue = Gtk::CheckButton.new(_('Create cuesheet'))
     @image = Gtk::CheckButton.new(_('Rip CD to single file'))
 #pack objects
-    @tableToc2.attach(@createCue, 0, 2, 1, 2, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @tableToc2.attach(@image, 0, 2, 2, 3, Gtk::FILL|Gtk::SHRINK, Gtk::SHRINK, 0, 0)
-    @vboxToc = Gtk::VBox.new()
-    @vboxToc.pack_start(@tableToc2,false,false)
+    @tableToc2.attach(@createCue, 0, 1, 2, 1)
+    @tableToc2.attach(@image, 0, 2, 2, 1)
+    @vboxToc = Gtk::Box.new(:vertical)
+    @vboxToc.pack_start(@tableToc2, expand: false, fill: false, padding: 0)
     @frameToc2 = newFrame(_('Advanced Toc analysis'), child=@vboxToc)
-# build hbox for cdrdao
-    @cdrdaoHbox = Gtk::HBox.new(false, 5)
+# build box for cdrdao
+    @cdrdaoHbox = Gtk::Box.new(:horizontal, 5)
     @cdrdao = Gtk::Label.new(_('Cdrdao installed?'))
-    @cdrdaoImage = Gtk::Image.new(Gtk::Stock::CANCEL, Gtk::IconSize::BUTTON)
-    @cdrdaoHbox.pack_start(@cdrdao, false, false, 5)
-    @cdrdaoHbox.pack_start(@cdrdaoImage, false, false)
+    @cdrdaoImage = Gtk::Image.new(stock: Gtk::Stock::CANCEL, size: :button)
+    @cdrdaoHbox.pack_start(@cdrdao, expand: false, fill: false, padding: 5)
+    @cdrdaoHbox.pack_start(@cdrdaoImage, expand: false, fill: false, padding: 0)
   end
 
   def buildFrameHandlingPregapsOtherThanTrackOne
     @tableToc3 = newTable(rows=3, columns=3)
 #create objects
-    @appendPregaps = Gtk::RadioButton.new(_('Append pregap to the previous track'))
-    @prependPregaps = Gtk::RadioButton.new(@appendPregaps, _('Prepend pregap to the track'))
+    @appendPregaps = Gtk::RadioButton.new(member: nil, label: _('Append pregap to the previous track'))
+    @prependPregaps = Gtk::RadioButton.new(member: @appendPregaps, label: _('Prepend pregap to the track'))
 #pack objects
-    @tableToc3.attach(@appendPregaps, 0, 1, 0, 1, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @tableToc3.attach(@prependPregaps, 0, 1, 1, 2, Gtk::FILL, Gtk::SHRINK, 0, 0)
+    @tableToc3.attach(@appendPregaps, 0, 0, 1, 1)
+    @tableToc3.attach(@prependPregaps, 0, 1, 1, 1)
     @frameToc3 = newFrame(_('Handling pregaps other than track 1'), child=@tableToc3)
-    @vboxToc.pack_start(@frameToc3,false,false)
+    @vboxToc.pack_start(@frameToc3, expand: false, fill: false, padding: 0)
   end
 
   def buildFrameHandlingTracksWithPreEmphasis
     @tableToc4 = newTable(rows=3, columns=3)
 #create objects
-    @correctPreEmphasis = Gtk::RadioButton.new(_('Correct pre-emphasis tracks with sox'))
-    @doNotCorrectPreEmphasis = Gtk::RadioButton.new(@correctPreEmphasis, _("Save the pre-emphasis tag in the cuesheet."))
+    @correctPreEmphasis = Gtk::RadioButton.new(member: nil, label: _('Correct pre-emphasis tracks with sox'))
+    @doNotCorrectPreEmphasis = Gtk::RadioButton.new(member: @correctPreEmphasis, label: _("Save the pre-emphasis tag in the cuesheet."))
 #pack objects
-    @tableToc4.attach(@correctPreEmphasis, 0, 1, 0, 1, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @tableToc4.attach(@doNotCorrectPreEmphasis, 0, 1, 1, 2, Gtk::FILL, Gtk::SHRINK, 0, 0)
+    @tableToc4.attach(@correctPreEmphasis, 0, 0, 1, 1)
+    @tableToc4.attach(@doNotCorrectPreEmphasis, 0, 1, 1, 1)
     @frameToc4 = newFrame(_('Handling tracks with pre-emphasis'), child=@tableToc4)
-    @vboxToc.pack_start(@frameToc4,false,false)
+    @vboxToc.pack_start(@frameToc4, expand: false, fill: false, padding: 0)
 #pack all frames into a single page
     setSignalsToc()
-    @pageToc = Gtk::VBox.new #One VBox to rule them all
-    [@frameToc1, @cdrdaoHbox, @frameToc2].each{|frame| @pageToc.pack_start(frame,false,false)}
+    @pageToc = Gtk::Box.new(:vertical) #One Box to rule them all
+    [@frameToc1, @cdrdaoHbox, @frameToc2].each{|frame| @pageToc.pack_start(frame, expand: false, fill: false, padding: 0)}
     @pageTocLabel = Gtk::Label.new(_("TOC analysis"))
     @display.append_page(@pageToc, @pageTocLabel)
   end
@@ -463,15 +464,15 @@ It is recommended to enable this option.")
 
   def createCodecRow(codec)
     @codecRows[codec] = [Gtk::Label.new(getLabelForCodec(codec))]
-    @codecRows[codec][0].set_alignment(0, 0.5)
+    @codecRows[codec][0].halign = :start
     if codec == 'wav'
       @codecRows[codec] << Gtk::Label.new(_('No settings available'))
-      @codecRows[codec][1].set_alignment(0, 0.5)
+      @codecRows[codec][1].halign = :start
     else
       @codecRows[codec] << Gtk::Entry.new()
-      @codecRows[codec][1].text = @prefs.send('settings' + codec.capitalize)
+      @codecRows[codec][1].text = @prefs.send('settings' + codec.capitalize).to_s
     end
-    @codecRows[codec] << Gtk::Button.new(Gtk::Stock::REMOVE)
+    @codecRows[codec] << Gtk::Button.new(stock: Gtk::Stock::REMOVE)
     addTooltipForOtherCodec(@codecRows[codec][1]) if codec == 'other'
 
     # connect the remove button signal
@@ -492,8 +493,7 @@ It is recommended to enable this option.")
   end
   
   def updateCodecsView
-    @selectCodecsTable.each{|child| @selectCodecsTable.remove(child)}
-    @selectCodecsTable.resize(@codecRows.size + 1, columns = 3)
+    @selectCodecsTable.children.each{|child| @selectCodecsTable.remove(child)}
     createCodecsTable()
     @selectCodecsTable.show_all()
   end
@@ -501,9 +501,10 @@ It is recommended to enable this option.")
   def createCodecsTable
     top = 0
     @codecRows.each do |codec, row|
-      @selectCodecsTable.attach(row[0], 0, 1, top, top+1, Gtk::FILL, Gtk::SHRINK, 0, 0)
-      @selectCodecsTable.attach(row[1], 1, 2, top, top+1, Gtk::FILL|Gtk::EXPAND, Gtk::SHRINK, 0, 0)
-      @selectCodecsTable.attach(row[2], 2, 3, top, top+1, Gtk::FILL, Gtk::SHRINK, 0, 0)  
+      @selectCodecsTable.attach(row[0], 0, top, 1, 1)
+      @selectCodecsTable.attach(row[1], 1, top, 1, 1)
+      row[1].hexpand = true
+      @selectCodecsTable.attach(row[2], 2, top, 1, 1)  
       top += 1
     end
     
@@ -516,15 +517,15 @@ It is recommended to enable this option.")
   end
   
   def createAddCodecRow
-    @addCodecComboBox = Gtk::ComboBox.new()
+    @addCodecComboBox = Gtk::ComboBoxText.new()
     @prefs.allCodecs.each do |codec|
       @addCodecComboBox.append_text(getLabelForCodec(codec)) unless @codecRows.key?(codec)
     end
     
     if @addCodecLabel.nil?
       @addCodecLabel = Gtk::Label.new(_('Codec'))
-      @addCodecLabel.set_alignment(0, 0.5)
-      @addCodecButton = Gtk::Button.new(Gtk::Stock::ADD)
+      @addCodecLabel.halign = :start
+      @addCodecButton = Gtk::Button.new(stock: Gtk::Stock::ADD)
     
       # create the signal for the button
       @addCodecButton.signal_connect("button_release_event") do |a, b|
@@ -537,11 +538,12 @@ It is recommended to enable this option.")
       end
     end
     
-    # put the row into the table
+    # put the row into the grid
     top = @codecRows.size
-    @selectCodecsTable.attach(@addCodecLabel, 0, 1, top, top+1, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @selectCodecsTable.attach(@addCodecComboBox, 1, 2, top, top+1, Gtk::FILL|Gtk::EXPAND, Gtk::SHRINK, 0, 0)
-    @selectCodecsTable.attach(@addCodecButton, 2, 3, top, top+1, Gtk::FILL, Gtk::SHRINK, 0, 0)
+    @selectCodecsTable.attach(@addCodecLabel, 0, top, 1, 1)
+    @selectCodecsTable.attach(@addCodecComboBox, 1, top, 1, 1)
+    @addCodecComboBox.hexpand = true
+    @selectCodecsTable.attach(@addCodecButton, 2, top, 1, 1)
   end
 
   def buildFrameCodecRelated #Encoding related frame
@@ -553,35 +555,35 @@ It is recommended to enable this option.")
     @maxThreads = Gtk::SpinButton.new(0.0, 10.0, 1.0)
     @maxThreadsLabel = Gtk::Label.new(_("Number of extra encoding threads"))
 #packing objects
-    @table80.attach(@maxThreadsLabel, 0, 1, 0, 1, Gtk::FILL, Gtk::FILL, 0, 0)
-    @table80.attach(@maxThreads, 1, 2, 0, 1, Gtk::FILL, Gtk::FILL, 0, 0)
-    @table80.attach(@playlist, 0, 2, 1, 2, Gtk::FILL, Gtk::FILL, 0, 0)
-    @table80.attach(@noSpaces, 0, 2, 2, 3, Gtk::FILL, Gtk::FILL, 0, 0)
-    @table80.attach(@noCapitals, 0, 2, 3, 4, Gtk::FILL, Gtk::FILL, 0, 0)
+    @table80.attach(@maxThreadsLabel, 0, 0, 1, 1)
+    @table80.attach(@maxThreads, 1, 0, 1, 1)
+    @table80.attach(@playlist, 0, 1, 2, 1)
+    @table80.attach(@noSpaces, 0, 2, 2, 1)
+    @table80.attach(@noCapitals, 0, 3, 2, 1)
     @frame80 = newFrame(_('Codec related'), child=@table80)
   end
 
   def buildFrameNormalizeToStandardVolume #Normalize audio
     @table85 = newTable(rows=2, columns=1)
 #creating objects
-    @normalize = Gtk::ComboBox.new()
+    @normalize = Gtk::ComboBoxText.new()
     @normalize.append_text(_("Don't standardize volume"))
     @normalize.append_text(_("Use replaygain on audio files"))
     @normalize.append_text(_("Use normalize on WAVE files"))
     @normalize.active=0
-    @modus = Gtk::ComboBox.new()
+    @modus = Gtk::ComboBoxText.new()
     @modus.append_text(_("Album / Audiophile modus"))
     @modus.append_text(_("Track modus"))
     @modus.active = 0
     @modus.sensitive = false
     @normalize.signal_connect("changed") {if @normalize.active == 0 ; @modus.sensitive = false else @modus.sensitive = true end}
 #packing objects
-    @table85.attach(@normalize, 0, 1, 0, 1, Gtk::FILL, Gtk::FILL, 0, 0)
-    @table85.attach(@modus, 1, 2, 0, 1, Gtk::FILL, Gtk::FILL, 0, 0)
+    @table85.attach(@normalize, 0, 0, 1, 1)
+    @table85.attach(@modus, 1, 0, 1, 1)
     @frame85 = newFrame(_('Normalize to standard volume'), child=@table85)
 #pack all frames into a single page
-    @page2 = Gtk::VBox.new #One VBox to rule them all
-    [@frame70, @frame80, @frame85].each{|frame| @page2.pack_start(frame,false,false)}
+    @page2 = Gtk::Box.new(:vertical) #One Box to rule them all
+    [@frame70, @frame80, @frame85].each{|frame| @page2.pack_start(frame, expand: false, fill: false, padding: 0)}
     @page2_label = Gtk::Label.new(_("Codecs"))
     @display.append_page(@page2, @page2_label)
   end
@@ -589,12 +591,12 @@ It is recommended to enable this option.")
   def buildFrameChooseMetadataProvider
     @table90 = newTable(rows=1, columns=2)
     @metadataLabel = Gtk::Label.new(_("Primary metadata provider:"))
-    @metadataChoice = Gtk::ComboBox.new()
+    @metadataChoice = Gtk::ComboBoxText.new()
     @metadataChoice.append_text(_("Freedb"))
     @metadataChoice.append_text(_("Musicbrainz"))
     @metadataChoice.append_text(_("Don't use a metadata provider"))
-    @table90.attach(@metadataLabel,0,1,0,1,Gtk::FILL, Gtk::SHRINK,0,0)
-    @table90.attach(@metadataChoice,1,2,0,1,Gtk::FILL, Gtk::SHRINK,0,0)
+    @table90.attach(@metadataLabel,0,0,1,1)
+    @table90.attach(@metadataChoice,1,0,1,1)
     @frame90 = newFrame(_('Choose your metadata provider'), child=@table90)
   end
   
@@ -602,20 +604,20 @@ It is recommended to enable this option.")
     @table91 = newTable(rows=4, columns=2)
 #creating objects
     @firstHit= Gtk::CheckButton.new(_("Always use first freedb hit"))
-    @freedb_server_label= Gtk::Label.new(_("Freedb server:")) ; @freedb_server_label.set_alignment(0.0, 0.5)
-    @freedb_username_label= Gtk::Label.new(_("Username:")) ; @freedb_username_label.set_alignment(0.0, 0.5)
-    @freedb_hostname_label= Gtk::Label.new(_("Hostname:")) ; @freedb_hostname_label.set_alignment(0.0, 0.5)
+    @freedb_server_label= Gtk::Label.new(_("Freedb server:")) ; @freedb_server_label.halign = :start
+    @freedb_username_label= Gtk::Label.new(_("Username:")) ; @freedb_username_label.halign = :start
+    @freedb_hostname_label= Gtk::Label.new(_("Hostname:")) ; @freedb_hostname_label.halign = :start
     @freedbServerEntry = Gtk::Entry.new
     @freedbUsernameEntry = Gtk::Entry.new
     @freedbHostnameEntry = Gtk::Entry.new
 #packing objects
-    @table91.attach(@firstHit, 0, 2, 0, 1, Gtk::FILL, Gtk::SHRINK, 0, 0) #both columns, 2nd row
-    @table91.attach(@freedb_server_label, 0, 1, 1, 2, Gtk::FILL, Gtk::SHRINK, 0, 0) #1st column, 3rd row
-    @table91.attach(@freedb_username_label, 0, 1, 2, 3, Gtk::FILL, Gtk::SHRINK, 0, 0) #1st column, 4th row
-    @table91.attach(@freedb_hostname_label, 0, 1, 3, 4, Gtk::FILL, Gtk::SHRINK, 0, 0) #1st column, 5th row
-    @table91.attach(@freedbServerEntry, 1, 2 , 1, 2, Gtk::FILL, Gtk::SHRINK, 0, 0) #2nd column, 3rd row
-    @table91.attach(@freedbUsernameEntry, 1, 2, 2, 3, Gtk::FILL, Gtk::SHRINK, 0, 0) #2nd column, 4th row
-    @table91.attach(@freedbHostnameEntry, 1, 2, 3, 4, Gtk::FILL, Gtk::SHRINK, 0, 0) #2nd column, 5th row
+    @table91.attach(@firstHit, 0, 0, 2, 1) #both columns, 1st row
+    @table91.attach(@freedb_server_label, 0, 1, 1, 1) #1st column, 2nd row
+    @table91.attach(@freedb_username_label, 0, 2, 1, 1) #1st column, 3rd row
+    @table91.attach(@freedb_hostname_label, 0, 3, 1, 1) #1st column, 4th row
+    @table91.attach(@freedbServerEntry, 1, 1, 1, 1) #2nd column, 2nd row
+    @table91.attach(@freedbUsernameEntry, 1, 2, 1, 1) #2nd column, 3rd row
+    @table91.attach(@freedbHostnameEntry, 1, 3, 1, 1) #2nd column, 4th row
     @frame91 = newFrame(_('Freedb options'), child=@table91)
 #pack frame
   end
@@ -623,25 +625,25 @@ It is recommended to enable this option.")
   def buildFrameMusicbrainzOptions
     @table92 = newTable(rows=3, columns=3)
     @labelPreferredCountry = Gtk::Label.new(_('Preferred countries:'))
-    @labelPreferredCountry.set_alignment(0.0, 0.5)
+    @labelPreferredCountry.halign = :start
     @labelPreferredRelease = Gtk::Label.new(_('Preferred release date:'))
-    @labelPreferredRelease.set_alignment(0.0, 0.5)
+    @labelPreferredRelease.halign = :start
     @labelPreferredYear = Gtk::Label.new(_('Preferred year (metadata):'))
-    @labelPreferredYear.set_alignment(0.0, 0.5)
+    @labelPreferredYear.halign = :start
     @entryPreferredCountry = Gtk::Entry.new()
-    @chooseOriginalRelease = Gtk::RadioButton.new(_('Original'))
-    @chooseLatestRelease = Gtk::RadioButton.new(@chooseOriginalRelease, _('Latest available'))
-    @chooseOriginalYear = Gtk::RadioButton.new(_('Original'))
-    @chooseReleaseYear = Gtk::RadioButton.new(@chooseOriginalYear, _('From release'))
+    @chooseOriginalRelease = Gtk::RadioButton.new(member: nil, label: _('Original'))
+    @chooseLatestRelease = Gtk::RadioButton.new(member: @chooseOriginalRelease, label: _('Latest available'))
+    @chooseOriginalYear = Gtk::RadioButton.new(member: nil, label: _('Original'))
+    @chooseReleaseYear = Gtk::RadioButton.new(member: @chooseOriginalYear, label: _('From release'))
 #packing objects
-    @table92.attach(@labelPreferredCountry, 0, 1, 0, 1, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table92.attach(@entryPreferredCountry, 1, 3, 0, 1, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table92.attach(@labelPreferredRelease, 0, 1, 1, 2, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table92.attach(@chooseOriginalRelease, 1, 2, 1, 2, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table92.attach(@chooseLatestRelease, 2, 3, 1, 2, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table92.attach(@labelPreferredYear, 0, 1, 2, 3, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table92.attach(@chooseOriginalYear, 1, 2, 2, 3, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table92.attach(@chooseReleaseYear, 2, 3, 2, 3, Gtk::FILL, Gtk::SHRINK, 0, 0)
+    @table92.attach(@labelPreferredCountry, 0, 0, 1, 1)
+    @table92.attach(@entryPreferredCountry, 1, 0, 2, 1)
+    @table92.attach(@labelPreferredRelease, 0, 1, 1, 1)
+    @table92.attach(@chooseOriginalRelease, 1, 1, 1, 1)
+    @table92.attach(@chooseLatestRelease, 2, 1, 1, 1)
+    @table92.attach(@labelPreferredYear, 0, 2, 1, 1)
+    @table92.attach(@chooseOriginalYear, 1, 2, 1, 1)
+    @table92.attach(@chooseReleaseYear, 2, 2, 1, 1)
     @frame92 = newFrame(_('Musicbrainz options'), @table92)
   end
 
@@ -653,8 +655,8 @@ It is recommended to enable this option.")
   
   def packMetadataFrames
     @metadataChoice.signal_connect("changed"){updateMetadataProviderView()}
-    @page3 = Gtk::VBox.new #One VBox to rule them all
-    [@frame90, @frame91, @frame92].each{|frame| @page3.pack_start(frame,false,false)}
+    @page3 = Gtk::Box.new(:vertical) #One Box to rule them all
+    [@frame90, @frame91, @frame92].each{|frame| @page3.pack_start(frame, expand: false, fill: false, padding: 0)}
     @page3_label = Gtk::Label.new(_("Metadata"))
     @display.append_page(@page3, @page3_label)
   end
@@ -662,11 +664,11 @@ It is recommended to enable this option.")
   def buildFrameFilenamingScheme # Naming scheme frame
     @table100 = newTable(rows=6, columns=2)
 #creating objects 1st column
-    @basedir_label = Gtk::Label.new(_('Base directory:')) ; @basedir_label.set_alignment(0.0, 0.5) #set_alignment(xalign=0.0, yalign=0.5)
-    @naming_normal_label = Gtk::Label.new(_('Standard:')) ; @naming_normal_label.set_alignment(0.0, 0.5)
-    @naming_various_label = Gtk::Label.new(_('Various artists:')) ; @naming_various_label.set_alignment(0.0, 0.5)
-    @naming_image_label = Gtk::Label.new(_('Single file image:')) ; @naming_image_label.set_alignment(0.0, 0.5)
-    @example_label =Gtk::Label.new('') ; @example_label.set_alignment(0.0, 0.5) ; @example_label.wrap = true
+    @basedir_label = Gtk::Label.new(_('Base directory:')) ; @basedir_label.halign = :start #halign=:start
+    @naming_normal_label = Gtk::Label.new(_('Standard:')) ; @naming_normal_label.halign = :start
+    @naming_various_label = Gtk::Label.new(_('Various artists:')) ; @naming_various_label.halign = :start
+    @naming_image_label = Gtk::Label.new(_('Single file image:')) ; @naming_image_label.halign = :start
+    @example_label =Gtk::Label.new('') ; @example_label.halign = :start ; @example_label.wrap = true
     @expander100 = Gtk::Expander.new(_('Show options for "File naming scheme"'))
 #configure expander
     #@artist_label = Gtk::Label.new("%a = artist   %b = album   %f = codec   %g = genre\n%va = various artists   %n = track   %t = trackname   %y = year")
@@ -675,12 +677,14 @@ It is recommended to enable this option.")
                                     " %n=" + _("Track") + " %va=" + _("Various artist"))
     @expander100.add(@legend_label)
 #packing 1st column
-    @table100.attach(@basedir_label, 0, 1, 0, 1, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table100.attach(@naming_normal_label, 0, 1, 1, 2, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table100.attach(@naming_various_label, 0, 1, 2, 3, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table100.attach(@naming_image_label, 0, 1, 3, 4, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table100.attach(@example_label, 0, 2, 4, 5, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK, 0, 0) #width = 2 columns, also maximise width
-    @table100.attach(@expander100, 0, 2 , 5, 6, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK, 0, 0)
+    @table100.attach(@basedir_label, 0, 0, 1, 1)
+    @table100.attach(@naming_normal_label, 0, 1, 1, 1)
+    @table100.attach(@naming_various_label, 0, 2, 1, 1)
+    @table100.attach(@naming_image_label, 0, 3, 1, 1)
+    @table100.attach(@example_label, 0, 4, 2, 1) #width = 2 columns
+    @example_label.hexpand = true
+    @table100.attach(@expander100, 0, 5, 2, 1)
+    @expander100.hexpand = true
 #creating objects 2nd column and connect signals to them
     @basedirEntry = Gtk::Entry.new
     @namingNormalEntry = Gtk::Entry.new
@@ -690,18 +694,22 @@ It is recommended to enable this option.")
     @basedirEntry.signal_connect("button_release_event"){showFileNormal() ; false}
     @namingNormalEntry.signal_connect("key_release_event"){showFileNormal() ; false}
     @namingNormalEntry.signal_connect("button_release_event"){showFileNormal() ; false}
-    @namingNormalEntry.signal_connect("focus-out-event"){if not File.dirname(@namingNormalEntry.text) =~ /%a|%b/ ; @namingNormalEntry.text = "%a (%y) %b/" + @namingNormalEntry.text; preventStupidness() end; false}
+    @namingNormalEntry.signal_connect("focus_out_event"){if not File.dirname(@namingNormalEntry.text) =~ /%a|%b/ ; @namingNormalEntry.text = "%a (%y) %b/" + @namingNormalEntry.text; preventStupidness() end; false}
     @namingVariousEntry.signal_connect("key_release_event"){showFileVarious() ; false}
     @namingVariousEntry.signal_connect("button_release_event"){showFileVarious() ; false}
-    @namingVariousEntry.signal_connect("focus-out-event"){if not File.dirname(@namingVariousEntry.text) =~ /%a|%b/ ; @namingVariousEntry.text = "%a (%y) %b/" + @namingVariousEntry.text; preventStupidness() end; false}
+    @namingVariousEntry.signal_connect("focus_out_event"){if not File.dirname(@namingVariousEntry.text) =~ /%a|%b/ ; @namingVariousEntry.text = "%a (%y) %b/" + @namingVariousEntry.text; preventStupidness() end; false}
     @namingImageEntry.signal_connect("key_release_event"){showFileImage() ; false}
     @namingImageEntry.signal_connect("button_release_event"){showFileImage() ; false}
-    @namingImageEntry.signal_connect("focus-out-event"){if not File.dirname(@namingImageEntry.text) =~ /%a|%b/ ; @namingImageEntry.text = "%a (%y) %b/" + @namingImageEntry.text; preventStupidness() end; false}
+    @namingImageEntry.signal_connect("focus_out_event"){if not File.dirname(@namingImageEntry.text) =~ /%a|%b/ ; @namingImageEntry.text = "%a (%y) %b/" + @namingImageEntry.text; preventStupidness() end; false}
 #packing 2nd column
-    @table100.attach(@basedirEntry, 1, 2, 0, 1, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table100.attach(@namingNormalEntry, 1, 2, 1, 2, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table100.attach(@namingVariousEntry, 1, 2, 2, 3, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table100.attach(@namingImageEntry, 1, 2, 3, 4, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK, 0, 0)
+    @table100.attach(@basedirEntry, 1, 0, 1, 1)
+    @basedirEntry.hexpand = true
+    @table100.attach(@namingNormalEntry, 1, 1, 1, 1)
+    @namingNormalEntry.hexpand = true
+    @table100.attach(@namingVariousEntry, 1, 2, 1, 1)
+    @namingVariousEntry.hexpand = true
+    @table100.attach(@namingImageEntry, 1, 3, 1, 1)
+    @namingImageEntry.hexpand = true
     @frame100 = newFrame(_('File naming scheme'), child=@table100)
   end
   
@@ -732,15 +740,15 @@ It is recommended to enable this option.")
   def buildFrameProgramsOfChoice
     @table110 = newTable(rows=2, columns=2)
 #creating objects
-    @editor_label = Gtk::Label.new(_("Log file viewer: ")) ; @editor_label.set_alignment(0.0, 0.5)
-    @filemanager_label = Gtk::Label.new(_("File manager: ")) ; @filemanager_label.set_alignment(0.0,0.5)
+    @editor_label = Gtk::Label.new(_("Log file viewer: ")) ; @editor_label.halign = :start
+    @filemanager_label = Gtk::Label.new(_("File manager: ")) ; @filemanager_label.halign = :start
     @editorEntry = Gtk::Entry.new
     @filemanagerEntry = Gtk::Entry.new
 #packing objects
-    @table110.attach(@editor_label, 0,1,0,1,Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table110.attach(@filemanager_label, 0,1,1,2,Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table110.attach(@editorEntry, 1,2,0,1, Gtk::FILL, Gtk::SHRINK, 0, 0)
-    @table110.attach(@filemanagerEntry, 1,2,1,2, Gtk::FILL, Gtk::SHRINK, 0, 0)
+    @table110.attach(@editor_label, 0, 0, 1, 1)
+    @table110.attach(@filemanager_label, 0, 1, 1, 1)
+    @table110.attach(@editorEntry, 1, 0, 1, 1)
+    @table110.attach(@filemanagerEntry, 1, 1, 1, 1)
     @frame110 = newFrame(_('Programs of choice'), child=@table110)
   end
 
@@ -751,14 +759,16 @@ It is recommended to enable this option.")
 #creating objects and packing them
     @verbose = Gtk::CheckButton.new(_('Verbose mode'))
     @debug = Gtk::CheckButton.new(_('Debug mode'))
-    @table120.attach(@verbose, 0,1,0,1,Gtk::FILL|Gtk::EXPAND, Gtk::SHRINK)
-    @table120.attach(@debug, 1,2,0,1,Gtk::FILL|Gtk::EXPAND, Gtk::SHRINK)
+    @table120.attach(@verbose, 0, 0, 1, 1)
+    @verbose.hexpand = true
+    @table120.attach(@debug, 1, 0, 1, 1)
+    @debug.hexpand = true
     @frame120 = newFrame(_('Debug options'), child=@table120)
   end
 
   def pack_other_frames #pack all frames into a single page
-    @page4 = Gtk::VBox.new()
-    [@frame100, @frame110, @frame120].each{|frame| @page4.pack_start(frame,false,false)}
+    @page4 = Gtk::Box.new(:vertical)
+    [@frame100, @frame110, @frame120].each{|frame| @page4.pack_start(frame, expand: false, fill: false, padding: 0)}
     @page4_label = Gtk::Label.new(_("Other"))
     @display.signal_connect("switch_page") do |a, b, page|
       if page == 1

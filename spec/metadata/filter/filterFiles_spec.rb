@@ -24,27 +24,27 @@ describe Metadata::FilterFiles do
   let(:filter) {Metadata::FilterFiles.new(nil, prefs)}
   
   before(:each) do
-    prefs.stub!(:noSpaces).and_return false
-    prefs.stub!(:noCapitals).and_return false
+    allow(prefs).to receive(:noSpaces).and_return false
+    allow(prefs).to receive(:noCapitals).and_return false
   end
   
   context "When determining the filename it has to be valid" do
     it "should replace the slash sign /" do
-      filter.filter('01 AC/DC - Jailbreak.mp3').should == '01 ACDC - Jailbreak.mp3'
+      expect(filter.filter('01 AC/DC - Jailbreak.mp3')).to eq('01 ACDC - Jailbreak.mp3')
     end
     
     it "should remove starting dots from filenames ." do
-      filter.filter('.Who knows - Someone.flac').should == 'Who knows - Someone.flac'
-      filter.filter('...Who knows - Someone.flac').should == 'Who knows - Someone.flac'
+      expect(filter.filter('.Who knows - Someone.flac')).to eq('Who knows - Someone.flac')
+      expect(filter.filter('...Who knows - Someone.flac')).to eq('Who knows - Someone.flac')
     end
     
     it "should keep other dots however ." do
-      filter.filter('.Who. knows - Someone.flac').should == 'Who. knows - Someone.flac'
-      filter.filter('Who. knows - Someone.flac').should == 'Who. knows - Someone.flac'
+      expect(filter.filter('.Who. knows - Someone.flac')).to eq('Who. knows - Someone.flac')
+      expect(filter.filter('Who. knows - Someone.flac')).to eq('Who. knows - Someone.flac')
     end
     
     it "should be able to combine all logic for filterFiles + filterDirs + filterAll" do
-      filter.filter(" AC/DC \"\\Don`t_won\342\200\230t_know ??_** >< | ").should == "ACDC Don't won't know"
+      expect(filter.filter(" AC/DC \"\\Don`t_won\342\200\230t_know ??_** >< | ")).to eq("ACDC Don't won't know")
     end
   end
 end

@@ -62,12 +62,11 @@ class ScanDiscCdrdao
   # Let the ripping wait for the process to finish, print the info to the screen (log)
   def joinWithMainThread(log)
     @log = log
-    if @error.nil?
-      scan() if @cdrdaoThread.nil?
-      displayStartMessage()
+    if @cdrdaoThread
+      displayStartMessage() if @error.nil?
       @cdrdaoThread.join()
       displayScanResults()
-    else
+    elsif @error
       @log << @error
     end
   end

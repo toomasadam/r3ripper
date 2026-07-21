@@ -30,33 +30,33 @@ describe Network do
 
   context "When setting up a CGI connection" do
     before(:each) do
-      prefs.stub!(:debug).and_return false
-      url.should_receive(:host).once.and_return 1
-      url.should_receive(:port).once.and_return 2
-      url.should_receive(:path).once.and_return 3
+      allow(prefs).to receive(:debug).and_return false
+      expect(url).to receive(:host).once.and_return 1
+      expect(url).to receive(:port).once.and_return 2
+      expect(url).to receive(:path).once.and_return 3
     end
     
     it "should be able to do so without a proxy" do
-      deps.should_receive(:env).with('http_proxy').once().and_return nil
-      uri.should_receive(:parse).once.and_return(url)
-      http.should_receive(:new).with(1, 2)
+      expect(deps).to receive(:env).with('http_proxy').once().and_return nil
+      expect(uri).to receive(:parse).once.and_return(url)
+      expect(http).to receive(:new).with(1, 2)
       
       network.startCgiConnection('http://freedb.freedb.org/~cddb/cddb.cgi')
-      network.path.should == 3
+      expect(network.path).to eq(3)
     end
     
     it "should be able to do so with a proxy with no password" do
-      deps.should_receive(:env).with('http_proxy').twice().and_return 4
-      uri.should_receive(:parse).once.and_return(url)
-      proxy.should_receive(:host).and_return 5
-      proxy.should_receive(:port).and_return 6
-      proxy.should_receive(:user).and_return 7
-      proxy.should_receive(:password).and_return false
-      uri.should_receive(:parse).with(4).and_return proxy
-      http.should_receive(:new).with(1, 2, 5, 6, 7, '')
+      expect(deps).to receive(:env).with('http_proxy').twice().and_return 4
+      expect(uri).to receive(:parse).once.and_return(url)
+      expect(proxy).to receive(:host).and_return 5
+      expect(proxy).to receive(:port).and_return 6
+      expect(proxy).to receive(:user).and_return 7
+      expect(proxy).to receive(:password).and_return false
+      expect(uri).to receive(:parse).with(4).and_return proxy
+      expect(http).to receive(:new).with(1, 2, 5, 6, 7, '')
       
       network.startCgiConnection('http://freedb.freedb.org/~cddb/cddb.cgi')
-      network.path.should == 3
+      expect(network.path).to eq(3)
     end
   end
 end

@@ -64,10 +64,10 @@ class ShortMessage
   
   def showError(error)
     require 'rubyripper/errors'
-    @display.text = Errors.send(error[0], error[1])
+    @display.text = Errors.send(error[0], error[1]).to_s
   end
 
   def showMessage(message)
-    @display.text = message
+    @display.text = message.to_s
   end
 end

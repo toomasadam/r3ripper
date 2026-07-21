@@ -31,21 +31,21 @@ describe CalcMusicbrainzID do
     before(:each) do
       @start = {1=>0, 2=>22617, 3=>41737, 4=>58167, 5=>71952, 6=>91225,
 7=>104502, 8=>115230, 9=>132015, 10=>143782, 11=>159720, 12=>174447, 13=>267107+11400}
-      disc.should_receive(:advancedTocScanner).once.and_return scanner
+      expect(disc).to receive(:advancedTocScanner).once.and_return scanner
     end
 
     it "should use the provided toc scanner to calculate the disc" do
-      scanner.should_receive(:respond_to?).with(:dataTracks).at_least(:once).and_return true
+      expect(scanner).to receive(:respond_to?).with(:dataTracks).at_least(:once).and_return true
 
-      scanner.should_receive(:dataTracks).at_least(3).and_return([13])
-      scanner.should_receive(:firstAudioTrack).at_least(:once).and_return(1)
-      scanner.should_receive(:audiotracks).at_least(:once).and_return(12)
+      expect(scanner).to receive(:dataTracks).at_least(3).and_return([13])
+      expect(scanner).to receive(:firstAudioTrack).at_least(:once).and_return(1)
+      expect(scanner).to receive(:audiotracks).at_least(:once).and_return(12)
       (1..13).each do |number|
-        scanner.should_receive(:getStartSector).with(number).at_least(:once).and_return @start[number]
+        expect(scanner).to receive(:getStartSector).with(number).at_least(:once).and_return @start[number]
       end
 
-      @musicbrainz.musicbrainzLookupPath.should == @musicbrainzLookupPath
-      @musicbrainz.discid.should == "I5l9cCSFccLKFEKS.7wqSZAorPU-"
+      expect(@musicbrainz.musicbrainzLookupPath).to eq(@musicbrainzLookupPath)
+      expect(@musicbrainz.discid).to eq("I5l9cCSFccLKFEKS.7wqSZAorPU-")
     end
   end
 end

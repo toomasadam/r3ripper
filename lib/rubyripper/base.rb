@@ -24,8 +24,8 @@ Thread.abort_on_exception = true
 # Make sure the locale files work before installing
 ENV['GETTEXT_PATH'] = File.expand_path('../../../data/locale',__FILE__)
 
-major_version = RUBY_VERSION.delete('.')[0..1].to_i
-if major_version < 19
+major_version, minor_version = RUBY_VERSION.split('.').map(&:to_i)
+if major_version < 1 || (major_version == 1 && minor_version < 9)
   puts "Ruby versions older than the 1.9 release are not supported anymore"
   puts "Please upgrade ruby to a recent version."
   exit()

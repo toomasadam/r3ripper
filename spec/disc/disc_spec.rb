@@ -29,73 +29,73 @@ describe Disc do
   
   context "When a disc is requested to be scanned" do
     before(:each) do
-      cdpar.should_receive(:scan).once().and_return true
+      expect(cdpar).to receive(:scan).once().and_return true
     end
     
     it "should send the scan command to cdparanoia" do
-      cdpar.should_receive(:status).once().and_return false
+      expect(cdpar).to receive(:status).once().and_return false
       disc.scan()
     end
     
     it "should trigger the metadata class if a disc is found" do
-      cdpar.should_receive(:status).once().and_return 'ok'
-      metadata.should_receive(:get).once().and_return 1
-      prefs.should_receive(:createCue).once().and_return false
+      expect(cdpar).to receive(:status).once().and_return 'ok'
+      expect(metadata).to receive(:get).once().and_return 1
+      expect(prefs).to receive(:createCue).once().and_return false
       disc.scan(metadata)
-      disc.metadata.should == 1
+      expect(disc.metadata).to eq(1)
     end
     
     it "should not trigger the metadata if no disc is found" do
-      cdpar.should_receive(:status).once().and_return false
-      metadata.should_not_receive(:get)
+      expect(cdpar).to receive(:status).once().and_return false
+      expect(metadata).not_to receive(:get)
       disc.scan(nil)
-      disc.metadata.should == nil
+      expect(disc.metadata).to eq(nil)
     end
   end
   
   context "When a toc analyzer is requested for calculating the disc id" do
     it "should first refer to the cd-info scanner if it is installed" do
-      deps.should_receive(:installed?).with('cd-info').and_return true
-      disc.advancedTocScanner(cdinfo='a', cdcontrol='b').should == 'a'
+      expect(deps).to receive(:installed?).with('cd-info').and_return true
+      expect(disc.advancedTocScanner(cdinfo='a', cdcontrol='b')).to eq('a')
     end
     
     it "should then refer to the cdcontrol scanner if it is installed" do
-      deps.should_receive(:installed?).with('cd-info').and_return false
-      deps.should_receive(:installed?).with('cdcontrol').and_return true
-      disc.advancedTocScanner(cdinfo='a', cdcontrol='b').should == 'b'
+      expect(deps).to receive(:installed?).with('cd-info').and_return false
+      expect(deps).to receive(:installed?).with('cdcontrol').and_return true
+      expect(disc.advancedTocScanner(cdinfo='a', cdcontrol='b')).to eq('b')
     end
     
     it "should fall back to cdparanoia if nothing better is available" do
-      deps.should_receive(:installed?).with('cd-info').and_return false
-      deps.should_receive(:installed?).with('cdcontrol').and_return false
-      disc.advancedTocScanner(cdinfo='a', cdcontrol='b').should == cdpar
+      expect(deps).to receive(:installed?).with('cd-info').and_return false
+      expect(deps).to receive(:installed?).with('cdcontrol').and_return false
+      expect(disc.advancedTocScanner(cdinfo='a', cdcontrol='b')).to eq(cdpar)
     end
   end
   
   context "When methods need to be forwarded" do
     it "should forward the freedbstring method to the calcFreedbID object" do
-      freedb.should_receive(:freedbString).once.and_return true
+      expect(freedb).to receive(:freedbString).once.and_return true
       disc.freedbString()
     end
     
     it "should forward the freedb discid method to the calcFreedbID object" do
-      freedb.should_receive(:discid).once.and_return true
+      expect(freedb).to receive(:discid).once.and_return true
       disc.freedbDiscid()
     end
     
     it "should forward the musicbrainzlookuppath method to the calcMusicbrainzID object" do
-      musicbrainz.should_receive(:musicbrainzLookupPath).once.and_return true
+      expect(musicbrainz).to receive(:musicbrainzLookupPath).once.and_return true
       disc.musicbrainzLookupPath()
     end
     
     it "should forward the musicbrainzdiscid method to the calcMusicbrainzID object" do
-      musicbrainz.should_receive(:discid).once.and_return true
+      expect(musicbrainz).to receive(:discid).once.and_return true
       disc.musicbrainzDiscid()
     end
     
     # all unknown commands should be redirected to cdparanoia
     it "should pass any other command to cdparanoia" do
-      cdpar.should_receive(:any_other_command).and_return true
+      expect(cdpar).to receive(:any_other_command).and_return true
       disc.any_other_command()
     end
   end

@@ -32,70 +32,70 @@ describe LoadFreedbRecord do
 
   context "When no local records are found" do
     it "should set the status and contents accordingly" do
-      file.should_receive(:glob).with("#{@dir}/*/#{@discid}").and_return(Array.new)
+      expect(file).to receive(:glob).with("#{@dir}/*/#{@discid}").and_return(Array.new)
 
       load.scan('12345678')
-      load.status.should == 'noRecords'
-      load.freedbRecord.should == nil
+      expect(load.status).to eq('noRecords')
+      expect(load.freedbRecord).to eq(nil)
     end
   end
 
   context "When one record is found" do
     it "should load the file and set the status to ok" do
-      file.should_receive(:glob).with("#{@dir}/*/#{@discid}").and_return(@result)
-      file.should_receive(:read).with(@result[0], 'r:UTF-8').and_return(@freedb)
+      expect(file).to receive(:glob).with("#{@dir}/*/#{@discid}").and_return(@result)
+      expect(file).to receive(:read).with(@result[0], 'r:UTF-8').and_return(@freedb)
 
       load.scan('12345678')
-      load.status.should == 'ok'
-      load.freedbRecord.should == @freedb
+      expect(load.status).to eq('ok')
+      expect(load.freedbRecord).to eq(@freedb)
     end
   end
 
   context "When two records or more are found" do
     it "should load the first file when 2 records are found" do
       result = ['/at/some/place/12345678', '/at/other/place/12345678']
-      file.should_receive(:glob).with("#{@dir}/*/#{@discid}").and_return(result)
-      file.should_receive(:read).with(result[0], 'r:UTF-8').and_return(@freedb)
+      expect(file).to receive(:glob).with("#{@dir}/*/#{@discid}").and_return(result)
+      expect(file).to receive(:read).with(result[0], 'r:UTF-8').and_return(@freedb)
 
       load.scan('12345678')
-      load.status.should == 'ok'
-      load.freedbRecord.should == @freedb
+      expect(load.status).to eq('ok')
+      expect(load.freedbRecord).to eq(@freedb)
     end
   end
 
   context "When the record is not encoded in UTF-8" do
     it "should first try to read the input as a ISO-8859-1 file" do
-      file.should_receive(:glob).with("#{@dir}/*/#{@discid}").and_return(@result)
-      file.should_receive(:read).with(@result[0], 'r:UTF-8').and_return(@nonUTF8)
-      file.should_receive(:read).with(@result[0], 'r:ISO-8859-1').and_return(@freedb)
+      expect(file).to receive(:glob).with("#{@dir}/*/#{@discid}").and_return(@result)
+      expect(file).to receive(:read).with(@result[0], 'r:UTF-8').and_return(@nonUTF8)
+      expect(file).to receive(:read).with(@result[0], 'r:ISO-8859-1').and_return(@freedb)
 
       load.scan('12345678')
-      load.status.should == 'ok'
-      load.freedbRecord.should == @freedb
+      expect(load.status).to eq('ok')
+      expect(load.freedbRecord).to eq(@freedb)
     end
     
     it "should then try to read the input as a GB18030 file" do
-      file.should_receive(:glob).with("#{@dir}/*/#{@discid}").and_return(@result)
-      file.should_receive(:read).with(@result[0], 'r:UTF-8').and_return(@nonUTF8)
-      file.should_receive(:read).with(@result[0], 'r:ISO-8859-1').and_return(@nonUTF8)
-      file.should_receive(:read).with(@result[0], 'r:GB18030').and_return(@freedb)
+      expect(file).to receive(:glob).with("#{@dir}/*/#{@discid}").and_return(@result)
+      expect(file).to receive(:read).with(@result[0], 'r:UTF-8').and_return(@nonUTF8)
+      expect(file).to receive(:read).with(@result[0], 'r:ISO-8859-1').and_return(@nonUTF8)
+      expect(file).to receive(:read).with(@result[0], 'r:GB18030').and_return(@freedb)
 
       load.scan('12345678')
-      load.status.should == 'ok'
-      load.freedbRecord.should == @freedb
+      expect(load.status).to eq('ok')
+      expect(load.freedbRecord).to eq(@freedb)
     end
   end
 
   context "When the conversion failed" do
     it "should set the status accordingly and return nothing" do
-      file.should_receive(:glob).with("#{@dir}/*/#{@discid}").and_return(@result)
-      file.should_receive(:read).with(@result[0], 'r:UTF-8').and_return(@nonUTF8)
-      file.should_receive(:read).with(@result[0], 'r:GB18030').and_return(@nonUTF8)
-      file.should_receive(:read).with(@result[0], 'r:ISO-8859-1').and_return(@nonUTF8)
+      expect(file).to receive(:glob).with("#{@dir}/*/#{@discid}").and_return(@result)
+      expect(file).to receive(:read).with(@result[0], 'r:UTF-8').and_return(@nonUTF8)
+      expect(file).to receive(:read).with(@result[0], 'r:GB18030').and_return(@nonUTF8)
+      expect(file).to receive(:read).with(@result[0], 'r:ISO-8859-1').and_return(@nonUTF8)
 
       load.scan('12345678')
-      load.status.should == 'invalidEncoding'
-      load.freedbRecord.should == nil
+      expect(load.status).to eq('invalidEncoding')
+      expect(load.freedbRecord).to eq(nil)
     end
   end
 end

@@ -25,18 +25,20 @@ module Metadata
     end
     
     def filter(item)
-      item.gsub!('$', 'S') #no dollars allowed
-      item.gsub!(':', '') #no colons allowed in FAT
-      item.gsub!('*', '') #no asterix allowed in FAT
-      item.gsub!('?', '') #no question mark allowed in FAT
-      item.gsub!('<', '') #no smaller than allowed in FAT
-      item.gsub!('>', '') #no greater than allowed in FAT
-      item.gsub!('|', '') #no pipe allowed in FAT
-      item.gsub!('\\', '') #the \\ means a normal \
-      item.gsub!('"', '')
-      item.gsub!(" ", "_") if @prefs.noSpaces
-      item.downcase! if @prefs.noCapitals
-      item = super(item)
+      # ensure we work on a copy to avoid side effects
+      result = item.dup
+      result.gsub!('$', 'S') #no dollars allowed
+      result.gsub!(':', '') #no colons allowed in FAT
+      result.gsub!('*', '') #no asterix allowed in FAT
+      result.gsub!('?', '') #no question mark allowed in FAT
+      result.gsub!('<', '') #no smaller than allowed in FAT
+      result.gsub!('>', '') #no greater than allowed in FAT
+      result.gsub!('|', '') #no pipe allowed in FAT
+      result.gsub!('\\', '') #the \\ means a normal \
+      result.gsub!('"', '')
+      result.gsub!(" ", "_") if @prefs.noSpaces
+      result.downcase! if @prefs.noCapitals
+      super(result)
     end
   end
 end

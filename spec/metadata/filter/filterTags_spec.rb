@@ -25,24 +25,24 @@ describe Metadata::FilterTags do
   let(:filter) {Metadata::FilterTags.new(data, prefs)}
   
   before(:each) do
-    prefs.stub!(:noSpaces).and_return false
-    prefs.stub!(:noCapitals).and_return false
+    allow(prefs).to receive(:noSpaces).and_return false
+    allow(prefs).to receive(:noCapitals).and_return false
   end
   
   context "When determining the tag it should be valid when passing the command" do
     it "should always return any tag with quotes around it to cover spaces" do
       data.artist = "Iron maiden"
-      filter.artist.should == '"Iron maiden"'
+      expect(filter.artist).to eq('"Iron maiden"')
     end
     
     it "should escape the double quote" do
       data.artist = 'abc"def'
-      filter.artist.should == '"abc\\"def"' # in a terminal this becomes abc\"def
+      expect(filter.artist).to eq('"abc\\"def"') # in a terminal this becomes abc\"def
     end
     
     it "should be able to combine all logic for filterTags + filterAll" do
       data.tracklist = {1=>" #{'abc"def'} AC/DC Don`t_wont_know ??_** >< | "}
-      filter.trackname(1).should == "\"#{'abc\\"def'} AC/DC Don't wont know ?? ** >< |\""
+      expect(filter.trackname(1)).to eq("\"#{'abc\\"def'} AC/DC Don't wont know ?? ** >< |\"")
     end
   end
 end

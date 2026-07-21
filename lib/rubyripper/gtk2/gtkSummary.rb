@@ -40,34 +40,34 @@ class GtkSummary
   def showMainResult(succes)
     if succes == true
       @label1 = Gtk::Label.new(_("The rip has succesfully finished.\nA short summary is shown below."))
-      @image1 = Gtk::Image.new(Gtk::Stock::DIALOG_INFO, Gtk::IconSize::DIALOG)
+      @image1 = Gtk::Image.new(stock: Gtk::Stock::DIALOG_INFO, size: :dialog)
     else
       @label1 = Gtk::Label.new(_("The rip had some problems.\nA short summary is shown below."))
-      @image1 = Gtk::Image.new(Gtk::Stock::DIALOG_ERROR, Gtk::IconSize::DIALOG)
+      @image1 = Gtk::Image.new(stock: Gtk::Stock::DIALOG_ERROR, size: :dialog)
     end
   end
 
   def buildSummary(summary)
-    @hbox1 = Gtk::HBox.new()
-    [@image1, @label1].each{|object| @hbox1.pack_start(object)}
+    @hbox1 = Gtk::Box.new(:horizontal)
+    [@image1, @label1].each{|object| @hbox1.pack_start(object, expand: false, fill: false, padding: 0)}
     @hbox1.border_width = 10
-    @separator1 = Gtk::HSeparator.new
+    @separator1 = Gtk::Separator.new(:horizontal)
 
     @textview = Gtk::TextView.new
     @textview.editable = false
     @scrolled_window = Gtk::ScrolledWindow.new
-    @scrolled_window.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_NEVER)
+    @scrolled_window.set_policy(:never, :never)
     @scrolled_window.border_width = 7
     @scrolled_window.add(@textview)
-    @textview.buffer.insert(@textview.buffer.end_iter, summary)
+    @textview.buffer.insert(@textview.buffer.end_iter, summary.to_s)
   end
 
   def buildOpenLogButton
     @button1 = Gtk::Button.new()
     @label2 = Gtk::Label.new(_("Open log file"))
-    @image2 = Gtk::Image.new(Gtk::Stock::EXECUTE, Gtk::IconSize::LARGE_TOOLBAR)
-    @hbox2 = Gtk::HBox.new()
-    [@image2, @label2].each{|object| @hbox2.pack_start(object)}
+    @image2 = Gtk::Image.new(stock: Gtk::Stock::EXECUTE, size: :large_toolbar)
+    @hbox2 = Gtk::Box.new(:horizontal)
+    [@image2, @label2].each{|object| @hbox2.pack_start(object, expand: false, fill: false, padding: 0)}
     @button1.add(@hbox2)
   end
 
@@ -75,9 +75,9 @@ class GtkSummary
     # assemble button 2
     @button2 = Gtk::Button.new()
     @label3 = Gtk::Label.new(_("Open directory"))
-    @image3 = Gtk::Image.new(Gtk::Stock::OPEN, Gtk::IconSize::LARGE_TOOLBAR)
-    @hbox3 = Gtk::HBox.new()
-    [@image3, @label3].each{|object| @hbox3.pack_start(object)}
+    @image3 = Gtk::Image.new(stock: Gtk::Stock::OPEN, size: :large_toolbar)
+    @hbox3 = Gtk::Box.new(:horizontal)
+    [@image3, @label3].each{|object| @hbox3.pack_start(object, expand: false, fill: false, padding: 0)}
     @button2.add(@hbox3)
   end
 
@@ -92,17 +92,18 @@ class GtkSummary
   end
 
   def assemblePage
-    @hbox4 = Gtk::HBox.new(true, 5) #put the two buttons in a box
-    [@button1, @button2].each{|object| @hbox4.pack_start(object)}
+    @hbox4 = Gtk::Box.new(:horizontal, 5) #put the two buttons in a box
+    @hbox4.homogeneous = true
+    [@button1, @button2].each{|object| @hbox4.pack_start(object, expand: true, fill: true, padding: 0)}
 
-    @vbox1 = Gtk::VBox.new(false,10)
-    @vbox1.pack_start(@hbox1,false,false)
-    @vbox1.pack_start(@separator1,false,false)
-    @vbox1.pack_start(@scrolled_window,false,false) #maximize the space for displaying the tracks
-    @vbox1.pack_start(@hbox4,false,false)
+    @vbox1 = Gtk::Box.new(:vertical, 10)
+    @vbox1.pack_start(@hbox1, expand: false, fill: false, padding: 0)
+    @vbox1.pack_start(@separator1, expand: false, fill: false, padding: 0)
+    @vbox1.pack_start(@scrolled_window, expand: true, fill: true, padding: 0) #maximize the space for displaying the tracks
+    @vbox1.pack_start(@hbox4, expand: false, fill: false, padding: 0)
 
     @display = Gtk::Frame.new(_("Ripping and encoding is finished"))
-    @display.set_shadow_type(Gtk::SHADOW_ETCHED_IN)
+    @display.shadow_type = :etched_in
     @display.border_width = 5
     @display.add(@vbox1)
   end

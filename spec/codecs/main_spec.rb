@@ -40,61 +40,61 @@ describe Codecs::Main do
     end
     
     it "should return the command to replaygain a track" do
-      scheme.should_receive(:getFile).with('mp3', 1).and_return 'output.mp3'
-      @codec.replaygain(1).should == 'mp3gain -c -r "output.mp3"'
+      expect(scheme).to receive(:getFile).with('mp3', 1).and_return 'output.mp3'
+      expect(@codec.replaygain(1)).to eq('mp3gain -c -r "output.mp3"')
     end
     
     it "should return the command to replaygain an album" do
-      scheme.should_receive(:getDir).with('mp3').and_return '/home/mp3'
-      @codec.replaygainAlbum().should == 'mp3gain -c -a "/home/mp3"/*.mp3'
+      expect(scheme).to receive(:getDir).with('mp3').and_return '/home/mp3'
+      expect(@codec.replaygainAlbum()).to eq('mp3gain -c -a "/home/mp3"/*.mp3')
     end
     
     # all conditional logic is only tested for mp3 since it's generic
     context "When calculating the command for encoding a track" do
       before(:each) do
-        prefs.should_receive(:settingsMp3).and_return '-V 2'
-        prefs.stub(:image).and_return false
-        scheme.should_receive(:getTempFile).with(1).and_return 'input_1.wav'
-        scheme.should_receive(:getFile).with('mp3', 1).and_return '/home/mp3/1-test.mp3'
-        disc.should_receive(:audiotracks).and_return 99
+        expect(prefs).to receive(:settingsMp3).and_return '-V 2'
+        allow(prefs).to receive(:image).and_return false
+        expect(scheme).to receive(:getTempFile).with(1).and_return 'input_1.wav'
+        expect(scheme).to receive(:getFile).with('mp3', 1).and_return '/home/mp3/1-test.mp3'
+        expect(disc).to receive(:audiotracks).and_return 99
       end
       
       it "should be able to generate the basic command" do
-        md.should_receive(:various?).and_return nil
-        disc.should_receive(:freedbDiscid).and_return nil
+        expect(md).to receive(:various?).and_return nil
+        expect(disc).to receive(:freedbDiscid).and_return nil
 
-        @codec.command(1).should == 'lame -V 2 --ta "trackArtist 1" --tl "album" '\
-            '--tv TCON="genre" --ty "year" --tv TENC="Rubyripper test" --tt "trackname 1" '\
-            '--tn 1/99 "input_1.wav" "/home/mp3/1-test.mp3"'
-        @codec.setTagsAfterEncoding(1).should == ''
+        expect(@codec.command(1)).to eq('lame -V 2 --ta "trackArtist 1" --tl "album" ' \
+            '--tv TCON="genre" --ty "year" --tv TENC="Rubyripper test" --tt "trackname 1" ' \
+            '--tn 1/99 "input_1.wav" "/home/mp3/1-test.mp3"')
+        expect(@codec.setTagsAfterEncoding(1)).to eq('')
       end
       
       it "should add the various artist tag if relevant" do
-        md.should_receive(:various?).and_return true
-        disc.should_receive(:freedbDiscid).and_return nil
+        expect(md).to receive(:various?).and_return true
+        expect(disc).to receive(:freedbDiscid).and_return nil
         
-        @codec.command(1).should == 'lame -V 2 --ta "trackArtist 1" --tl "album" '\
-            '--tv TCON="genre" --ty "year" --tv TPE2="artist" --tv TENC="Rubyripper test" '\
-            '--tt "trackname 1" --tn 1/99 "input_1.wav" "/home/mp3/1-test.mp3"'
+        expect(@codec.command(1)).to eq('lame -V 2 --ta "trackArtist 1" --tl "album" ' \
+            '--tv TCON="genre" --ty "year" --tv TPE2="artist" --tv TENC="Rubyripper test" ' \
+            '--tt "trackname 1" --tn 1/99 "input_1.wav" "/home/mp3/1-test.mp3"')
       end
       
       it "should add the discid if available" do
-        md.should_receive(:various?).and_return nil
-        disc.should_receive(:freedbDiscid).twice.and_return 'ABCDEFGH'
+        expect(md).to receive(:various?).and_return nil
+        expect(disc).to receive(:freedbDiscid).twice.and_return 'ABCDEFGH'
         
-        @codec.command(1).should == 'lame -V 2 --ta "trackArtist 1" --tl "album" '\
-            '--tv TCON="genre" --ty "year" --tv TENC="Rubyripper test" --tc DISCID="ABCDEFGH" '\
-            '--tt "trackname 1" --tn 1/99 "input_1.wav" "/home/mp3/1-test.mp3"'
+        expect(@codec.command(1)).to eq('lame -V 2 --ta "trackArtist 1" --tl "album" ' \
+            '--tv TCON="genre" --ty "year" --tv TENC="Rubyripper test" --tc DISCID="ABCDEFGH" ' \
+            '--tt "trackname 1" --tn 1/99 "input_1.wav" "/home/mp3/1-test.mp3"')
       end
       
       it "should add the discnumber if available" do
-        md.should_receive(:various?).and_return nil
-        md.should_receive(:discNumber).twice.and_return "1"
-        disc.should_receive(:freedbDiscid).and_return nil
+        expect(md).to receive(:various?).and_return nil
+        expect(md).to receive(:discNumber).twice.and_return "1"
+        expect(disc).to receive(:freedbDiscid).and_return nil
         
-        @codec.command(1).should == 'lame -V 2 --ta "trackArtist 1" --tl "album" '\
-            '--tv TCON="genre" --ty "year" --tv TPOS=1 --tv TENC="Rubyripper test" --tt '\
-            '"trackname 1" --tn 1/99 "input_1.wav" "/home/mp3/1-test.mp3"'
+        expect(@codec.command(1)).to eq('lame -V 2 --ta "trackArtist 1" --tl "album" ' \
+            '--tv TCON="genre" --ty "year" --tv TPOS=1 --tv TENC="Rubyripper test" --tt ' \
+            '"trackname 1" --tn 1/99 "input_1.wav" "/home/mp3/1-test.mp3"')
       end
     end
   end
@@ -105,30 +105,30 @@ describe Codecs::Main do
     end
     
     it "should return the command to replaygain a track" do
-      scheme.should_receive(:getFile).with('vorbis', 1).and_return 'output.ogg'
-      @codec.replaygain(1).should == 'vorbisgain "output.ogg"'
+      expect(scheme).to receive(:getFile).with('vorbis', 1).and_return 'output.ogg'
+      expect(@codec.replaygain(1)).to eq('vorbisgain "output.ogg"')
     end
     
     it "should return the command to replaygain an album" do
-      scheme.should_receive(:getDir).with('vorbis').and_return '/home/vorbis'
-      @codec.replaygainAlbum.should == 'vorbisgain -a "/home/vorbis"/*.ogg'
+      expect(scheme).to receive(:getDir).with('vorbis').and_return '/home/vorbis'
+      expect(@codec.replaygainAlbum).to eq('vorbisgain -a "/home/vorbis"/*.ogg')
     end
     
     it "should calculate the command for encoding" do
-      prefs.should_receive(:settingsVorbis).and_return '-q 6'
-      prefs.stub(:image).and_return false
-      scheme.should_receive(:getTempFile).with(1).and_return 'input_1.wav'
-      scheme.should_receive(:getFile).with('vorbis', 1).and_return '/home/vorbis/1-test.ogg'
-      disc.should_receive(:audiotracks).and_return 99
-      md.should_receive(:various?).and_return true
-      md.should_receive(:discNumber).twice.and_return "1"
-      disc.should_receive(:freedbDiscid).twice.and_return 'ABCDEFGH'
+      expect(prefs).to receive(:settingsVorbis).and_return '-q 6'
+      allow(prefs).to receive(:image).and_return false
+      expect(scheme).to receive(:getTempFile).with(1).and_return 'input_1.wav'
+      expect(scheme).to receive(:getFile).with('vorbis', 1).and_return '/home/vorbis/1-test.ogg'
+      expect(disc).to receive(:audiotracks).and_return 99
+      expect(md).to receive(:various?).and_return true
+      expect(md).to receive(:discNumber).twice.and_return "1"
+      expect(disc).to receive(:freedbDiscid).twice.and_return 'ABCDEFGH'
       
-      @codec.command(1).should == 'oggenc -o "/home/vorbis/1-test.ogg" -q 6 -c '\
-          'ARTIST="trackArtist 1" -c ALBUM="album" -c GENRE="genre" -c DATE="year" -c '\
-          '"ALBUM ARTIST"="artist" -c DISCNUMBER=1 -c ENCODER="Rubyripper test" -c '\
-          'DISCID="ABCDEFGH" -c TITLE="trackname 1" -c TRACKNUMBER=1 -c TRACKTOTAL=99 "input_1.wav"'
-      @codec.setTagsAfterEncoding(1).should == ''
+      expect(@codec.command(1)).to eq('oggenc -o "/home/vorbis/1-test.ogg" -q 6 -c ' \
+          'ARTIST="trackArtist 1" -c ALBUM="album" -c GENRE="genre" -c DATE="year" -c ' \
+          '"ALBUM ARTIST"="artist" -c DISCNUMBER=1 -c ENCODER="Rubyripper test" -c ' \
+          'DISCID="ABCDEFGH" -c TITLE="trackname 1" -c TRACKNUMBER=1 -c TRACKTOTAL=99 "input_1.wav"')
+      expect(@codec.setTagsAfterEncoding(1)).to eq('')
     end
   end
   
@@ -138,51 +138,51 @@ describe Codecs::Main do
     end
     
     it "should return the command to replaygain a track" do
-      scheme.should_receive(:getFile).with('flac', 1).and_return 'output.flac'
-      @codec.replaygain(1).should == 'metaflac --add-replay-gain "output.flac"'
+      expect(scheme).to receive(:getFile).with('flac', 1).and_return 'output.flac'
+      expect(@codec.replaygain(1)).to eq('metaflac --add-replay-gain "output.flac"')
     end
     
     it "should return the command to replaygain an album" do
-      scheme.should_receive(:getDir).with('flac').and_return '/home/flac'
-      @codec.replaygainAlbum.should == 'metaflac --add-replay-gain "/home/flac"/*.flac'
+      expect(scheme).to receive(:getDir).with('flac').and_return '/home/flac'
+      expect(@codec.replaygainAlbum).to eq('metaflac --add-replay-gain "/home/flac"/*.flac')
     end
     
     it "should calculate the command for encoding a track" do
-      prefs.should_receive(:settingsFlac).and_return '-q 6'
-      prefs.stub(:image).and_return false
-      scheme.should_receive(:getTempFile).with(1).and_return 'input_1.wav'
-      scheme.should_receive(:getFile).with('flac', 1).and_return '/home/flac/1-test.flac'
-      disc.should_receive(:audiotracks).and_return 99
-      md.should_receive(:various?).and_return true
-      md.should_receive(:discNumber).twice.and_return "1"
-      disc.should_receive(:freedbDiscid).twice.and_return 'ABCDEFGH'
+      expect(prefs).to receive(:settingsFlac).and_return '-q 6'
+      allow(prefs).to receive(:image).and_return false
+      expect(scheme).to receive(:getTempFile).with(1).and_return 'input_1.wav'
+      expect(scheme).to receive(:getFile).with('flac', 1).and_return '/home/flac/1-test.flac'
+      expect(disc).to receive(:audiotracks).and_return 99
+      expect(md).to receive(:various?).and_return true
+      expect(md).to receive(:discNumber).twice.and_return "1"
+      expect(disc).to receive(:freedbDiscid).twice.and_return 'ABCDEFGH'
       
-      @codec.command(1).should == 'flac -o "/home/flac/1-test.flac" -q 6 --tag '\
-          'ARTIST="trackArtist 1" --tag ALBUM="album" --tag GENRE="genre" --tag DATE="year" '\
-          '--tag "ALBUM ARTIST"="artist" --tag DISCNUMBER=1 --tag ENCODER="Rubyripper test" '\
-          '--tag DISCID="ABCDEFGH" --tag TITLE="trackname 1" --tag TRACKNUMBER=1 --tag '\
-          'TRACKTOTAL=99 "input_1.wav"'
-      @codec.setTagsAfterEncoding(1).should == ''
+      expect(@codec.command(1)).to eq('flac -o "/home/flac/1-test.flac" -q 6 --tag ' \
+          'ARTIST="trackArtist 1" --tag ALBUM="album" --tag GENRE="genre" --tag DATE="year" ' \
+          '--tag "ALBUM ARTIST"="artist" --tag DISCNUMBER=1 --tag ENCODER="Rubyripper test" ' \
+          '--tag DISCID="ABCDEFGH" --tag TITLE="trackname 1" --tag TRACKNUMBER=1 --tag ' \
+          'TRACKTOTAL=99 "input_1.wav"')
+      expect(@codec.setTagsAfterEncoding(1)).to eq('')
     end
     
     it "should save the cuesheet file if available for image rips" do
-      prefs.should_receive(:settingsFlac).and_return '-q 6'
-      prefs.stub(:image).and_return true
-      prefs.should_receive(:createCue).and_return true
-      scheme.should_receive(:getCueFile).and_return '/home/flac/test.cue'
-      file.should_receive(:exist?).with('/home/flac/test.cue').and_return true
-      scheme.should_receive(:getTempFile).with(1).and_return 'input_1.wav'
-      scheme.should_receive(:getFile).with('flac', 1).and_return '/home/flac/1-test.flac'
-      disc.should_receive(:audiotracks).and_return 99
-      md.should_receive(:various?).and_return true
-      md.should_receive(:discNumber).twice.and_return "1"
-      disc.should_receive(:freedbDiscid).twice.and_return 'ABCDEFGH'
+      expect(prefs).to receive(:settingsFlac).and_return '-q 6'
+      allow(prefs).to receive(:image).and_return true
+      expect(prefs).to receive(:createCue).and_return true
+      expect(scheme).to receive(:getCueFile).and_return '/home/flac/test.cue'
+      expect(file).to receive(:exist?).with('/home/flac/test.cue').and_return true
+      expect(scheme).to receive(:getTempFile).with(1).and_return 'input_1.wav'
+      expect(scheme).to receive(:getFile).with('flac', 1).and_return '/home/flac/1-test.flac'
+      expect(disc).to receive(:audiotracks).and_return 99
+      expect(md).to receive(:various?).and_return true
+      expect(md).to receive(:discNumber).twice.and_return "1"
+      expect(disc).to receive(:freedbDiscid).twice.and_return 'ABCDEFGH'
       
-      @codec.command(1).should == 'flac -o "/home/flac/1-test.flac" -q 6 --tag '\
-          'ARTIST="trackArtist 1" --tag ALBUM="album" --tag GENRE="genre" --tag DATE="year" '\
-          '--tag "ALBUM ARTIST"="artist" --tag DISCNUMBER=1 --tag ENCODER="Rubyripper test" '\
-          '--tag DISCID="ABCDEFGH" --tag '\
-          'TRACKTOTAL=99 --cuesheet="/home/flac/test.cue" "input_1.wav"'
+      expect(@codec.command(1)).to eq('flac -o "/home/flac/1-test.flac" -q 6 --tag ' \
+          'ARTIST="trackArtist 1" --tag ALBUM="album" --tag GENRE="genre" --tag DATE="year" ' \
+          '--tag "ALBUM ARTIST"="artist" --tag DISCNUMBER=1 --tag ENCODER="Rubyripper test" ' \
+          '--tag DISCID="ABCDEFGH" --tag ' \
+          'TRACKTOTAL=99 --cuesheet="/home/flac/test.cue" "input_1.wav"')
     end
   end
   
@@ -192,20 +192,20 @@ describe Codecs::Main do
     end
     
     it "should return the command to replaygain a track" do
-      scheme.should_receive(:getFile).with('wav', 1).and_return 'output.wav'
-      @codec.replaygain(1).should == 'wavegain "output.wav"'
+      expect(scheme).to receive(:getFile).with('wav', 1).and_return 'output.wav'
+      expect(@codec.replaygain(1)).to eq('wavegain "output.wav"')
     end
     
     it "should return the command to replaygain an album" do
-      scheme.should_receive(:getDir).with('wav').and_return '/home/wav'
-      @codec.replaygainAlbum.should == 'wavegain -a "/home/wav"/*.wav'
+      expect(scheme).to receive(:getDir).with('wav').and_return '/home/wav'
+      expect(@codec.replaygainAlbum).to eq('wavegain -a "/home/wav"/*.wav')
     end
     
     it "should calculate the command for encoding" do
-      scheme.should_receive(:getTempFile).with(1).and_return 'input_1.wav'
-      scheme.should_receive(:getFile).with('wav', 1).and_return '/home/wav/1-test.wav'   
-      @codec.command(1).should == 'cp "input_1.wav" "/home/wav/1-test.wav"'
-      @codec.setTagsAfterEncoding(1).should == ''
+      expect(scheme).to receive(:getTempFile).with(1).and_return 'input_1.wav'
+      expect(scheme).to receive(:getFile).with('wav', 1).and_return '/home/wav/1-test.wav'   
+      expect(@codec.command(1)).to eq('cp "input_1.wav" "/home/wav/1-test.wav"')
+      expect(@codec.setTagsAfterEncoding(1)).to eq('')
     end
   end
   
@@ -215,30 +215,30 @@ describe Codecs::Main do
     end
     
     it "should return the command to replaygain a track" do
-      scheme.should_receive(:getFile).with('nero', 1).and_return 'output.m4a'
-      @codec.replaygain(1).should == 'aacgain -c -r "output.m4a"'
+      expect(scheme).to receive(:getFile).with('nero', 1).and_return 'output.m4a'
+      expect(@codec.replaygain(1)).to eq('aacgain -c -r "output.m4a"')
     end
     
     it "should return the command to replaygain an album" do
-      scheme.should_receive(:getDir).with('nero').and_return '/home/nero'
-      @codec.replaygainAlbum().should == 'aacgain -c -a "/home/nero"/*.m4a'
+      expect(scheme).to receive(:getDir).with('nero').and_return '/home/nero'
+      expect(@codec.replaygainAlbum()).to eq('aacgain -c -a "/home/nero"/*.m4a')
     end
        
     it "should calculate the command for encoding and tagging" do
-      prefs.should_receive(:settingsNero).and_return '-q 1'
-      prefs.stub(:image).and_return false
-      scheme.should_receive(:getTempFile).with(1).and_return 'input_1.wav'
-      scheme.should_receive(:getFile).with('nero', 1).twice.and_return '/home/nero/1-test.m4a'
-      disc.should_receive(:audiotracks).and_return 99
-      md.should_receive(:various?).and_return true
-      md.should_receive(:discNumber).twice.and_return "1"
-      disc.should_receive(:freedbDiscid).twice.and_return 'ABCDEFGH'
+      expect(prefs).to receive(:settingsNero).and_return '-q 1'
+      allow(prefs).to receive(:image).and_return false
+      expect(scheme).to receive(:getTempFile).with(1).and_return 'input_1.wav'
+      expect(scheme).to receive(:getFile).with('nero', 1).twice.and_return '/home/nero/1-test.m4a'
+      expect(disc).to receive(:audiotracks).and_return 99
+      expect(md).to receive(:various?).and_return true
+      expect(md).to receive(:discNumber).twice.and_return "1"
+      expect(disc).to receive(:freedbDiscid).twice.and_return 'ABCDEFGH'
       
-      @codec.command(1).should == 'neroAacEnc -q 1 -if "input_1.wav" -of "/home/nero/1-test.m4a"'
-      @codec.setTagsAfterEncoding(1).should == 'neroAacTag "/home/nero/1-test.m4a" '\
-          '-meta:artist="trackArtist 1" -meta:album="album" -meta:genre="genre" -meta:year="year" '\
-          '-meta-user:"ALBUM ARTIST"="artist" -meta:disc=1 -meta-user:ENCODER="Rubyripper test" '\
-          '-meta-user:DISCID="ABCDEFGH" -meta:title="trackname 1" -meta:track=1 -meta:totaltracks=99'
+      expect(@codec.command(1)).to eq('neroAacEnc -q 1 -if "input_1.wav" -of "/home/nero/1-test.m4a"')
+      expect(@codec.setTagsAfterEncoding(1)).to eq('neroAacTag "/home/nero/1-test.m4a" ' \
+          '-meta:artist="trackArtist 1" -meta:album="album" -meta:genre="genre" -meta:year="year" ' \
+          '-meta-user:"ALBUM ARTIST"="artist" -meta:disc=1 -meta-user:ENCODER="Rubyripper test" ' \
+          '-meta-user:DISCID="ABCDEFGH" -meta:title="trackname 1" -meta:track=1 -meta:totaltracks=99')
     end
   end
   
@@ -248,30 +248,30 @@ describe Codecs::Main do
     end
     
     it "should return an empty string for the replaygain commands (not available)" do
-      scheme.should_receive(:getFile).with('wavpack', 1).and_return 'output.wv'
-      @codec.replaygain(1).should == ''
-      scheme.should_receive(:getDir).with('wavpack').and_return '/home/wavpack'
-      @codec.replaygainAlbum.should == ''
+      expect(scheme).to receive(:getFile).with('wavpack', 1).and_return 'output.wv'
+      expect(@codec.replaygain(1)).to eq('')
+      expect(scheme).to receive(:getDir).with('wavpack').and_return '/home/wavpack'
+      expect(@codec.replaygainAlbum).to eq('')
     end
     
     it "should calculate the command for encoding an image rip" do
-      prefs.should_receive(:settingsWavpack).and_return ''
-      prefs.stub(:image).and_return true
-      prefs.should_receive(:createCue).and_return true
-      scheme.should_receive(:getCueFile).and_return '/home/wavpack/test.cue'
-      file.should_receive(:exist?).with('/home/wavpack/test.cue').and_return true
-      scheme.should_receive(:getTempFile).with(1).and_return 'input_1.wav'
-      scheme.should_receive(:getFile).with('wavpack', 1).and_return '/home/wavpack/1-test.wv'
-      disc.should_receive(:audiotracks).and_return 99
-      md.should_receive(:various?).and_return true
-      md.should_receive(:discNumber).twice.and_return "1"
-      disc.should_receive(:freedbDiscid).twice.and_return 'ABCDEFGH'
+      expect(prefs).to receive(:settingsWavpack).and_return ''
+      allow(prefs).to receive(:image).and_return true
+      expect(prefs).to receive(:createCue).and_return true
+      expect(scheme).to receive(:getCueFile).and_return '/home/wavpack/test.cue'
+      expect(file).to receive(:exist?).with('/home/wavpack/test.cue').and_return true
+      expect(scheme).to receive(:getTempFile).with(1).and_return 'input_1.wav'
+      expect(scheme).to receive(:getFile).with('wavpack', 1).and_return '/home/wavpack/1-test.wv'
+      expect(disc).to receive(:audiotracks).and_return 99
+      expect(md).to receive(:various?).and_return true
+      expect(md).to receive(:discNumber).twice.and_return "1"
+      expect(disc).to receive(:freedbDiscid).twice.and_return 'ABCDEFGH'
       
-      @codec.command(1).should == 'wavpack -w ARTIST="trackArtist 1" -w ALBUM="album" '\
-          '-w GENRE="genre" -w DATE="year" -w "ALBUM ARTIST"="artist" -w DISCNUMBER=1 -w '\
-          'ENCODER="Rubyripper test" -w DISCID="ABCDEFGH" -w '\
-          'TRACKTOTAL=99 -w CUESHEET="/home/wavpack/test.cue" "input_1.wav" -o "/home/wavpack/1-test.wv"'
-      @codec.setTagsAfterEncoding(1).should == ''
+      expect(@codec.command(1)).to eq('wavpack -w ARTIST="trackArtist 1" -w ALBUM="album" ' \
+          '-w GENRE="genre" -w DATE="year" -w "ALBUM ARTIST"="artist" -w DISCNUMBER=1 -w ' \
+          'ENCODER="Rubyripper test" -w DISCID="ABCDEFGH" -w ' \
+          'TRACKTOTAL=99 -w CUESHEET="/home/wavpack/test.cue" "input_1.wav" -o "/home/wavpack/1-test.wv"')
+      expect(@codec.setTagsAfterEncoding(1)).to eq('')
     end
   end
   
@@ -281,20 +281,22 @@ describe Codecs::Main do
     end
       
     it "should calculate the command for encoding" do
-      prefs.should_receive(:settingsOpus).and_return '--bitrate 160'
-      prefs.stub(:image).and_return false
-      scheme.should_receive(:getTempFile).with(1).and_return 'input_1.wav'
-      scheme.should_receive(:getFile).with('opus', 1).and_return '/home/opus/1-test.opus'
-      disc.should_receive(:audiotracks).and_return 99
-      md.should_receive(:various?).and_return true
-      md.should_receive(:discNumber).twice.and_return "1"
-      disc.should_receive(:freedbDiscid).twice.and_return 'ABCDEFGH'
+      expect(prefs).to receive(:settingsOpus).and_return '--bitrate 160'
+      allow(prefs).to receive(:image).and_return false
+      expect(scheme).to receive(:getTempFile).with(1).and_return 'input_1.wav'
+      expect(scheme).to receive(:getFile).with('opus', 1).and_return '/home/opus/1-test.opus'
+      expect(disc).to receive(:audiotracks).and_return 99
+      expect(md).to receive(:various?).and_return true
+      expect(md).to receive(:discNumber).twice.and_return "1"
+      expect(disc).to receive(:freedbDiscid).twice.and_return 'ABCDEFGH'
       
-      @codec.command(1).should == 'opusenc --bitrate 160 --artist "trackArtist 1" --comment ALBUM="album" '\
-          '--comment GENRE="genre" --comment DATE="year" --comment "ALBUM ARTIST"="artist" '\
-          '--comment DISCNUMBER=1 --comment ENCODER="Rubyripper test" --comment DISCID="ABCDEFGH" --title "trackname 1" '\
-          '--comment TRACKNUMBER=1 --comment TRACKTOTAL=99 "input_1.wav" "/home/opus/1-test.opus"'
-      @codec.setTagsAfterEncoding(1).should == ''
+      expect(@codec.command(1)).to eq('opusenc --bitrate 160 --artist "trackArtist 1" --comment ALBUM="album" ' \
+          '--comment GENRE="genre" --comment DATE="year" --comment "ALBUM ARTIST"="artist" ' \
+          '--comment DISCNUMBER=1 --comment ENCODER="Rubyripper test" --comment DISCID="ABCDEFGH" --title "trackname 1" ' \
+          '--comment TRACKNUMBER=1 --comment TRACKTOTAL=99 "input_1.wav" "/home/opus/1-test.opus"')
+      expect(@codec.setTagsAfterEncoding(1)).to eq('')
     end
   end
 end
+
+

@@ -28,19 +28,19 @@ describe SaveFreedbRecord do
 
   it "should save the provided record in a file at the right location" do
     file = double('fileAndDir')
-    file.should_receive(:write).with(@filename, @record, false).and_return('ok')
+    expect(file).to receive(:write).with(@filename, @record, false).and_return('ok')
     save = SaveFreedbRecord.new(file)
 
     save.save(@record, @category, @discid)
-    save.outputFile.should == @filename
+    expect(save.outputFile).to eq(@filename)
   end
 
   it "shouldn't overwrite existing files but still save the filename" do
     file = double('fileAndDir')
-    file.should_receive(:write).exactly(1).times.and_return('fileExists')
+    expect(file).to receive(:write).exactly(1).times.and_return('fileExists')
 
     save = SaveFreedbRecord.new(file)
     save.save(@record, @category, @discid)
-    save.outputFile.should == @filename
+    expect(save.outputFile).to eq(@filename)
 	end
 end

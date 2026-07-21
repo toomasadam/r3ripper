@@ -25,9 +25,11 @@ module Metadata
     end
     
     def filter(item)
-      item.gsub!('/', '') #no slashes allowed in filenames
-      while(item[0] == '.'); item = item[1..-1] ; end
-      item = super(item)
+      # ensure we work on a copy to avoid side effects
+      result = item.dup
+      result.gsub!('/', '') #no slashes allowed in filenames
+      while(result[0] == '.'); result = result[1..-1] ; end
+      super(result)
     end
   end
 end

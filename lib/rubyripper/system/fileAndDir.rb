@@ -56,7 +56,7 @@ class FileAndDir
   end
   
   def exists?(filename)
-    if File.exists?(file = File.expand_path(filename))
+    if filename && File.exist?(file = File.expand_path(filename))
       return file
     else		  
       return false

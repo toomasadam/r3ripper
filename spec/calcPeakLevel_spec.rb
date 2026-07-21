@@ -27,20 +27,20 @@ describe CalcPeakLevel do
    
   context "Given sox is installed" do
     before(:each) do
-      deps.stub!(:installed?).with('sox').and_return true
+      allow(deps).to receive(:installed?).with('sox').and_return true
     end
     
     # calculation is (96 + sox-level) / 96 * 100
     it "should report 93.75 percent if the peak level db from sox is -6.00" do
       sox_output = ["Pk lev dB      -6.00     -6.00     -6.45"]
-      exec.should_receive(:launch).with("sox \"filename\" -n stats", false, true).and_return sox_output      
-      calc.getPeakLevel('filename').should == '93.75'
+      expect(exec).to receive(:launch).with("sox \"filename\" -n stats", false, true).and_return sox_output      
+      expect(calc.getPeakLevel('filename')).to eq('93.75')
     end
     
     it "should report 100% if the peak level db from sox is 0" do
       sox_output = ["Pk lev dB       0.00      0.00      0.00", 'blabla']
-      exec.should_receive(:launch).with("sox \"filename\" -n stats", false, true).and_return sox_output      
-      calc.getPeakLevel('filename').should == '100.00'
+      expect(exec).to receive(:launch).with("sox \"filename\" -n stats", false, true).and_return sox_output      
+      expect(calc.getPeakLevel('filename')).to eq('100.00')
     end
   end
 end

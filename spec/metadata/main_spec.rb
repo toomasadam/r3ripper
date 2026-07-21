@@ -28,65 +28,65 @@ describe Metadata::Main do
 
   context "When the metadata for a disc is requested" do
     it "should use Musicbrainz if that is the preference" do
-      prefs.stub!(:metadataProvider).and_return "musicbrainz"
-      musicbrainz.should_receive(:get)
-      musicbrainz.should_receive(:status).and_return 'ok'
-      main.get.should == musicbrainz
+      allow(prefs).to receive(:metadataProvider).and_return "musicbrainz"
+      expect(musicbrainz).to receive(:get)
+      expect(musicbrainz).to receive(:status).and_return 'ok'
+      expect(main.get).to eq(musicbrainz)
     end
   
     it "should use Freedb if that is the preference" do
-      prefs.stub!(:metadataProvider).and_return "freedb"
-      freedb.should_receive(:get)
-      freedb.should_receive(:status).and_return 'ok'
-      main.get.should == freedb
+      allow(prefs).to receive(:metadataProvider).and_return "freedb"
+      expect(freedb).to receive(:get)
+      expect(freedb).to receive(:status).and_return 'ok'
+      expect(main.get).to eq(freedb)
     end
     
     it "should skip both providers if that is the preference" do
-      prefs.stub!(:metadataProvider).and_return "none"
-      main.get.should == data
+      allow(prefs).to receive(:metadataProvider).and_return "none"
+      expect(main.get).to eq(data)
     end
     
     context "Given the preference is set to musicbrainz" do
       before(:each) do
-        prefs.stub!(:metadataProvider).and_return "musicbrainz"
+        allow(prefs).to receive(:metadataProvider).and_return "musicbrainz"
       end
       
       it "should first fall back to Freedb if Musicbrainz fails" do
-        musicbrainz.should_receive(:get)
-        musicbrainz.should_receive(:status).and_return 'mayday'
-        freedb.should_receive(:get)
-        freedb.should_receive(:status).and_return 'ok'
-        main.get.should == freedb
+        expect(musicbrainz).to receive(:get)
+        expect(musicbrainz).to receive(:status).and_return 'mayday'
+        expect(freedb).to receive(:get)
+        expect(freedb).to receive(:status).and_return 'ok'
+        expect(main.get).to eq(freedb)
       end
       
       it "should fall back to none if Freedb fails as well" do
-        musicbrainz.should_receive(:get)
-        musicbrainz.should_receive(:status).and_return 'mayday'
-        freedb.should_receive(:get)
-        freedb.should_receive(:status).and_return 'mayday'
-        main.get.should == data
+        expect(musicbrainz).to receive(:get)
+        expect(musicbrainz).to receive(:status).and_return 'mayday'
+        expect(freedb).to receive(:get)
+        expect(freedb).to receive(:status).and_return 'mayday'
+        expect(main.get).to eq(data)
       end
     end
     
     context "Given the preference is set to freedb" do
       before(:each) do
-        prefs.stub!(:metadataProvider).and_return "freedb"
+        allow(prefs).to receive(:metadataProvider).and_return "freedb"
       end
       
       it "should first fall back to Musicbrainz if Freedb fails" do
-        freedb.should_receive(:get)
-        freedb.should_receive(:status).and_return 'mayday'
-        musicbrainz.should_receive(:get)
-        musicbrainz.should_receive(:status).and_return 'ok'
-        main.get.should == musicbrainz
+        expect(freedb).to receive(:get)
+        expect(freedb).to receive(:status).and_return 'mayday'
+        expect(musicbrainz).to receive(:get)
+        expect(musicbrainz).to receive(:status).and_return 'ok'
+        expect(main.get).to eq(musicbrainz)
       end
       
       it "should fall back to none if Musicbrainz fails as well" do
-        freedb.should_receive(:get)
-        freedb.should_receive(:status).and_return 'mayday'
-        musicbrainz.should_receive(:get)
-        musicbrainz.should_receive(:status).and_return 'mayday'
-        main.get.should == data
+        expect(freedb).to receive(:get)
+        expect(freedb).to receive(:status).and_return 'mayday'
+        expect(musicbrainz).to receive(:get)
+        expect(musicbrainz).to receive(:status).and_return 'mayday'
+        expect(main.get).to eq(data)
       end
     end
   end

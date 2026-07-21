@@ -25,42 +25,42 @@ describe ScanDiscCdrdao do
   let(:log) {double('Log').as_null_object}
   let(:cdrdao) {ScanDiscCdrdao.new(exec, prefs, file)}
   
-  before(:each){prefs.stub!(:cdrom).and_return('/dev/cdrom')}
+  before(:each){allow(prefs).to receive(:cdrom).and_return('/dev/cdrom')}
 
   context "In case cdrdao exits with an error" do
     it "should detect cdrdao is not installed" do
-      exec.stub!(:launch).and_return(nil)
-      log.should_receive(:<<).with('Error: cdrdao is required, but not detected on your system!')
+      allow(exec).to receive(:launch).and_return(nil)
+      expect(log).to receive(:<<).with('Error: cdrdao is required, but not detected on your system!')
       cdrdao.scanInBackground()
       cdrdao.joinWithMainThread(log)
     end
     
     it "should detect if there is no disc in the drive" do
-      exec.stub!(:launch).and_return('ERROR: Unit not ready, giving up.')
-      log.should_receive(:<<).with('Error: There is no audio disc ready in drive /dev/cdrom.')
+      allow(exec).to receive(:launch).and_return('ERROR: Unit not ready, giving up.')
+      expect(log).to receive(:<<).with('Error: There is no audio disc ready in drive /dev/cdrom.')
       cdrdao.scanInBackground()
       cdrdao.joinWithMainThread(log)
     end
     
     it "should detect if there is a parameter problem" do
-      exec.stub!(:launch).and_return('Usage: cdrdao')
-      log.should_receive(:<<).with('Error: cdrdao does not recognize the parameters used.')
+      allow(exec).to receive(:launch).and_return('Usage: cdrdao')
+      expect(log).to receive(:<<).with('Error: cdrdao does not recognize the parameters used.')
       cdrdao.scanInBackground()
       cdrdao.joinWithMainThread(log)
     end
     
     it "should detect if the drive is not recognized" do
-      exec.stub!(:launch).and_return('ERROR: Cannot setup device')
-      log.should_receive(:<<).with('Error: The device /dev/cdrom doesn\'t exist on your system!')
+      allow(exec).to receive(:launch).and_return('ERROR: Cannot setup device')
+      expect(log).to receive(:<<).with('Error: The device /dev/cdrom doesn\'t exist on your system!')
       cdrdao.scanInBackground()
       cdrdao.joinWithMainThread(log)
     end
     
     it "should not give a warning with correct results" do
-      exec.stub!(:launch).and_return('ok')
-      log.should_receive(:<<).with("\nADVANCED TOC ANALYSIS (with cdrdao)\n")
-      log.should_receive(:<<).with("...please be patient, this may take a while\n\n")
-      log.should_receive(:<<).with("No pregap, silence, pre-emphasis or data track detected\n\n")
+      allow(exec).to receive(:launch).and_return('ok')
+      expect(log).to receive(:<<).with("\nADVANCED TOC ANALYSIS (with cdrdao)\n")
+      expect(log).to receive(:<<).with("...please be patient, this may take a while\n\n")
+      expect(log).to receive(:<<).with("No pregap, silence, pre-emphasis or data track detected\n\n")
       cdrdao.scanInBackground()
       cdrdao.joinWithMainThread(log)
       cdrdao.error.nil? == true
@@ -68,97 +68,97 @@ describe ScanDiscCdrdao do
   end
   
   context "When parsing the file" do
-    before(:each){exec.stub!(:launch).and_return('ok')}
+    before(:each){allow(exec).to receive(:launch).and_return('ok')}
 
     # notice there are 75 sectors in a second
     it "should detect if the disc starts with a silence" do
-      file.should_receive(:read).and_return('SILENCE 00:01:20')
-      log.should_receive(:<<).with("Silence detected for disc : 95 sectors\n")
+      expect(file).to receive(:read).and_return('SILENCE 00:01:20')
+      expect(log).to receive(:<<).with("Silence detected for disc : 95 sectors\n")
       cdrdao.scanInBackground()
       cdrdao.joinWithMainThread(log)
-      cdrdao.getSilenceSectors.should == 95
+      expect(cdrdao.getSilenceSectors).to eq(95)
     end
     
     it "should detect if a track has a pregap" do
-      file.should_receive(:read).and_return(%Q{// Track 3\n// Track 4\nSTART 00:00:35\n// Track 5})
-      log.should_receive(:<<).with("Pregap detected for track 4 : 35 sectors\n")
+      expect(file).to receive(:read).and_return(%Q{// Track 3\n// Track 4\nSTART 00:00:35\n// Track 5})
+      expect(log).to receive(:<<).with("Pregap detected for track 4 : 35 sectors\n")
       cdrdao.scanInBackground()
       cdrdao.joinWithMainThread(log)
-      cdrdao.getPregapSectors(track=3).should == 0
-      cdrdao.getPregapSectors(track=4).should == 35
-      cdrdao.getPregapSectors(track=5).should == 0
+      expect(cdrdao.getPregapSectors(track=3)).to eq(0)
+      expect(cdrdao.getPregapSectors(track=4)).to eq(35)
+      expect(cdrdao.getPregapSectors(track=5)).to eq(0)
     end
     
     it "should detect if a track has pre-emphasis" do
-      file.should_receive(:read).and_return(%Q{// Track 3\n// Track 4\nPRE_EMPHASIS\n// Track 5})
-      log.should_receive(:<<).with("Pre_emphasis detected for track 4\n")
+      expect(file).to receive(:read).and_return(%Q{// Track 3\n// Track 4\nPRE_EMPHASIS\n// Track 5})
+      expect(log).to receive(:<<).with("Pre_emphasis detected for track 4\n")
       cdrdao.scanInBackground()
       cdrdao.joinWithMainThread(log)
-      cdrdao.preEmph?(3).should == false
-      cdrdao.preEmph?(4).should == true
-      cdrdao.preEmph?(5).should == false
+      expect(cdrdao.preEmph?(3)).to eq(false)
+      expect(cdrdao.preEmph?(4)).to eq(true)
+      expect(cdrdao.preEmph?(5)).to eq(false)
     end
 
     it "should detect if a track has a ISRC code" do
-      file.should_receive(:read).and_return(%Q{// Track 3\n// Track 4\nISRC "USSM10007452"\n// Track 5})
+      expect(file).to receive(:read).and_return(%Q{// Track 3\n// Track 4\nISRC "USSM10007452"\n// Track 5})
       cdrdao.scanInBackground()
       cdrdao.joinWithMainThread(log)
-      cdrdao.getIsrcForTrack(3).should == ''
-      cdrdao.getIsrcForTrack(4).should == 'USSM10007452'
-      cdrdao.getIsrcForTrack(5).should == ''
+      expect(cdrdao.getIsrcForTrack(3)).to eq('')
+      expect(cdrdao.getIsrcForTrack(4)).to eq('USSM10007452')
+      expect(cdrdao.getIsrcForTrack(5)).to eq('')
     end
     
     it "should detect data tracks" do
-      file.should_receive(:read).and_return(%Q{// Track 3\n// Track 4\nTRACK DATA\n// Track 5\nTRACK DATA})
-      log.should_receive(:<<).with("Track 4 is marked as a DATA track\n")
-      log.should_receive(:<<).with("Track 5 is marked as a DATA track\n")
+      expect(file).to receive(:read).and_return(%Q{// Track 3\n// Track 4\nTRACK DATA\n// Track 5\nTRACK DATA})
+      expect(log).to receive(:<<).with("Track 4 is marked as a DATA track\n")
+      expect(log).to receive(:<<).with("Track 5 is marked as a DATA track\n")
       cdrdao.scanInBackground()
       cdrdao.joinWithMainThread(log)
-      cdrdao.dataTracks.should == [4,5]
+      expect(cdrdao.dataTracks).to eq([4,5])
     end
     
     it "should detect the type of the disc" do
-      file.should_receive(:read).and_return('CD_DA')
+      expect(file).to receive(:read).and_return('CD_DA')
       cdrdao.scanInBackground()
       cdrdao.joinWithMainThread(log)
-      cdrdao.discType.should == 'CD_DA'
+      expect(cdrdao.discType).to eq('CD_DA')
     end
     
     it "should detect the highest track number" do
-      file.should_receive(:read).and_return(%Q{// Track 3\n// Track 4\nTRACK DATA\n// Track 5\nTRACK DATA})
+      expect(file).to receive(:read).and_return(%Q{// Track 3\n// Track 4\nTRACK DATA\n// Track 5\nTRACK DATA})
       cdrdao.scanInBackground()
       cdrdao.joinWithMainThread(log)
-      cdrdao.tracks.should == 5
+      expect(cdrdao.tracks).to eq(5)
     end
   end
   
   context "When there is cd-text on the disc" do
-    before(:each){exec.stub!(:launch).and_return('ok')}
+    before(:each){allow(exec).to receive(:launch).and_return('ok')}
     
     it "should detect the artist and album" do
-      file.should_receive(:read).and_return(%Q[CD_TEXT {\n  LANGUAGE 0 {\n    TITLE "SYSTEM OF A DOWN   STEAL THIS ALBUM!"])
+      expect(file).to receive(:read).and_return(%Q[CD_TEXT {\n  LANGUAGE 0 {\n    TITLE "SYSTEM OF A DOWN   STEAL THIS ALBUM!"])
       cdrdao.scanInBackground()
       cdrdao.joinWithMainThread(log)
-      cdrdao.artist.should == "SYSTEM OF A DOWN"
-      cdrdao.album.should == "STEAL THIS ALBUM!"
+      expect(cdrdao.artist).to eq("SYSTEM OF A DOWN")
+      expect(cdrdao.album).to eq("STEAL THIS ALBUM!")
     end
     
     it "should detect the tracknames" do
-      file.should_receive(:read).and_return(%Q[// Track 3\nCD_TEXT {\n  LANGUAGE 0 {\n    TITLE "BUBBLES"\n    PERFORMER ""\n  }\n}])
+      expect(file).to receive(:read).and_return(%Q[// Track 3\nCD_TEXT {\n  LANGUAGE 0 {\n    TITLE "BUBBLES"\n    PERFORMER ""\n  }\n}])
       cdrdao.scanInBackground()
       cdrdao.joinWithMainThread(log)
-      cdrdao.getTrackname(track=2).should == ""
-      cdrdao.getTrackname(track=3).should == "BUBBLES"
-      cdrdao.getTrackname(track=4).should == ""
+      expect(cdrdao.getTrackname(track=2)).to eq("")
+      expect(cdrdao.getTrackname(track=3)).to eq("BUBBLES")
+      expect(cdrdao.getTrackname(track=4)).to eq("")
     end
     
     it "should detect the various artists" do
-      file.should_receive(:read).and_return(%Q[// Track 3\nCD_TEXT {\n  LANGUAGE 0 {\n    TITLE "BUBBLES"\n    PERFORMER "ABCDE"\n  }\n}])
+      expect(file).to receive(:read).and_return(%Q[// Track 3\nCD_TEXT {\n  LANGUAGE 0 {\n    TITLE "BUBBLES"\n    PERFORMER "ABCDE"\n  }\n}])
       cdrdao.scanInBackground()
       cdrdao.joinWithMainThread(log)
-      cdrdao.getVarArtist(track=2).should == ""
-      cdrdao.getVarArtist(track=3).should == "ABCDE"
-      cdrdao.getVarArtist(track=4).should == ""
+      expect(cdrdao.getVarArtist(track=2)).to eq("")
+      expect(cdrdao.getVarArtist(track=3)).to eq("ABCDE")
+      expect(cdrdao.getVarArtist(track=4)).to eq("")
     end    
   end
 end

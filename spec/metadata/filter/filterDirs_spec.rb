@@ -25,73 +25,73 @@ describe Metadata::FilterDirs do
   let(:filter) {Metadata::FilterDirs.new(data, prefs)}
   
   before(:each) do
-    prefs.stub!(:noSpaces).and_return false
-    prefs.stub!(:noCapitals).and_return false
+    allow(prefs).to receive(:noSpaces).and_return false
+    allow(prefs).to receive(:noCapitals).and_return false
   end
   
   context "When determining the dirname it should be valid in a FAT filesystem" do
     it "should replace the dollar sign $" do
       data.artist = 'I like CA$H'
-      filter.artist.should == 'I like CASH'
+      expect(filter.artist).to eq('I like CASH')
     end
     
     it "should remove colons :" do
       data.artist = 'Hello: world'
-      filter.artist.should == 'Hello world'
+      expect(filter.artist).to eq('Hello world')
     end
     
     it "should remove asterixes *" do
       data.artist = 'Hello* world'
-      filter.artist.should == 'Hello world'
+      expect(filter.artist).to eq('Hello world')
     end
     
     it "should remove question marks ?" do
       data.artist = 'Hello? world'
-      filter.artist.should == 'Hello world'
+      expect(filter.artist).to eq('Hello world')
     end
     
     it "should remove smaller than signs <" do
       data.artist = 'Hello< world'
-      filter.artist.should == 'Hello world'
+      expect(filter.artist).to eq('Hello world')
     end
     
     it "should remove bigger than signs >" do
       data.artist = 'Hello> world'
-      filter.artist.should == 'Hello world'
+      expect(filter.artist).to eq('Hello world')
     end
     
     it "should remove the pipe character |" do
       data.artist = 'Hello| world'
-      filter.artist.should == 'Hello world'
+      expect(filter.artist).to eq('Hello world')
     end
     
     it "should remove backslashes \\" do
       data.artist = 'Hello\\ world'
-      filter.artist.should == 'Hello world'
+      expect(filter.artist).to eq('Hello world')
     end
     
     it "should remove double quotes \"" do
       data.artist = 'Hello" world'
-      filter.artist.should == "Hello world"
+      expect(filter.artist).to eq("Hello world")
     end
     
     it "should be able to combine all logic for filterDirs + filterAll" do
       data.tracklist = {1=>"  \"\\Don`t_won\342\200\230t_know ??_** >< | "}
-      filter.trackname(1).should == "Don't won't know"
+      expect(filter.trackname(1)).to eq("Don't won't know")
     end
   end
   
   context "Replace any characters that are not wished by the user" do
     it "should replace all spaces to underscores if wished for" do
       data.artist = 'Hello world'
-      prefs.stub!(:noSpaces).and_return true
-      filter.artist.should == "Hello_world"
+      allow(prefs).to receive(:noSpaces).and_return true
+      expect(filter.artist).to eq("Hello_world")
     end
     
     it "should downsize all letters if wished for" do
       data.artist = 'hELLo WoRLD'
-      prefs.stub!(:noCapitals).and_return true
-      filter.artist.should == 'hello world'
+      allow(prefs).to receive(:noCapitals).and_return true
+      expect(filter.artist).to eq('hello world')
     end
   end
 end

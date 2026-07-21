@@ -67,11 +67,10 @@ describe Cuesheet do
 
   it "should show all relevant disc data at the top" do
     cue.test_printDiscData()
-    cue.cuesheet.should == ['REM GENRE rock', 'REM DATE 1983', 'REM DISCID AAAA1234',
+    expect(cue.cuesheet).to eq(['REM GENRE rock', 'REM DATE 1983', 'REM DISCID AAAA1234',
                             'REM FREEDB_QUERY "This is a freedb string"', 'REM COMMENT "Rubyripper test"',
-                            'PERFORMER "Iron Maiden"', 'TITLE "Number of the Beast"']
+                            'PERFORMER "Iron Maiden"', 'TITLE "Number of the Beast"'])
   end
-  
   context "When printing the track info for image rips" do
     
     before(:each) do
@@ -85,60 +84,60 @@ describe Cuesheet do
     end
     
     it "should handle the default case for a disc correctly" do
-      cdrdao.stub!(:getPregapSectors).and_return 0
+      allow(cdrdao).to receive(:getPregapSectors).and_return 0
       cue.test_printTrackDataImage('flac')
-      cue.cuesheet.should == @cuesheet
+      expect(cue.cuesheet).to eq(@cuesheet)
     end
     
     it "should write the ISRC for tracks where the info is found without quotes" do
-      cdrdao.stub!(:getPregapSectors).and_return 0
-      cdrdao.stub!(:getIsrcForTrack).with(1).and_return 'someISRCcode'
-      cdrdao.stub!(:getIsrcForTrack).with(2).and_return ''
-      cdrdao.stub!(:getIsrcForTrack).with(3).and_return 'someOtherISRCcode'
+      allow(cdrdao).to receive(:getPregapSectors).and_return 0
+      allow(cdrdao).to receive(:getIsrcForTrack).with(1).and_return 'someISRCcode'
+      allow(cdrdao).to receive(:getIsrcForTrack).with(2).and_return ''
+      allow(cdrdao).to receive(:getIsrcForTrack).with(3).and_return 'someOtherISRCcode'
       @cuesheet.insert(4, '    ISRC someISRCcode')
       @cuesheet.insert(13, '    ISRC someOtherISRCcode')
       cue.test_printTrackDataImage('flac')
-      cue.cuesheet.should == @cuesheet
+      expect(cue.cuesheet).to eq(@cuesheet)
     end
     
     it "should write a zero index if hidden audio before track 1 is ripped" do
-      prefs.stub!(:ripHiddenAudio).and_return true
+      allow(prefs).to receive(:ripHiddenAudio).and_return true
       disc.startSectors[1] = 100
-      cdrdao.stub!(:getPregapSectors).and_return 0
+      allow(cdrdao).to receive(:getPregapSectors).and_return 0
       @cuesheet.insert(4, '    INDEX 00 00:00:00')
       @cuesheet[5] = '    INDEX 01 00:01:25'
       cue.test_printTrackDataImage('flac')
-      cue.cuesheet.should == @cuesheet
+      expect(cue.cuesheet).to eq(@cuesheet)
     end
     
     it "should write a pregap tag if hidden audio before track 1 is not ripped" do
-      prefs.stub!(:ripHiddenAudio).and_return false
+      allow(prefs).to receive(:ripHiddenAudio).and_return false
       disc.startSectors[1] = 100
-      cdrdao.stub!(:getPregapSectors).and_return 0
+      allow(cdrdao).to receive(:getPregapSectors).and_return 0
       @cuesheet.insert(4, '    PREGAP 00:01:25')
       cue.test_printTrackDataImage('flac')
-      cue.cuesheet.should == @cuesheet
+      expect(cue.cuesheet).to eq(@cuesheet)
     end
     
     # The reported start sectors in the TOC are always after the pregap.
     # The zero index therefore is the startindex of the track minus the pregap.
     it "should write a zero index for tracks > 1 with a pregap" do
-      prefs.stub!(:ripHiddenAudio).and_return true
-      cdrdao.stub!(:getPregapSectors).and_return 0
-      cdrdao.stub!(:getPregapSectors).with(2).and_return 100
+      allow(prefs).to receive(:ripHiddenAudio).and_return true
+      allow(cdrdao).to receive(:getPregapSectors).and_return 0
+      allow(cdrdao).to receive(:getPregapSectors).with(2).and_return 100
       @cuesheet.insert(8, '    INDEX 00 00:01:50')
       @cuesheet[9] = '    INDEX 01 00:03:00'
       cue.test_printTrackDataImage('flac')
-      cue.cuesheet.should == @cuesheet
+      expect(cue.cuesheet).to eq(@cuesheet)
     end
   end
   
   context "When printing the track info for prepend based track ripping" do
     before(:each) do
-      cdrdao.stub!(:preEmph?).and_return false
-      cdrdao.stub!(:getPregapSectors).and_return 0
-      prefs.stub!(:preGaps).and_return 'prepend'
-      prefs.stub!(:image).and_return false
+      allow(cdrdao).to receive(:preEmph?).and_return false
+      allow(cdrdao).to receive(:getPregapSectors).and_return 0
+      allow(prefs).to receive(:preGaps).and_return 'prepend'
+      allow(prefs).to receive(:image).and_return false
       @cuesheet = ['FILE "Track_1.flac" WAVE',
                    '  TRACK 01 AUDIO', '    TITLE "Title track 1"',
                    '    PERFORMER "Iron Maiden"', '    INDEX 01 00:00:00',
@@ -152,39 +151,39 @@ describe Cuesheet do
     
     it "should handle the default case for a disc correctly" do
       cue.test_printTrackData('flac')
-      cue.cuesheet.should == @cuesheet
+      expect(cue.cuesheet).to eq(@cuesheet)
     end
     
     it "should set the pre-emphasis flag if the preference is marking in cuesheet" do
-      prefs.stub!(:preEmphasis).and_return 'cue'
-      cdrdao.stub!(:preEmph?).with(2).and_return true
+      allow(prefs).to receive(:preEmphasis).and_return 'cue'
+      allow(cdrdao).to receive(:preEmph?).with(2).and_return true
       @cuesheet.insert(9, '    FLAGS PRE')
       cue.test_printTrackData('flac')
-      cue.cuesheet.should == @cuesheet
+      expect(cue.cuesheet).to eq(@cuesheet)
     end
     
     it "should skip the pre-emphasis flag if the preference is decoding with sox" do
-      prefs.stub!(:preEmphasis).and_return 'sox'
-      cdrdao.stub!(:preEmph?).with(2).and_return true
+      allow(prefs).to receive(:preEmphasis).and_return 'sox'
+      allow(cdrdao).to receive(:preEmph?).with(2).and_return true
       cue.test_printTrackData('flac')
-      cue.cuesheet.should == @cuesheet
+      expect(cue.cuesheet).to eq(@cuesheet)
     end
     
     it "should prepend the gap to the track" do
-      cdrdao.stub!(:getPregapSectors).with(2).and_return 40
+      allow(cdrdao).to receive(:getPregapSectors).with(2).and_return 40
       @cuesheet.insert(9, '    INDEX 00 00:00:00')
       @cuesheet[10] = '    INDEX 01 00:00:40'
       cue.test_printTrackData('flac')
-      cue.cuesheet.should == @cuesheet
+      expect(cue.cuesheet).to eq(@cuesheet)
     end
   end
   
   context "When printing the track info for append based track ripping" do
     before(:each) do
-      cdrdao.stub!(:preEmph?).and_return false
-      cdrdao.stub!(:getPregapSectors).and_return 0
-      prefs.stub!(:preGaps).and_return 'append'
-      prefs.stub!(:image).and_return false
+      allow(cdrdao).to receive(:preEmph?).and_return false
+      allow(cdrdao).to receive(:getPregapSectors).and_return 0
+      allow(prefs).to receive(:preGaps).and_return 'append'
+      allow(prefs).to receive(:image).and_return false
       @cuesheet = ['FILE "Track_1.flac" WAVE',
                    '  TRACK 01 AUDIO', '    TITLE "Title track 1"',
                    '    PERFORMER "Iron Maiden"', '    INDEX 01 00:00:00',
@@ -198,50 +197,50 @@ describe Cuesheet do
     
     it "should handle the default case for a disc correctly" do
       cue.test_printTrackData('flac')
-      cue.cuesheet.should == @cuesheet
+      expect(cue.cuesheet).to eq(@cuesheet)
     end
     
     it "should set the pre-emphasis flag if the preference is marking in cuesheet" do
-      prefs.stub!(:preEmphasis).and_return 'cue'
-      cdrdao.stub!(:preEmph?).with(2).and_return true
+      allow(prefs).to receive(:preEmphasis).and_return 'cue'
+      allow(cdrdao).to receive(:preEmph?).with(2).and_return true
       @cuesheet.insert(9, '    FLAGS PRE')
       cue.test_printTrackData('flac')
-      cue.cuesheet.should == @cuesheet
+      expect(cue.cuesheet).to eq(@cuesheet)
     end
     
     it "should skip the pre-emphasis flag if the preference is decoding with sox" do
-      prefs.stub!(:preEmphasis).and_return 'sox'
-      cdrdao.stub!(:preEmph?).with(2).and_return true
+      allow(prefs).to receive(:preEmphasis).and_return 'sox'
+      allow(cdrdao).to receive(:preEmph?).with(2).and_return true
       cue.test_printTrackData('flac')
-      cue.cuesheet.should == @cuesheet
+      expect(cue.cuesheet).to eq(@cuesheet)
     end
     
     it "should append the gaps to previous track for last track" do
-      cdrdao.stub!(:getPregapSectors).with(3).and_return 40
+      allow(cdrdao).to receive(:getPregapSectors).with(3).and_return 40
       @cuesheet.delete_at(10)
       @cuesheet.insert(13, '    INDEX 00 00:02:35')
       @cuesheet.insert(14, 'FILE "Track_3.flac" WAVE')
       cue.test_printTrackData('flac')
-      cue.cuesheet.should == @cuesheet
+      expect(cue.cuesheet).to eq(@cuesheet)
     end
     
     it "should append the gaps to track 1 for second track" do
-      cdrdao.stub!(:getPregapSectors).with(2).and_return 40
+      allow(cdrdao).to receive(:getPregapSectors).with(2).and_return 40
       @cuesheet.delete_at(5)
       @cuesheet.insert(8, '    INDEX 00 00:02:35')
       @cuesheet.insert(9, 'FILE "Track_2.flac" WAVE')
       cue.test_printTrackData('flac')
-      cue.cuesheet.should == @cuesheet
+      expect(cue.cuesheet).to eq(@cuesheet)
     end    
   end
   
   context "When printing the info for 1st track with hidden sectors" do
     before(:each) do
       disc.startSectors[1] = 450 # 450 / 75 = 6 seconds
-      cdrdao.stub!(:preEmph?).and_return false
-      cdrdao.stub!(:getPregapSectors).and_return 0
-      prefs.stub!(:preGaps).and_return 'prepend'
-      prefs.stub!(:image).and_return false
+      allow(cdrdao).to receive(:preEmph?).and_return false
+      allow(cdrdao).to receive(:getPregapSectors).and_return 0
+      allow(prefs).to receive(:preGaps).and_return 'prepend'
+      allow(prefs).to receive(:image).and_return false
       @cuesheet = ['FILE "Track_1.flac" WAVE',
                    '  TRACK 01 AUDIO', '    TITLE "Title track 1"',
                    '    PERFORMER "Iron Maiden"', '    INDEX 01 00:00:00',
@@ -254,27 +253,27 @@ describe Cuesheet do
     end
 
     it "should mark a pregap if the sectors are not ripped" do
-      prefs.stub!(:ripHiddenAudio).and_return false
+      allow(prefs).to receive(:ripHiddenAudio).and_return false
       @cuesheet.insert(4, '    PREGAP 00:06:00')
       cue.test_printTrackData('flac')
-      cue.cuesheet.should == @cuesheet
+      expect(cue.cuesheet).to eq(@cuesheet)
     end
 
     it "should prepend to track 1 if hidden sectors are < seconds than preference" do
-      prefs.stub!(:ripHiddenAudio).and_return true
-      prefs.stub!(:minLengthHiddenTrack).and_return 7
+      allow(prefs).to receive(:ripHiddenAudio).and_return true
+      allow(prefs).to receive(:minLengthHiddenTrack).and_return 7
       @cuesheet.insert(4, '    INDEX 00 00:00:00')
       @cuesheet[5] = '    INDEX 01 00:06:00'
       cue.test_printTrackData('flac')
-      cue.cuesheet.should == @cuesheet
+      expect(cue.cuesheet).to eq(@cuesheet)
     end
 
     it "should use a pregap if hidden sectors are >= seconds than preference" do
-      prefs.stub!(:ripHiddenAudio).and_return true
-      prefs.stub!(:minLengthHiddenTrack).and_return 6
+      allow(prefs).to receive(:ripHiddenAudio).and_return true
+      allow(prefs).to receive(:minLengthHiddenTrack).and_return 6
       @cuesheet.insert(4, '    PREGAP 00:06:00')
       cue.test_printTrackData('flac')
-      cue.cuesheet.should == @cuesheet
+      expect(cue.cuesheet).to eq(@cuesheet)
     end
   end
 end
