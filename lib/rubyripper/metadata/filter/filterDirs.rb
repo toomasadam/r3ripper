@@ -27,6 +27,7 @@ module Metadata
     def filter(item)
       # ensure we work on a copy to avoid side effects
       result = item.dup
+      while(result[0] == '.'); result = result[1..-1] ; end
       result.gsub!('$', 'S') #no dollars allowed
       result.gsub!(':', '') #no colons allowed in FAT
       result.gsub!('*', '') #no asterix allowed in FAT

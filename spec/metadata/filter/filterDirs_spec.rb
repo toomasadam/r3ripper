@@ -35,6 +35,11 @@ describe Metadata::FilterDirs do
       expect(filter.artist).to eq('I like CASH')
     end
     
+    it "should remove starting dots from directory names ." do
+      data.artist = '...and so the night became'
+      expect(filter.artist).to eq('and so the night became')
+    end
+    
     it "should remove colons :" do
       data.artist = 'Hello: world'
       expect(filter.artist).to eq('Hello world')

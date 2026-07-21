@@ -28,7 +28,6 @@ module Metadata
       # ensure we work on a copy to avoid side effects
       result = item.dup
       result.gsub!('/', '') #no slashes allowed in filenames
-      while(result[0] == '.'); result = result[1..-1] ; end
       super(result)
     end
   end
