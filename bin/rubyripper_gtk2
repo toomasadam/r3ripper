@@ -167,13 +167,13 @@ attr_reader :instances
   
   # The abort button transforms into exit when the rip is finished or aborted
   def updateAbortButtonToExit
-    @buttontext[4].text = '_' + _("Exit")
+    @buttontext[4].text_with_mnemonic = '_' + _("Exit")
     @buttonicons[4].stock = Gtk::Stock::QUIT
   end
   
   # The exit button transforms into abort when the rip is started
   def updateExitButtonToAbort
-    @buttontext[4].text = '_' + _("Abort")
+    @buttontext[4].text_with_mnemonic = '_' + _("Abort")
     @buttonicons[4].stock = Gtk::Stock::CANCEL
   end
   
@@ -239,7 +239,7 @@ attr_reader :instances
 
   def savePreferences
     if @currentInstance == 'GtkPreferences'
-      @buttontext[0].text = '_'+_('Preferences')
+      @buttontext[0].text_with_mnemonic = '_'+_('Preferences')
       @buttonicons[0].stock = Gtk::Stock::PREFERENCES
       @gtkPrefs.save
     end
@@ -274,7 +274,7 @@ attr_reader :instances
     @buttons.each{|button| button.sensitive = false}
     Thread.new do
       if @currentInstance != 'GtkPreferences'
-        @buttontext[0].text = '_'+_('Disc info')
+        @buttontext[0].text_with_mnemonic = '_'+_('Disc info')
         @buttonicons[0].stock = Gtk::Stock::INFO
         startupPreferences()
         @buttons[0..2].each{|button| button.sensitive = true}
@@ -343,12 +343,12 @@ attr_reader :instances
   end
   
   def showClosedTray
-    @buttontext[2].text = '_'+_("Close tray")
+    @buttontext[2].text_with_mnemonic = '_'+_("Close tray")
     @buttonicons[2].stock = Gtk::Stock::GOTO_TOP
   end
   
   def showOpenTray
-    @buttontext[2].text = '_'+_("Open tray")
+    @buttontext[2].text_with_mnemonic = '_'+_("Open tray")
     @buttonicons[2].stock = Gtk::Stock::GOTO_BOTTOM
   end
   
