@@ -302,12 +302,12 @@ class GtkCountryDialog
   end
 
   def add_selected_country
-    selection = @available_view.selection
-    _model, iter = selection.selected
+    iter = @available_view.selection.selected
     return unless iter
 
-    code = iter[1]
-    name = iter[0]
+    model = @available_view.model
+    name = model.get_value(iter, 0)
+    code = model.get_value(iter, 1)
 
     # Don't add duplicate country codes
     already_exists = false
@@ -329,8 +329,7 @@ class GtkCountryDialog
   end
 
   def remove_selected_country
-    selection = @preferred_view.selection
-    _model, iter = selection.selected
+    iter = @preferred_view.selection.selected
     return unless iter
 
     @preferred_store.remove(iter)
@@ -339,38 +338,38 @@ class GtkCountryDialog
   end
 
   def move_selected_up
-    selection = @preferred_view.selection
-    model, iter = selection.selected
+    iter = @preferred_view.selection.selected
     return unless iter
 
+    model = @preferred_store
     path = model.get_path(iter)
     return if path.indices[0] == 0
 
-    prev_path = Gtk::TreePath.new(path.indices[0] - 1)
+    prev_path = Gtk::TreePath.new((path.indices[0] - 1).to_s)
     prev_iter = model.get_iter(prev_path)
     return unless prev_iter
 
     model.swap(iter, prev_iter)
     update_ranks
-    selection.select_iter(iter)
+    @preferred_view.selection.select_iter(iter)
     update_buttons_sensitivity
   end
 
   def move_selected_down
-    selection = @preferred_view.selection
-    model, iter = selection.selected
+    iter = @preferred_view.selection.selected
     return unless iter
 
+    model = @preferred_store
     path = model.get_path(iter)
     return if path.indices[0] >= model.iter_n_children(nil) - 1
 
-    next_path = Gtk::TreePath.new(path.indices[0] + 1)
+    next_path = Gtk::TreePath.new((path.indices[0] + 1).to_s)
     next_iter = model.get_iter(next_path)
     return unless next_iter
 
     model.swap(iter, next_iter)
     update_ranks
-    selection.select_iter(iter)
+    @preferred_view.selection.select_iter(iter)
     update_buttons_sensitivity
   end
 

@@ -62,5 +62,47 @@ describe GtkCountryDialog do
       dialog_obj.load_countries('DE, FR, CA')
       expect(dialog_obj.generate_country_string).to eq('DE,FR,CA')
     end
+
+    it 'adds selected country from available view when calling add_selected_country' do
+      dialog_obj = GtkCountryDialog.new(nil, 'US')
+      view = dialog_obj.instance_variable_get(:@available_view)
+      filter_store = dialog_obj.instance_variable_get(:@filter_store)
+
+      first_iter = filter_store.iter_first
+      view.selection.select_iter(first_iter)
+
+      dialog_obj.send(:add_selected_country)
+
+      expect(dialog_obj.generate_country_string).to eq('US,XW')
+    end
+
+    it 'removes selected country from preferred view when calling remove_selected_country' do
+      dialog_obj = GtkCountryDialog.new(nil, 'US, GB, JP')
+      preferred_view = dialog_obj.instance_variable_get(:@preferred_view)
+      preferred_store = dialog_obj.instance_variable_get(:@preferred_store)
+
+      first_iter = preferred_store.iter_first
+      preferred_view.selection.select_iter(first_iter)
+
+      dialog_obj.send(:remove_selected_country)
+
+      expect(dialog_obj.generate_country_string).to eq('GB,JP')
+    end
+
+    it 'reorders countries up and down in preferred view' do
+      dialog_obj = GtkCountryDialog.new(nil, 'US, GB, JP')
+      preferred_view = dialog_obj.instance_variable_get(:@preferred_view)
+      preferred_store = dialog_obj.instance_variable_get(:@preferred_store)
+
+      second_path = Gtk::TreePath.new("1")
+      second_iter = preferred_store.get_iter(second_path)
+      preferred_view.selection.select_iter(second_iter)
+
+      dialog_obj.send(:move_selected_up)
+      expect(dialog_obj.generate_country_string).to eq('GB,US,JP')
+
+      dialog_obj.send(:move_selected_down)
+      expect(dialog_obj.generate_country_string).to eq('US,GB,JP')
+    end
   end
 end
