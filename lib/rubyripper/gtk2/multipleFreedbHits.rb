@@ -26,7 +26,7 @@ class MultipleFreedbHits
   attr_reader :display
 
   def initialize(value, main_instance)
-    @label1 = Gtk::Label.new(_("The freedb server reports multiple hits.\nWhich one would you prefer?"))
+    @label1 = Gtk::Label.new(_("The FreeDB server reports multiple hits.\nWhich one would you prefer?"))
     @image1 = Gtk::Image.new(stock: Gtk::Stock::DIALOG_QUESTION, size: :dialog)
     @hbox1 = Gtk::Box.new(:horizontal)
     [@image1, @label1].each{|object| @hbox1.pack_start(object, expand: false, fill: false, padding: 0)}
@@ -38,7 +38,7 @@ class MultipleFreedbHits
     @hbox2.pack_start(@combobox, expand: false, fill: false, padding: 5)
 
     @button1 = Gtk::Button.new
-    @label2 = Gtk::Label.new(_("Ok"))
+    @label2 = Gtk::Label.new(_("OK"))
     @image2 = Gtk::Image.new(stock: Gtk::Stock::OK, size: :large_toolbar)
     @hbox3 = Gtk::Box.new(:horizontal)
     [@image2, @label2].each{|object| @hbox3.pack_start(object, expand: false, fill: false, padding: 15)}
@@ -50,7 +50,7 @@ class MultipleFreedbHits
     @vbox1.border_width = 10
     [@hbox1, @hbox2, @separator1, @hbox4].each{|object| @vbox1.pack_start(object, expand: false, fill: false, padding: 10)}
 
-    @display = Gtk::Frame.new(_("Multiple hits found...")) # will contain the above
+    @display = Gtk::Frame.new(_("Multiple Hits Found...")) # will contain the above
     @display.shadow_type = :etched_in
     @display.border_width = 5
     @display.add(@vbox1)

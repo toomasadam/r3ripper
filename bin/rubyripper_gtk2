@@ -194,7 +194,7 @@ attr_reader :instances
     @vbuttonbox1 = Gtk::ButtonBox.new(:vertical) #child of @mainHbox
     @buttons = [Gtk::Button.new, Gtk::Button.new, Gtk::Button.new, Gtk::Button.new, Gtk::Button.new]
     @buttons.each{|button| button.sensitive = false}
-    @buttontext = [Gtk::Label.new('_'+_('Preferences'), use_underline: true), Gtk::Label.new('_'+_("Scan drive"), use_underline: true), Gtk::Label.new('_'+_("Open tray"), use_underline: true), Gtk::Label.new('_'+_("Rip cd now!"), use_underline: true), Gtk::Label.new('_'+_("Exit"), use_underline: true)]
+    @buttontext = [Gtk::Label.new('_'+_('Preferences'), use_underline: true), Gtk::Label.new('_'+_("Scan drive"), use_underline: true), Gtk::Label.new('_'+_("Open tray"), use_underline: true), Gtk::Label.new('_'+_("Rip CD now!"), use_underline: true), Gtk::Label.new('_'+_("Exit"), use_underline: true)]
     @buttonicons = [Gtk::Image.new(stock: Gtk::Stock::PREFERENCES, size: :large_toolbar), Gtk::Image.new(stock: Gtk::Stock::REFRESH, size: :large_toolbar), Gtk::Image.new(stock: Gtk::Stock::GOTO_BOTTOM, size: :large_toolbar), Gtk::Image.new(stock: Gtk::Stock::CDROM, size: :large_toolbar), Gtk::Image.new(stock: Gtk::Stock::QUIT, size: :large_toolbar)]
     @vboxes = [Gtk::Box.new(:vertical), Gtk::Box.new(:vertical), Gtk::Box.new(:vertical),  Gtk::Box.new(:vertical), Gtk::Box.new(:vertical)]
 

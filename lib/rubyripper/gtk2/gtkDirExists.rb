@@ -26,7 +26,7 @@ class GtkDirExists
   attr_reader :display
 
   def initialize(gui, rubyripper, dirname)
-    @label = Gtk::Label.new(_("The directory %s already exists.\n\nWhat do you want rubyripper to do?") % [dirname])
+    @label = Gtk::Label.new(_("The directory %s already exists.\n\nWhat do you want RubyRipperReborn to do?") % [dirname])
     @label.wrap = true
     @image = Gtk::Image.new(stock: Gtk::Stock::DIALOG_QUESTION, size: :dialog)
   
@@ -35,7 +35,7 @@ class GtkDirExists
     @separator = Gtk::Separator.new(:horizontal)
 
     @buttons = [Gtk::Button.new, Gtk::Button.new, Gtk::Button.new]
-    @labels = [Gtk::Label.new(_("Cancel rip")), Gtk::Label.new(_("Delete existing\ndirectory")), Gtk::Label.new(_("Auto rename\ndirectory"))]
+    @labels = [Gtk::Label.new(_("Cancel rip")), Gtk::Label.new(_("Delete existing\ndirectory")), Gtk::Label.new(_("Auto-rename\ndirectory"))]
     @images = [Gtk::Image.new(stock: Gtk::Stock::CANCEL, size: :large_toolbar), Gtk::Image.new(stock: Gtk::Stock::CLEAR, size: :large_toolbar), Gtk::Image.new(stock: Gtk::Stock::OK, size: :large_toolbar)]
     @hboxes = [Gtk::Box.new(:horizontal), Gtk::Box.new(:horizontal), Gtk::Box.new(:horizontal)]
     @buttonbox = Gtk::Box.new(:horizontal)
@@ -55,7 +55,7 @@ class GtkDirExists
     @vbox.border_width = 10
     [@infobox, @separator, @buttonbox].each{|object| @vbox.pack_start(object, expand: false, fill: false, padding: 10)}
     
-    @display = Gtk::Frame.new(_("Directory already exists...")) # will contain the above
+    @display = Gtk::Frame.new(_("Directory Already Exists...")) # will contain the above
     @display.shadow_type = :etched_in
     @display.border_width = 5
     @display.add(@vbox)

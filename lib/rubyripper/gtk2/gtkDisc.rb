@@ -104,7 +104,7 @@ class GtkDisc
     @albumLabel = Gtk::Label.new(_('Album:'))
     @genreLabel = Gtk::Label.new(_('Genre:'))
     @yearLabel = Gtk::Label.new(_('Year:'))
-    @varCheckbox = Gtk::CheckButton.new(_('Mark disc as various artist'))
+    @varCheckbox = Gtk::CheckButton.new(_('Mark disc as various artists'))
 
     @freezeCheckbox = Gtk::CheckButton.new(_('Freeze disc info'))
     @discNumberLabel = Gtk::Label.new(_('Disc:'))
@@ -246,7 +246,7 @@ class GtkDisc
   end
 
   def configDisplayValues()
-    @label10.set_markup(_("<b>Disc info</b>"))
+    @label10.set_markup(_("<b>Disc Info</b>"))
     @frame10.shadow_type = :etched_in
     @frame10.label_widget = @label10
     @frame10.border_width = 5
@@ -254,7 +254,7 @@ class GtkDisc
     @scrolledWindow.set_policy(:automatic, :automatic)
     @scrolledWindow.border_width = 5
 
-    @label20.set_markup(_("<b>Track selection</b>"))
+    @label20.set_markup(_("<b>Track Selection</b>"))
     @frame20.shadow_type = :etched_in
     @frame20.label_widget = @label20
     @frame20.border_width = 5

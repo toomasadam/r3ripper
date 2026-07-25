@@ -43,7 +43,7 @@ class ShortMessage
   end
 
   def noDiscFound
-    @display.text = _("No disc found in %s!\nPlease insert a disc and push 'Scan drive'.\n\nThe cdrom drive can be set in 'Preferences'.") % [@prefs.cdrom]
+    @display.text = _("No disc found in %s!\nPlease insert a disc and push 'Scan drive'.\n\nThe CD-ROM drive can be set in 'Preferences'.") % [@prefs.cdrom]
   end
 
   def openTray
@@ -55,7 +55,7 @@ class ShortMessage
   end
 
   def askForDisc
-    @display.text = _("Insert an audio-disc and press 'Close tray'.\nThe drive will automatically be scanned for a disc.\n\nIf the tray is already closed, press 'Scan drive'")
+    @display.text = _("Insert an audio disc and press 'Close tray'.\nThe drive will automatically be scanned for a disc.\n\nIf the tray is already closed, press 'Scan drive'")
   end
 
   def noEjectFound

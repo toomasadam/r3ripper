@@ -44,8 +44,15 @@
     *   Fixed `@instances` initialization in `GraphicalUserInterface#initialize`.
 *   **Test Suite Stability**: Fixed test pollution and header size assertion math in `spec/waveFile_spec.rb`, bringing total test pass rate to 100% (249/249 passing).
 
+### 7. GNOME HIG GUI Capitalization & Branding Standard
+*   **GNOME HIG Compliance**: Standardized all GUI strings to strictly follow GNOME Human Interface Guidelines (HIG):
+    *   **Control Labels**: Use **Sentence case** for all push buttons, check buttons, radio buttons, spin buttons, entry labels, and tooltips (e.g., `Mark disc as various artists`, `Pad missing samples with zeros`, `Eject CD when finished`).
+    *   **Titles & Headers**: Use **Title Case** for window titles, dialog frames, notebook tabs, section headers, and expander titles (e.g., `Directory Already Exists...`, `CD-ROM Device`, `TOC Analysis`, `Active Audio Codecs`, `Choose Metadata Provider`).
+    *   **Proper Software & Technology Naming**: Enforce standard capitalization for technical tools, file formats, and services (`CD-ROM`, `FreeDB`, `MusicBrainz`, `ReplayGain`, `M3U`, `SoX`, `cdparanoia`, `cdrdao`, `cue sheet`, `log file`).
+*   **Application Branding**: Updated user-facing application name strings in CLI and GUI to **RubyRipperReborn**.
+
 ## Current Project Status
 *   **Core Engine**: Stable and verified on Ruby 3.4+.
 *   **CLI Interface**: Fully functional (`bin/rubyripper_cli` or `bundle exec ./bin/rubyripper_cli`).
-*   **Modernized GUI**: Fully functional on GTK3 (`bin/rubyripper_gtk2` or `bundle exec ./bin/rubyripper_gtk2`).
-*   **Test Suite**: Modern RSpec 3, 100% passing (249 examples).
+*   **Modernized GUI**: Fully functional on GTK3 with GNOME HIG compliance (`bin/rubyripper_gtk2` or `bundle exec ./bin/rubyripper_gtk2`).
+*   **Test Suite**: Modern RSpec 3, 100% passing (250 examples).

@@ -39,7 +39,7 @@ class GtkSummary
 
   def showMainResult(succes)
     if succes == true
-      @label1 = Gtk::Label.new(_("The rip has succesfully finished.\nA short summary is shown below."))
+      @label1 = Gtk::Label.new(_("The rip has successfully finished.\nA short summary is shown below."))
       @image1 = Gtk::Image.new(stock: Gtk::Stock::DIALOG_INFO, size: :dialog)
     else
       @label1 = Gtk::Label.new(_("The rip had some problems.\nA short summary is shown below."))
@@ -102,7 +102,7 @@ class GtkSummary
     @vbox1.pack_start(@scrolled_window, expand: true, fill: true, padding: 0) #maximize the space for displaying the tracks
     @vbox1.pack_start(@hbox4, expand: false, fill: false, padding: 0)
 
-    @display = Gtk::Frame.new(_("Ripping and encoding is finished"))
+    @display = Gtk::Frame.new(_("Ripping and Encoding Finished"))
     @display.shadow_type = :etched_in
     @display.border_width = 5
     @display.add(@vbox1)

@@ -72,7 +72,7 @@ class RipStatus
     @vbox1.border_width = 5
 
     @label1 = Gtk::Label.new
-    @label1.set_markup(_("<b>Ripping status</b>"))
+    @label1.set_markup(_("<b>Ripping Status</b>"))
     @display = Gtk::Frame.new
     @display.shadow_type = :etched_in
     @display.label_widget = @label1
