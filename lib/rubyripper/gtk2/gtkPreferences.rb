@@ -642,20 +642,31 @@ It is recommended to enable this option.")
     @labelPreferredYear = Gtk::Label.new(_('Preferred year (metadata):'))
     @labelPreferredYear.halign = :start
     @entryPreferredCountry = Gtk::Entry.new()
+    @configureCountryButton = Gtk::Button.new(label: _('Configure...'))
     @chooseOriginalRelease = Gtk::RadioButton.new(member: nil, label: _('Original'))
     @chooseLatestRelease = Gtk::RadioButton.new(member: @chooseOriginalRelease, label: _('Latest available'))
     @chooseOriginalYear = Gtk::RadioButton.new(member: nil, label: _('Original'))
     @chooseReleaseYear = Gtk::RadioButton.new(member: @chooseOriginalYear, label: _('From release'))
 #packing objects
     @table92.attach(@labelPreferredCountry, 0, 0, 1, 1)
-    @table92.attach(@entryPreferredCountry, 1, 0, 2, 1)
+    @table92.attach(@entryPreferredCountry, 1, 0, 1, 1)
+    @table92.attach(@configureCountryButton, 2, 0, 1, 1)
     @table92.attach(@labelPreferredRelease, 0, 1, 1, 1)
     @table92.attach(@chooseOriginalRelease, 1, 1, 1, 1)
     @table92.attach(@chooseLatestRelease, 2, 1, 1, 1)
     @table92.attach(@labelPreferredYear, 0, 2, 1, 1)
     @table92.attach(@chooseOriginalYear, 1, 2, 1, 1)
     @table92.attach(@chooseReleaseYear, 2, 2, 1, 1)
+    @configureCountryButton.signal_connect("clicked") { show_country_dialog }
     @frame92 = newFrame(_('MusicBrainz Options'), @table92)
+  end
+
+  def show_country_dialog
+    require 'rubyripper/gtk2/gtkCountryDialog'
+    parent_window = (@display && @display.toplevel.is_a?(Gtk::Window)) ? @display.toplevel : nil
+    dialog = GtkCountryDialog.new(parent_window, @entryPreferredCountry.text)
+    result = dialog.run
+    @entryPreferredCountry.text = result if result
   end
 
   # grey out the two frames if no metadata provider is chosen

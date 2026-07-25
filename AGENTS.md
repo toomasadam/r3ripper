@@ -60,8 +60,17 @@
 *   **Preferences Integration**: Added `Configure...` push button (`Gtk::Button`) next to `Pass cdparanoia options` in `GtkPreferences`.
 *   **Test Suite Expansion**: Added unit tests in `spec/gtk2/gtkCdparanoiaDialog_spec.rb` covering flag parsing, option string formatting, and widget synchronization (262 examples passing).
 
+### 9. GTK3 Preferred Countries Selection Dialog
+*   **GTK3 Dual-List Dialog (`GtkCountryDialog`)**: Added a modal GTK3 configuration dialog to visually search, pick, and rank preferred countries for MusicBrainz metadata retrieval:
+    *   **Searchable Available List**: Master tree view featuring real-time `Gtk::SearchEntry` filtering over standard MusicBrainz region codes (`XW` Worldwide, `XE` Europe, `XU` Unknown) and ISO 3166-1 country codes.
+    *   **Priority Order List**: Ordered tree view displaying active country priorities with rank indices (`1.`, `2.`, `3.`).
+    *   **Reordering Controls**: Action push buttons to add countries, remove countries, and shift priority ranks up/down.
+    *   **Bidirectional Parsing**: Converts raw comma-separated country codes (including alias mapping like `UK` -> `GB`) on dialog open, and formats ordered strings on apply.
+*   **Preferences Integration**: Added `Configure...` push button (`Gtk::Button`) next to `Preferred countries:` in `GtkPreferences`.
+*   **Test Suite Expansion**: Added unit tests in `spec/gtk2/gtkCountryDialog_spec.rb` covering country string parsing, code alias mapping, name formatting, and store updates (272 examples passing).
+
 ## Current Project Status
 *   **Core Engine**: Stable and verified on Ruby 3.4+.
 *   **CLI Interface**: Fully functional (`bin/rubyripper_cli` or `bundle exec ./bin/rubyripper_cli`).
 *   **Modernized GUI**: Fully functional on GTK3 with GNOME HIG compliance (`bin/rubyripper_gtk2` or `bundle exec ./bin/rubyripper_gtk2`).
-*   **Test Suite**: Modern RSpec 3, 100% passing (262 examples).
+*   **Test Suite**: Modern RSpec 3, 100% passing (272 examples).
