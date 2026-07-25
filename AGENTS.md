@@ -51,8 +51,17 @@
     *   **Proper Software & Technology Naming**: Enforce standard capitalization for technical tools, file formats, and services (`CD-ROM`, `FreeDB`, `MusicBrainz`, `ReplayGain`, `M3U`, `SoX`, `cdparanoia`, `cdrdao`, `cue sheet`, `log file`).
 *   **Application Branding**: Updated user-facing application name strings in CLI and GUI to **RubyRipperReborn**.
 
+### 8. GTK3 cdparanoia Configuration Dialog
+*   **GTK3 Options Dialog (`GtkCdparanoiaDialog`)**: Added a modal GTK3 configuration dialog to visually select and configure `cdparanoia` options from Preferences:
+    *   **Categorized Layout**: Grouped controls into GNOME HIG-compliant frames (`Paranoia & Verification Modes`, `Drive & Speed Controls`, `Custom Parameters`, `Result Preview`).
+    *   **Interactive Controls**: Added options for `-Z` (disable extra verification), `-Y` (disable all paranoia), `-X` (disable scratch repair), `-S` (read speed limit), `-o` (overlap search sectors), and custom raw flags.
+    *   **Dynamic Mutual Exclusion**: Enforced UI sensitivity rules (e.g., `-Y` automatically disables `-Z` and `-X` controls).
+    *   **Live Preview & Bidirectional Parsing**: Real-time generation of command string and parsing of existing option strings upon opening the dialog.
+*   **Preferences Integration**: Added `Configure...` push button (`Gtk::Button`) next to `Pass cdparanoia options` in `GtkPreferences`.
+*   **Test Suite Expansion**: Added unit tests in `spec/gtk2/gtkCdparanoiaDialog_spec.rb` covering flag parsing, option string formatting, and widget synchronization (262 examples passing).
+
 ## Current Project Status
 *   **Core Engine**: Stable and verified on Ruby 3.4+.
 *   **CLI Interface**: Fully functional (`bin/rubyripper_cli` or `bundle exec ./bin/rubyripper_cli`).
 *   **Modernized GUI**: Fully functional on GTK3 with GNOME HIG compliance (`bin/rubyripper_gtk2` or `bundle exec ./bin/rubyripper_gtk2`).
-*   **Test Suite**: Modern RSpec 3, 100% passing (250 examples).
+*   **Test Suite**: Modern RSpec 3, 100% passing (262 examples).

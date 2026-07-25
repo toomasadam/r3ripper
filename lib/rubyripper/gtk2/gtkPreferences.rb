@@ -327,23 +327,34 @@ It is recommended to enable this option.")
   end
 
   def buildFrameRippingRelated
-    @table60 = newTable(rows=2, columns=3)
+    @table60 = newTable(rows=3, columns=3)
 #create objects
     @rip_label = Gtk::Label.new(_("Pass cdparanoia options:")) ; @rip_label.halign = :start
     @eject= Gtk::CheckButton.new(_('Eject CD when finished'))
     @noLog = Gtk::CheckButton.new(_('Only keep log file if correction is needed'))
     @ripEntry= Gtk::Entry.new ; @ripEntry.width_request = 120
+    @configureCdparanoiaButton = Gtk::Button.new(label: _('Configure...'))
 #pack objects
     @table60.attach(@rip_label, 0, 0, 1, 1)
     @table60.attach(@ripEntry, 1, 0, 1, 1)
-    @table60.attach(@eject, 0, 1, 2, 1)
-    @table60.attach(@noLog, 0, 2, 2, 1)
+    @table60.attach(@configureCdparanoiaButton, 2, 0, 1, 1)
+    @table60.attach(@eject, 0, 1, 3, 1)
+    @table60.attach(@noLog, 0, 2, 3, 1)
+    @configureCdparanoiaButton.signal_connect("clicked") { show_cdparanoia_dialog }
     @frame60 = newFrame(_('Ripping Related'), child=@table60)
 #pack all frames into a single page
     @page1 = Gtk::Box.new(:vertical) #One Box to rule them all
     [@frame40, @frame50, @frame60].each{|frame| @page1.pack_start(frame, expand: false, fill: false, padding: 0)}
     @page1_label = Gtk::Label.new(_("Secure Ripping"))
     @display.append_page(@page1, @page1_label)
+  end
+
+  def show_cdparanoia_dialog
+    require 'rubyripper/gtk2/gtkCdparanoiaDialog'
+    parent_window = (@display && @display.toplevel.is_a?(Gtk::Window)) ? @display.toplevel : nil
+    dialog = GtkCdparanoiaDialog.new(parent_window, @ripEntry.text)
+    result = dialog.run
+    @ripEntry.text = result if result
   end
 
   def buildFrameAudioSectorsBeforeTrackOne
