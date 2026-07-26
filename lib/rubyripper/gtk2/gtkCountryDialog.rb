@@ -168,7 +168,7 @@ class GtkCountryDialog
     @dialog.add_button(_("Cancel"), Gtk::ResponseType::CANCEL)
     @dialog.add_button(_("Apply"), Gtk::ResponseType::OK)
     @dialog.default_response = Gtk::ResponseType::OK
-    @dialog.set_default_size(620, 420)
+    @dialog.set_default_size(740, 440)
     @keep_alive << @dialog
   end
 
@@ -222,7 +222,10 @@ class GtkCountryDialog
     @col_avail_name = Gtk::TreeViewColumn.new(_("Country"), @renderer_avail_name, text: 0)
     @col_avail_code = Gtk::TreeViewColumn.new(_("Code"), @renderer_avail_code, text: 1)
     @col_avail_name.resizable = true
+    @col_avail_name.expand = true
+    @col_avail_name.min_width = 140
     @col_avail_code.resizable = true
+    @col_avail_code.min_width = 60
     @keep_alive << @col_avail_name << @col_avail_code
 
     @available_view.append_column(@col_avail_name)
@@ -230,6 +233,7 @@ class GtkCountryDialog
 
     scrolled = Gtk::ScrolledWindow.new
     scrolled.set_policy(:automatic, :automatic)
+    scrolled.set_min_content_width(240)
     scrolled.add(@available_view)
     vbox.pack_start(scrolled, expand: true, fill: true, padding: 0)
     @keep_alive << scrolled << vbox
@@ -278,8 +282,12 @@ class GtkCountryDialog
     @col_pref_name = Gtk::TreeViewColumn.new(_("Country"), @renderer_pref_name, text: 1)
     @col_pref_code = Gtk::TreeViewColumn.new(_("Code"), @renderer_pref_code, text: 2)
     @col_pref_rank.resizable = false
+    @col_pref_rank.min_width = 50
     @col_pref_name.resizable = true
+    @col_pref_name.expand = true
+    @col_pref_name.min_width = 140
     @col_pref_code.resizable = true
+    @col_pref_code.min_width = 60
     @keep_alive << @col_pref_rank << @col_pref_name << @col_pref_code
 
     @preferred_view.append_column(@col_pref_rank)
@@ -288,6 +296,7 @@ class GtkCountryDialog
 
     scrolled = Gtk::ScrolledWindow.new
     scrolled.set_policy(:automatic, :automatic)
+    scrolled.set_min_content_width(270)
     scrolled.add(@preferred_view)
     vbox_tree.pack_start(scrolled, expand: true, fill: true, padding: 0)
 
