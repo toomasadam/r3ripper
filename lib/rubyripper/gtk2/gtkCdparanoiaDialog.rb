@@ -20,6 +20,7 @@ require 'shellwords'
 
 class GtkCdparanoiaDialog
   include GetText
+  extend GetText
   GetText.bindtextdomain("rubyripper")
 
   attr_reader :dialog, :result_options
@@ -48,7 +49,11 @@ class GtkCdparanoiaDialog
     else
       @result_options = nil
     end
-    @dialog.destroy
+
+    dlg = @dialog
+    @dialog = nil
+    dlg.destroy if dlg
+
     @result_options
   end
 
@@ -166,15 +171,13 @@ class GtkCdparanoiaDialog
   private
 
   def create_dialog
-    @dialog = Gtk::Dialog.new(
-      title: _("Configure cdparanoia Options"),
-      parent: @parent,
-      flags: [:modal, :destroy_with_parent],
-      buttons: [
-        [_("Cancel"), Gtk::ResponseType::CANCEL],
-        [_("Apply"), Gtk::ResponseType::OK]
-      ]
-    )
+    @dialog = Gtk::Dialog.new
+    @dialog.title = _("Configure cdparanoia Options")
+    @dialog.transient_for = @parent if @parent && @parent.is_a?(Gtk::Window)
+    @dialog.modal = true
+    @dialog.destroy_with_parent = true
+    @dialog.add_button(_("Cancel"), Gtk::ResponseType::CANCEL)
+    @dialog.add_button(_("Apply"), Gtk::ResponseType::OK)
     @dialog.default_response = Gtk::ResponseType::OK
     @dialog.set_default_size(480, -1)
   end

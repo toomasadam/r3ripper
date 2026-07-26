@@ -66,9 +66,9 @@ describe GtkCountryDialog do
     it 'adds selected country from available view when calling add_selected_country' do
       dialog_obj = GtkCountryDialog.new(nil, 'US')
       view = dialog_obj.instance_variable_get(:@available_view)
-      filter_store = dialog_obj.instance_variable_get(:@filter_store)
+      avail_store = dialog_obj.instance_variable_get(:@available_store)
 
-      first_iter = filter_store.iter_first
+      first_iter = avail_store.iter_first
       view.selection.select_iter(first_iter)
 
       dialog_obj.send(:add_selected_country)
@@ -103,6 +103,15 @@ describe GtkCountryDialog do
 
       dialog_obj.send(:move_selected_down)
       expect(dialog_obj.generate_country_string).to eq('US,GB,JP')
+    end
+
+    it 'updates rank numbers correctly using safe iteration' do
+      dialog_obj = GtkCountryDialog.new(nil, 'US, GB, JP, DE')
+      preferred_store = dialog_obj.instance_variable_get(:@preferred_store)
+
+      ranks = []
+      preferred_store.each { |_m, _p, iter| ranks << iter[0] }
+      expect(ranks).to eq(['1', '2', '3', '4'])
     end
   end
 end

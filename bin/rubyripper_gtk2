@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 #    Rubyripper - A secure ripper for Linux/BSD/OSX
-#    Copyright (C) 2007 - 2011 Bouke Woudstra (boukewoudstra@gmail.com)
+#    Copyright (C) 2007 - 2026 Bouke Woudstra & RubyRipperReborn Contributors
 #
 #    This file is part of Rubyripper. Rubyripper is free software: 
 #    you can redistribute it and/or modify it under the terms of 
@@ -72,16 +72,17 @@ attr_reader :instances
   def showDisc ; scanDiscResults(); end
   def continueRip ; updateInterfaceAndStartRip ; end
   
-  # send updates to the interface, 1 at a time
+  # send updates to the interface on the main GLib thread
   def update(modus, value=false)
-    @updateQueue ||= SizedQueue.new(1)
-    @updateQueue << Thread.new do
+    GLib::Idle.add do
       if modus == "error"
         @shortMessage.showMessage(value)
         changeDisplay(@shortMessage)
-        sleep(5)
-        changeDisplay(@gtkDisc)
-        @buttons.each{|button| button.sensitive = true}
+        GLib::Timeout.add_seconds(5) do
+          changeDisplay(@gtkDisc)
+          @buttons.each{|button| button.sensitive = true}
+          false
+        end
       elsif modus == "ripping_progress"
         @ripStatus.updateProgress('ripping', value)
       elsif modus == "encoding_progress"
@@ -98,8 +99,8 @@ attr_reader :instances
         puts _("Ehh.. There shouldn't be anything else. WTF?")
         puts _("Secret modus = %s") % [modus]
       end
+      false
     end
-    @updateQueue.pop()
   end
   
   private
@@ -139,15 +140,20 @@ attr_reader :instances
    
   def scanDisc
     Thread.new do
-      @buttons.each{|button| button.sensitive = false}
+      GLib::Idle.add do
+        @buttons.each{|button| button.sensitive = false}
+        false
+      end
       if @gtkDisc ; @gtkDisc.refresh
       else
         require 'rubyripper/gtk2/gtkDisc'
         @gtkDisc = GtkDisc.new()
         @gtkDisc.start()
       end
-    
-      scanDiscResults()
+      GLib::Idle.add do
+        scanDiscResults()
+        false
+      end
     end
   end
   
@@ -227,8 +233,11 @@ attr_reader :instances
         @rubyripper.cancelRip() # Let rubyripper stop ripping and encoding
         @rubyripper = nil # kill the instance
         @rubyripperThread.exit() # kill the thread
-        @buttons.each{|button| button.sensitive = true}
-        changeDisplay(@gtkDisc)
+        GLib::Idle.add do
+          @buttons.each{|button| button.sensitive = true}
+          changeDisplay(@gtkDisc)
+          false
+        end
       end
     end
   end
@@ -272,20 +281,18 @@ attr_reader :instances
   # The button should change to the opposite value
   def showDiscOrPreferences
     @buttons.each{|button| button.sensitive = false}
-    Thread.new do
-      if @currentInstance != 'GtkPreferences'
-        @buttontext[0].text_with_mnemonic = '_'+_('Disc info')
-        @buttonicons[0].stock = Gtk::Stock::INFO
-        startupPreferences()
-        @buttons[0..2].each{|button| button.sensitive = true}
-        @buttons[3].sensitive = true if @gtkDisc && @gtkDisc.error.nil?
-        @buttons[4].sensitive = true
-      elsif @gtkDisc && @gtkDisc.error.nil?
-        changeDisplay(@gtkDisc)
-        @buttons.each{|button| button.sensitive = true}
-      else
-        refreshDisc()
-      end
+    if @currentInstance != 'GtkPreferences'
+      @buttontext[0].text_with_mnemonic = '_'+_('Disc info')
+      @buttonicons[0].stock = Gtk::Stock::INFO
+      startupPreferences()
+      @buttons[0..2].each{|button| button.sensitive = true}
+      @buttons[3].sensitive = true if @gtkDisc && @gtkDisc.error.nil?
+      @buttons[4].sensitive = true
+    elsif @gtkDisc && @gtkDisc.error.nil?
+      changeDisplay(@gtkDisc)
+      @buttons.each{|button| button.sensitive = true}
+    else
+      refreshDisc()
     end
   end
 
@@ -302,119 +309,57 @@ attr_reader :instances
       md.freedbChoice(choice)
     end
 
-    status = md.status
+    showDisc()
+  end
 
-    if status == true #success
-      @gtkDisc.updateMetadata()
-      if @currentInstance != 'GtkDisc'
-        changeDisplay(@gtkDisc)
-      end
-    elsif status[0] == "choices"
-      require 'rubyripper/gtk2/multipleFreedbHits'
-      @instances['MultipleFreedbHits'] = MultipleFreedbHits.new(status[1], self)
-      changeDisplay(@instances['MultipleFreedbHits'])
-    elsif status[0] == "networkDown" || status[0] == "noMatches" || status[0] == "unknownReturnCode" || status[0] == "NoAudioDisc"
-      update("error", status[1])
-    else
-      puts "Unknown error with Metadata class."
-    end
-  end
-  
-  # TODO cancelTocScan()
   def handleTray
-    @buttons.each{|button| button.sensitive = false}
-    Thread.new do
-      if @buttontext[2].text == _("Open tray")
-        openDrive()
-        askForDisc()
-      else
-        closeDrive()
-        scanDisc()
-      end
+    if @buttontext[2].text == _("Open tray")
+      @deps.ejectDrive(@prefs.cdrom)
+      showCloseTray()
+    else
+      @deps.closeDrive(@prefs.cdrom)
+      refreshDisc()
     end
   end
-  
-  # open the drive, so reset the gtk disc object
-  def openDrive
-    @gtkDisc = nil
-    @shortMessage.openTray()
-    changeDisplay(@shortMessage)
-    @deps.eject(@prefs.cdrom)
-  end
-  
-  def showClosedTray
+
+  def showCloseTray
     @buttontext[2].text_with_mnemonic = '_'+_("Close tray")
     @buttonicons[2].stock = Gtk::Stock::GOTO_TOP
   end
-  
+
   def showOpenTray
     @buttontext[2].text_with_mnemonic = '_'+_("Open tray")
     @buttonicons[2].stock = Gtk::Stock::GOTO_BOTTOM
   end
-  
-  def askForDisc
-    showClosedTray()
-    @shortMessage.askForDisc()
-    @buttons[0..2].each{|button| button.sensitive = true}
-    @buttons[4].sensitive = true
-  end
-  
-  # close the drive again
-  def closeDrive
-    @shortMessage.closeTray()
-    changeDisplay(@shortMessage)
-    @deps.closeTray(@prefs.cdrom)
-    showOpenTray()
-  end
 
   def startRip
-    @buttons[0..3].each{|button| button.sensitive = false}
-    @gtkDisc.save()
-    
-    require 'rubyripper/rubyripper'
-    @rubyripper = Rubyripper.new(self, @gtkDisc.disc, @gtkDisc.selection)
-
-    errors = @rubyripper.checkConfiguration()  
-    if errors.empty?
-      updateInterfaceAndStartRip()
-    else
-      @buttons[0..3].each{|button| button.sensitive = true}
-      showErrors(errors)
-    end
-  end
-  
-  def updateInterfaceAndStartRip
     require 'rubyripper/gtk2/ripStatus'
+    require 'rubyripper/gtk2/gtkDirExists'
+    require 'rubyripper/cli/rubyripper'
+    
+    savePreferences()
+    
+    @ripStatus = RipStatus.new(self)
+    @rubyripper = Rubyripper.new(self)
+    
     @rubyripperThread = Thread.new do
-      @buttons[0..3].each{|button| button.sensitive = false}
-      @ripStatus = RipStatus.new()
-      changeDisplay(@ripStatus)
-      @rubyripper.startRip
+      @rubyripper.start()
     end
+    
+    @buttons.each{|button| button.sensitive = false}
+    @buttons[4].sensitive = true # abort button should be clickable
+    changeDisplay(@ripStatus)
   end
 
-  # build the text then show the errors
-  def showErrors(errors)
-    text = ''
-    text << _("Please solve the following configuration errors first:") + "\n"
-    errors.each do |error|
-      text << '  > ' + Errors.send(error[0], error[1]) + "\n"
-    end
-    update("error", text)
-  end
-  
-  def showSummary(succes)
-    @buttons[0..3].each{|button| button.sensitive = true}
-    require 'rubyripper/gtk2/gtkSummary'
-    @gtkSummary = GtkSummary.new(@rubyripper.fileScheme, @rubyripper.summary, succes)
-    changeDisplay(@gtkSummary)
-    showClosedTray if @prefs.eject == true
-    @rubyripper = false # some resetting of variables, I suspect some optimization of ruby otherwise would prevent refreshing
+  def showSummary(summary)
+    require 'rubyripper/gtk2/summary'
+    @summary = Summary.new(self, summary)
+    changeDisplay(@summary)
+    @buttons[4].sensitive = true
   end
 end
 
 if File.expand_path(__FILE__) == File.expand_path($0)
-  Gtk.init
-  app = GraphicalUserInterface.new()
-  app.start()
+  gui = GraphicalUserInterface.new()
+  gui.start()
 end
