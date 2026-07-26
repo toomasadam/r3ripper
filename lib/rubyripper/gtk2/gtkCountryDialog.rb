@@ -187,6 +187,7 @@ class GtkCountryDialog
     main_hbox.pack_start(build_available_frame, expand: true, fill: true, padding: 0)
     main_hbox.pack_start(build_middle_buttons, expand: false, fill: false, padding: 0)
     main_hbox.pack_start(build_preferred_frame, expand: true, fill: true, padding: 0)
+    main_hbox.pack_start(build_right_buttons, expand: false, fill: false, padding: 0)
     @keep_alive << main_hbox
 
     content_area.pack_start(main_hbox, expand: true, fill: true, padding: 0)
@@ -260,7 +261,6 @@ class GtkCountryDialog
   end
 
   def build_preferred_frame
-    hbox = Gtk::Box.new(:horizontal, 5)
     vbox_tree = Gtk::Box.new(:vertical, 5)
 
     # Store: [Rank, Name, Code]
@@ -291,7 +291,19 @@ class GtkCountryDialog
     scrolled.add(@preferred_view)
     vbox_tree.pack_start(scrolled, expand: true, fill: true, padding: 0)
 
-    vbox_order = Gtk::Box.new(:vertical, 5)
+    @preferred_view.selection.signal_connect("changed") do
+      update_buttons_sensitivity
+    end
+    @preferred_view.signal_connect("row-activated") do
+      remove_selected_country
+    end
+
+    @keep_alive << scrolled << vbox_tree
+    new_frame(_("Preferred Priority Order"), vbox_tree)
+  end
+
+  def build_right_buttons
+    vbox_order = Gtk::Box.new(:vertical, 8)
     vbox_order.valign = :center
 
     @btn_up = Gtk::Button.new(label: _("Move up"))
@@ -302,19 +314,8 @@ class GtkCountryDialog
 
     vbox_order.pack_start(@btn_up, expand: false, fill: false, padding: 0)
     vbox_order.pack_start(@btn_down, expand: false, fill: false, padding: 0)
-
-    hbox.pack_start(vbox_tree, expand: true, fill: true, padding: 0)
-    hbox.pack_start(vbox_order, expand: false, fill: false, padding: 0)
-
-    @preferred_view.selection.signal_connect("changed") do
-      update_buttons_sensitivity
-    end
-    @preferred_view.signal_connect("row-activated") do
-      remove_selected_country
-    end
-
-    @keep_alive << scrolled << vbox_tree << vbox_order << @btn_up << @btn_down << hbox
-    new_frame(_("Preferred Priority Order"), hbox)
+    @keep_alive << @btn_up << @btn_down << vbox_order
+    vbox_order
   end
 
   def populate_available_store(query = '')
