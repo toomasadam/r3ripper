@@ -69,8 +69,19 @@
 *   **Preferences Integration**: Added `Configure...` push button (`Gtk::Button`) next to `Preferred countries:` in `GtkPreferences`.
 *   **Test Suite Expansion**: Added unit tests in `spec/gtk2/gtkCountryDialog_spec.rb` covering country string parsing, code alias mapping, name formatting, and store updates (272 examples passing).
 
+### 10. GTK3 & CLI GnuDB Options Section Modernization
+*   **GTK3 Preferences Section (`GtkPreferences`)**:
+    *   Renamed section frame title from legacy `FreeDB Options` to **`GnuDB Options`** following GNOME HIG Title Case standards.
+    *   Updated primary metadata provider dropdown option from `FreeDB` to **`GnuDB`**.
+    *   Standardized control labels to GNOME HIG Sentence case (`Always use first GnuDB hit`, `GnuDB server:`).
+    *   Added **Reset to Default** push button (`Gtk::Button`) next to the server entry to quickly restore the default GnuDB endpoint (`http://gnudb.gnudb.org/~cddb/cddb.cgi`).
+    *   Added tooltips explaining CDDB protocol handshake identity parameter roles (`Username` & `Hostname`).
+*   **CLI Preferences Modernization (`CliPreferences`)**:
+    *   Updated menu labels and option prompts from `Freedb...` to **`GnuDB...`**.
+*   **Test Suite Expansion**: Added unit test specs in `spec/gtk2/gtkPreferences_spec.rb` for GnuDB frame initialization, controls, and server reset behavior (278 examples passing).
+
 ## Current Project Status
 *   **Core Engine**: Stable and verified on Ruby 3.4+.
 *   **CLI Interface**: Fully functional (`bin/rubyripper_cli` or `bundle exec ./bin/rubyripper_cli`).
 *   **Modernized GUI**: Fully functional on GTK3 with GNOME HIG compliance (`bin/rubyripper_gtk2` or `bundle exec ./bin/rubyripper_gtk2`).
-*   **Test Suite**: Modern RSpec 3, 100% passing (272 examples).
+*   **Test Suite**: Modern RSpec 3, 100% passing (278 examples).

@@ -30,7 +30,7 @@ class GtkPreferences
 
   def initialize(prefs=nil, deps=nil)
     @prefs = prefs ? prefs : Preferences::Main.instance
-    @deps = deps ? deps : Dependency.instance
+    @deps = deps ? deps : Dependency.new
     @codec_labels = {'flac' => 'FLAC', 'wavpack' => 'WavPack', 'nero' => 'Nero AAC',
                      'fraunhofer' => 'Fraunhofer AAC', 'other' => _('Other')}
   end
@@ -603,7 +603,7 @@ It is recommended to enable this option.")
     @table90 = newTable(rows=1, columns=2)
     @metadataLabel = Gtk::Label.new(_("Primary metadata provider:"))
     @metadataChoice = Gtk::ComboBoxText.new()
-    @metadataChoice.append_text(_("FreeDB"))
+    @metadataChoice.append_text(_("GnuDB"))
     @metadataChoice.append_text(_("MusicBrainz"))
     @metadataChoice.append_text(_("Don't use a metadata provider"))
     @table90.attach(@metadataLabel,0,0,1,1)
@@ -612,26 +612,37 @@ It is recommended to enable this option.")
   end
   
   def buildFrameFreedbOptions
-    @table91 = newTable(rows=4, columns=2)
+    @table91 = newTable(rows=4, columns=3)
 #creating objects
-    @firstHit= Gtk::CheckButton.new(_("Always use first FreeDB hit"))
-    @freedb_server_label= Gtk::Label.new(_("FreeDB server:")) ; @freedb_server_label.halign = :start
+    @firstHit= Gtk::CheckButton.new(_("Always use first GnuDB hit"))
+    @freedb_server_label= Gtk::Label.new(_("GnuDB server:")) ; @freedb_server_label.halign = :start
     @freedb_username_label= Gtk::Label.new(_("Username:")) ; @freedb_username_label.halign = :start
     @freedb_hostname_label= Gtk::Label.new(_("Hostname:")) ; @freedb_hostname_label.halign = :start
     @freedbServerEntry = Gtk::Entry.new
     @freedbUsernameEntry = Gtk::Entry.new
     @freedbHostnameEntry = Gtk::Entry.new
+    @resetGnudbServerButton = Gtk::Button.new(label: _('Reset to Default'))
+
+    @freedbServerEntry.tooltip_text = _("HTTP CGI endpoint for GnuDB disc metadata queries")
+    @freedbUsernameEntry.tooltip_text = _("Username sent during the CDDB protocol handshake")
+    @freedbHostnameEntry.tooltip_text = _("Hostname sent during the CDDB protocol handshake")
+
+    @resetGnudbServerButton.signal_connect("clicked") do
+      @freedbServerEntry.text = 'http://gnudb.gnudb.org/~cddb/cddb.cgi'
+    end
+
 #packing objects
-    @table91.attach(@firstHit, 0, 0, 2, 1) #both columns, 1st row
+    @table91.attach(@firstHit, 0, 0, 3, 1) #all columns, 1st row
     @table91.attach(@freedb_server_label, 0, 1, 1, 1) #1st column, 2nd row
-    @table91.attach(@freedb_username_label, 0, 2, 1, 1) #1st column, 3rd row
-    @table91.attach(@freedb_hostname_label, 0, 3, 1, 1) #1st column, 4th row
     @table91.attach(@freedbServerEntry, 1, 1, 1, 1) #2nd column, 2nd row
-    @table91.attach(@freedbUsernameEntry, 1, 2, 1, 1) #2nd column, 3rd row
-    @table91.attach(@freedbHostnameEntry, 1, 3, 1, 1) #2nd column, 4th row
-    @frame91 = newFrame(_('FreeDB Options'), child=@table91)
-#pack frame
+    @table91.attach(@resetGnudbServerButton, 2, 1, 1, 1) #3rd column, 2nd row
+    @table91.attach(@freedb_username_label, 0, 2, 1, 1) #1st column, 3rd row
+    @table91.attach(@freedbUsernameEntry, 1, 2, 2, 1) #2nd and 3rd column, 3rd row
+    @table91.attach(@freedb_hostname_label, 0, 3, 1, 1) #1st column, 4th row
+    @table91.attach(@freedbHostnameEntry, 1, 3, 2, 1) #2nd and 3rd column, 4th row
+    @frame91 = newFrame(_('GnuDB Options'), child=@table91)
   end
+  alias_method :buildFrameGnudbOptions, :buildFrameFreedbOptions
   
   def buildFrameMusicbrainzOptions
     @table92 = newTable(rows=3, columns=3)

@@ -231,10 +231,10 @@ Feature: Manage rubyripper preferences
       *** METADATA PREFERENCES ***
       
        1) Metadata provider: freedb
-       2) Freedb use first hit [*]
-       3) Freedb server: http://freedb.freedb.org/~cddb/cddb.cgi
-       4) Freedb username: anonymous
-       5) Freedb hostname: my_secret.com
+       2) GnuDB use first hit [*]
+       3) GnuDB server: http://gnudb.gnudb.org/~cddb/cddb.cgi
+       4) GnuDB username: anonymous
+       5) GnuDB hostname: my_secret.com
        6) Musicbrainz preferred countries (1st, 2nd,...): US,UK,XW,XE,JP
        7) Musicbrainz preferred date: earlier
        8) Musicbrainz use first known year (including LPs) [*]
@@ -261,10 +261,10 @@ Feature: Manage rubyripper preferences
       *** METADATA PREFERENCES ***
 
        1) Metadata provider: none
-       2) Freedb use first hit [ ]
-       3) Freedb server: www.google.nl
-       4) Freedb username: joe
-       5) Freedb hostname: dalton.com
+       2) GnuDB use first hit [ ]
+       3) GnuDB server: www.google.nl
+       4) GnuDB username: joe
+       5) GnuDB hostname: dalton.com
        6) Musicbrainz preferred countries (1st, 2nd,...): UK,US
        7) Musicbrainz preferred date: later
        8) Musicbrainz use first known year (including LPs) [ ]
