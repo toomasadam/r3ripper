@@ -72,8 +72,8 @@ describe GtkPreferences do
     expect(gtk_prefs.instance_variable_get(:@configureNormalButton).label).to eq('Configure...')
     expect(gtk_prefs.instance_variable_get(:@expander100)).to be_nil
 
-    expect(gtk_prefs.instance_variable_get(:@example_normal_label).text).to include('Judas Priest')
-    expect(gtk_prefs.instance_variable_get(:@example_various_label).text).to include('Kid Rock')
-    expect(gtk_prefs.instance_variable_get(:@example_image_label).text).to include('Kid Rock')
+    expect(gtk_prefs.instance_variable_get(:@example_normal_label).text).to include('Pink Floyd')
+    expect(gtk_prefs.instance_variable_get(:@example_various_label).text).to include('Dick Dale & His Del-Tones')
+    expect(gtk_prefs.instance_variable_get(:@example_image_label).text).to include('Dick Dale & His Del-Tones')
   end
 end

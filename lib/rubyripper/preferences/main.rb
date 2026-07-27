@@ -66,10 +66,10 @@ module Preferences
   def self.showFilenameNormal(basedir, layout)
     filename = File.expand_path(File.join(basedir, layout))
     filename = "%s.ext" % [filename]
-    {'%a' => 'Judas Priest', '%b' => 'Sin After Sin', '%f' => 'codec',
-    '%g' => 'Rock', '%y' => '1977', '%n' =>'01', '%t' => 'Sinner',
-    '%i' =>'inputfile', '%o' => 'outputfile'}.each do |key, value|
-        filename.gsub!(key,value)
+    {'%va' => 'Various Artists', '%a' => 'Pink Floyd', '%b' => 'The Dark Side of the Moon',
+    '%f' => 'flac', '%g' => 'Progressive Rock', '%y' => '1973', '%n' => '01', '%t' => 'Speak to Me',
+    '%i' => 'inputfile', '%o' => 'outputfile'}.each do |key, value|
+        filename.gsub!(key, value)
     end
     return filename
   end
@@ -78,10 +78,10 @@ module Preferences
   def self.showFilenameVarious(basedir, layout)
     filename = File.expand_path(File.join(basedir, layout))
     filename = "%s.ext" % [filename]
-    {'%va' => 'Various Artists', '%b' => 'TMF Rockzone', '%f' => 'codec',
-    '%g' => "Rock", '%y' => '1999', '%n' => '01', '%a' => 'Kid Rock',
-    '%t' => 'Cowboy'}.each do |key, value|
-        filename.gsub!(key,value)
+    {'%va' => 'Various Artists', '%b' => 'Pulp Fiction (Music from the Motion Picture)', '%f' => 'flac',
+    '%g' => 'Soundtrack', '%y' => '1994', '%n' => '01', '%a' => 'Dick Dale & His Del-Tones',
+    '%t' => 'Misirlou', '%i' => 'inputfile', '%o' => 'outputfile'}.each do |key, value|
+        filename.gsub!(key, value)
     end
     return filename
   end
