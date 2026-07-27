@@ -48,14 +48,18 @@ describe GtkPreferences do
     expect(server_entry.text).to eq('http://gnudb.gnudb.org/~cddb/cddb.cgi')
   end
 
-  it 'uses labeled push buttons for codec remove and add actions' do
+  it 'uses labeled Remove push button and auto-adds codecs on dropdown selection' do
     gtk_prefs = GtkPreferences.new(prefs, deps)
     gtk_prefs.start
     codec_rows = gtk_prefs.instance_variable_get(:@codecRows)
     remove_button = codec_rows['flac'][2]
-    add_button = gtk_prefs.instance_variable_get(:@addCodecButton)
-
     expect(remove_button.label).to eq('Remove')
-    expect(add_button.label).to eq('Add')
+
+    add_combo = gtk_prefs.instance_variable_get(:@addCodecComboBox)
+    expect(gtk_prefs.instance_variable_get(:@addCodecButton)).to be_nil
+
+    expect(prefs).to receive(:wavpack=).with(true)
+    add_combo.active = 1 # Select WavPack
+    expect(codec_rows.key?('wavpack')).to be true
   end
 end

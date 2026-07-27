@@ -529,32 +529,32 @@ It is recommended to enable this option.")
   
   def createAddCodecRow
     @addCodecComboBox = Gtk::ComboBoxText.new()
+    @addCodecComboBox.append_text(_('Add codec...'))
     @prefs.allCodecs.each do |codec|
       @addCodecComboBox.append_text(getLabelForCodec(codec)) unless @codecRows.key?(codec)
+    end
+    @addCodecComboBox.active = 0
+
+    @addCodecComboBox.signal_connect("changed") do
+      label = @addCodecComboBox.active_text
+      if label && label != _('Add codec...')
+        codec = getCodecForLabel(label)
+        createCodecRow(codec)
+        @prefs.send(codec + '=', true)
+        updateCodecsView()
+      end
     end
     
     if @addCodecLabel.nil?
       @addCodecLabel = Gtk::Label.new(_('Codec'))
       @addCodecLabel.halign = :start
-      @addCodecButton = Gtk::Button.new(label: _('Add'))
-    
-      # create the signal for the button
-      @addCodecButton.signal_connect("clicked") do
-        
-        label = @addCodecComboBox.active_text
-        if not label.nil?
-          createCodecRow(getCodecForLabel(label))
-          updateCodecsView()
-        end
-      end
     end
     
     # put the row into the grid
     top = @codecRows.size
     @selectCodecsTable.attach(@addCodecLabel, 0, top, 1, 1)
-    @selectCodecsTable.attach(@addCodecComboBox, 1, top, 1, 1)
+    @selectCodecsTable.attach(@addCodecComboBox, 1, top, 2, 1)
     @addCodecComboBox.hexpand = true
-    @selectCodecsTable.attach(@addCodecButton, 2, top, 1, 1)
   end
 
   def buildFrameCodecRelated #Encoding related frame

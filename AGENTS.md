@@ -78,8 +78,8 @@
     *   Added tooltips explaining CDDB protocol handshake identity parameter roles (`Username` & `Hostname`).
 *   **CLI Preferences Modernization (`CliPreferences`)**:
     *   Updated menu labels and option prompts from `Freedb...` to **`GnuDB...`**.
-*   **Active Audio Codecs Button Modernization**: Replaced deprecated `Gtk::Stock::REMOVE` and `Gtk::Stock::ADD` buttons in `GtkPreferences` with explicit HIG-compliant labeled push buttons (`Remove` & `Add`), resolving unlabelled/blank buttons in GTK3.
-*   **Test Suite Expansion**: Added unit test specs in `spec/gtk2/gtkPreferences_spec.rb` for GnuDB frame initialization, controls, server reset behavior, and codec button labels (279 examples passing).
+*   **Active Audio Codecs Workflow Modernization**: Streamlined codec selection in `GtkPreferences` by automatically adding chosen codecs upon combo box selection (`changed` signal) and removing the redundant `Add` push button. Replaced deprecated `Gtk::Stock::REMOVE` with HIG-compliant labeled push button (`Remove`).
+*   **Test Suite Expansion**: Added unit test specs in `spec/gtk2/gtkPreferences_spec.rb` for GnuDB frame initialization, controls, server reset behavior, and codec auto-addition UX (279 examples passing).
 
 ## Current Project Status
 *   **Core Engine**: Stable and verified on Ruby 3.4+.
