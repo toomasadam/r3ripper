@@ -139,6 +139,7 @@ class GtkPreferences
     @debug.active = @prefs.debug
     @editorEntry.text = @prefs.editor.to_s
     @filemanagerEntry.text = @prefs.filemanager.to_s
+    sync_app_combos()
   end
   
   def loadNormalizer
@@ -855,6 +856,9 @@ It is recommended to enable this option.")
 #Small table needed for setting programs
 #log file viewer 	| entry
 #file manager 	| entry
+  EDITOR_CMDS = ['xdg-open', 'gnome-text-editor', 'gedit', 'kate', 'mousepad', 'xed', 'leafpad', 'code'].freeze
+  FILEMANAGER_CMDS = ['xdg-open', 'nautilus', 'dolphin', 'thunar', 'pcmanfm', 'nemo', 'caja'].freeze
+
   def buildFrameProgramsOfChoice
     @table110 = newTable(rows=2, columns=4)
 
@@ -864,8 +868,11 @@ It is recommended to enable this option.")
     @editorEntry = Gtk::Entry.new
     @filemanagerEntry = Gtk::Entry.new
 
+    @editorEntry.signal_connect('changed') { sync_editor_combo }
+    @filemanagerEntry.signal_connect('changed') { sync_filemanager_combo }
+
     @editorPresetCombo = Gtk::ComboBoxText.new
-    @editorPresetCombo.append_text(_('Select program...'))
+    @editorPresetCombo.append_text(_('Custom application...'))
     [
       { label: N_('Default'), cmd: 'xdg-open' },
       { label: N_('GNOME Text Editor'), cmd: 'gnome-text-editor' },
@@ -881,14 +888,13 @@ It is recommended to enable this option.")
     @editorPresetCombo.active = 0
     @editorPresetCombo.signal_connect('changed') do
       idx = @editorPresetCombo.active
-      editor_cmds = ['xdg-open', 'gnome-text-editor', 'gedit', 'kate', 'mousepad', 'xed', 'leafpad', 'code']
-      if idx > 0 && editor_cmds[idx - 1]
-        @editorEntry.text = editor_cmds[idx - 1]
+      if idx > 0 && EDITOR_CMDS[idx - 1]
+        @editorEntry.text = EDITOR_CMDS[idx - 1]
       end
     end
 
     @filemanagerPresetCombo = Gtk::ComboBoxText.new
-    @filemanagerPresetCombo.append_text(_('Select program...'))
+    @filemanagerPresetCombo.append_text(_('Custom application...'))
     [
       { label: N_('Default'), cmd: 'xdg-open' },
       { label: N_('Files (Nautilus)'), cmd: 'nautilus' },
@@ -903,9 +909,8 @@ It is recommended to enable this option.")
     @filemanagerPresetCombo.active = 0
     @filemanagerPresetCombo.signal_connect('changed') do
       idx = @filemanagerPresetCombo.active
-      fm_cmds = ['xdg-open', 'nautilus', 'dolphin', 'thunar', 'pcmanfm', 'nemo', 'caja']
-      if idx > 0 && fm_cmds[idx - 1]
-        @filemanagerEntry.text = fm_cmds[idx - 1]
+      if idx > 0 && FILEMANAGER_CMDS[idx - 1]
+        @filemanagerEntry.text = FILEMANAGER_CMDS[idx - 1]
       end
     end
 
@@ -945,8 +950,30 @@ It is recommended to enable this option.")
     dialog.current_folder = '/usr/bin'
     if dialog.run == Gtk::ResponseType::ACCEPT
       entry.text = dialog.filename
+      sync_app_combos
     end
     dialog.destroy
+  end
+
+  def sync_editor_combo
+    return unless @editorEntry && @editorPresetCombo
+    cmd = @editorEntry.text.to_s.strip
+    idx = EDITOR_CMDS.index(cmd)
+    target_active = idx ? idx + 1 : 0
+    @editorPresetCombo.active = target_active if @editorPresetCombo.active != target_active
+  end
+
+  def sync_filemanager_combo
+    return unless @filemanagerEntry && @filemanagerPresetCombo
+    cmd = @filemanagerEntry.text.to_s.strip
+    idx = FILEMANAGER_CMDS.index(cmd)
+    target_active = idx ? idx + 1 : 0
+    @filemanagerPresetCombo.active = target_active if @filemanagerPresetCombo.active != target_active
+  end
+
+  def sync_app_combos
+    sync_editor_combo
+    sync_filemanager_combo
   end
 
 #Small table for debugging

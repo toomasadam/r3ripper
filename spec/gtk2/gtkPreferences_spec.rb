@@ -77,17 +77,24 @@ describe GtkPreferences do
     expect(gtk_prefs.instance_variable_get(:@example_image_label).text).to include('Pink Floyd')
   end
 
-  it 'initializes Programs of Choice preset dropdowns and browse buttons' do
+  it 'synchronizes Programs of Choice preset dropdowns bi-directionally' do
     gtk_prefs = GtkPreferences.new(prefs, deps)
     gtk_prefs.start
     editor_entry = gtk_prefs.instance_variable_get(:@editorEntry)
+    editor_combo = gtk_prefs.instance_variable_get(:@editorPresetCombo)
     expect(gtk_prefs.instance_variable_get(:@browseEditorButton).label).to eq('Browse...')
 
-    editor_combo = gtk_prefs.instance_variable_get(:@editorPresetCombo)
-    editor_combo.active = 1 # Default (xdg-open)
-    expect(editor_entry.text).to eq('xdg-open')
-
+    # Selecting preset updates entry text
     editor_combo.active = 3 # Gedit
     expect(editor_entry.text).to eq('gedit')
+    expect(editor_combo.active).to eq(3)
+
+    # Updating entry text to a custom command syncs combo back to 0 (Custom application...)
+    editor_entry.text = '/usr/bin/custom-editor'
+    expect(editor_combo.active).to eq(0)
+
+    # Updating entry text back to a preset command syncs combo to matching index
+    editor_entry.text = 'xdg-open'
+    expect(editor_combo.active).to eq(1)
   end
 end

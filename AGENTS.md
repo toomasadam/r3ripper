@@ -101,8 +101,9 @@
 
 ### 13. GTK3 Programs of Choice Controls Modernization
 *   **Application Preset Dropdowns**: Added `Gtk::ComboBoxText` selectors for `Log file viewer` (`Default (xdg-open)`, `gnome-text-editor`, `gedit`, `kate`, `mousepad`, `xed`, `leafpad`, `code`) and `File manager` (`Default (xdg-open)`, `nautilus`, `dolphin`, `thunar`, `pcmanfm`, `nemo`, `caja`).
+*   **Bi-directional Synchronization**: Automatic synchronization between text entries and dropdown selectors (`sync_app_combos`). Text entry edits or file chooser selections dynamically update dropdown items (showing `Custom application...` for custom binary paths), and dropdown selections dynamically update text entry values.
 *   **Executable File Choosers**: Added **`Browse...`** push buttons (`Gtk::FileChooserDialog`) scoped to `/usr/bin` for picking binary executables visually.
-*   **Test Suite Expansion**: Added unit test specs in `spec/gtk2/gtkPreferences_spec.rb` covering preset selection and default reset buttons (297 examples passing).
+*   **Test Suite Expansion**: Added unit test specs in `spec/gtk2/gtkPreferences_spec.rb` covering preset selection, bi-directional synchronization, and custom command fallback (297 examples passing).
 
 ## Current Project Status
 *   **Core Engine**: Stable and verified on Ruby 3.4+.
