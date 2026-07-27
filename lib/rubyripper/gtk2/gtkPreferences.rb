@@ -717,12 +717,12 @@ It is recommended to enable this option.")
   end
 
   def buildFrameFilenamingScheme # Naming scheme frame
-    @table100 = newTable(rows=7, columns=3)
+    @table100 = newTable(rows=4, columns=3)
 #creating objects 1st column
-    @basedir_label = Gtk::Label.new(_('Base directory:')) ; @basedir_label.halign = :start
-    @naming_normal_label = Gtk::Label.new(_('Standard:')) ; @naming_normal_label.halign = :start
-    @naming_various_label = Gtk::Label.new(_('Various artists:')) ; @naming_various_label.halign = :start
-    @naming_image_label = Gtk::Label.new(_('Single file image:')) ; @naming_image_label.halign = :start
+    @basedir_label = Gtk::Label.new(_('Base directory:')) ; @basedir_label.halign = :start ; @basedir_label.valign = :center
+    @naming_normal_label = Gtk::Label.new(_('Standard:')) ; @naming_normal_label.halign = :start ; @naming_normal_label.valign = :start
+    @naming_various_label = Gtk::Label.new(_('Various artists:')) ; @naming_various_label.halign = :start ; @naming_various_label.valign = :start
+    @naming_image_label = Gtk::Label.new(_('Single file image:')) ; @naming_image_label.halign = :start ; @naming_image_label.valign = :start
 
     @example_normal_label = Gtk::Label.new('') ; @example_normal_label.halign = :start ; @example_normal_label.wrap = true
     @example_various_label = Gtk::Label.new('') ; @example_various_label.halign = :start ; @example_various_label.wrap = true
@@ -734,10 +734,10 @@ It is recommended to enable this option.")
     @namingVariousEntry = Gtk::Entry.new
     @namingImageEntry = Gtk::Entry.new
 
-    @browseBasedirButton = Gtk::Button.new(label: _('Browse...'))
-    @configureNormalButton = Gtk::Button.new(label: _('Configure...'))
-    @configureVariousButton = Gtk::Button.new(label: _('Configure...'))
-    @configureImageButton = Gtk::Button.new(label: _('Configure...'))
+    @browseBasedirButton = Gtk::Button.new(label: _('Browse...')) ; @browseBasedirButton.valign = :center
+    @configureNormalButton = Gtk::Button.new(label: _('Configure...')) ; @configureNormalButton.valign = :start
+    @configureVariousButton = Gtk::Button.new(label: _('Configure...')) ; @configureVariousButton.valign = :start
+    @configureImageButton = Gtk::Button.new(label: _('Configure...')) ; @configureImageButton.valign = :start
 
     @basedirEntry.signal_connect("key_release_event"){updateAllFileExamples() ; false}
     @basedirEntry.signal_connect("button_release_event"){updateAllFileExamples() ; false}
@@ -756,6 +756,19 @@ It is recommended to enable this option.")
     @configureVariousButton.signal_connect("clicked") { show_naming_dialog('various', @namingVariousEntry) }
     @configureImageButton.signal_connect("clicked") { show_naming_dialog('image', @namingImageEntry) }
 
+    # Group entry and example label in vertical boxes for exact alignment
+    box_normal = Gtk::Box.new(:vertical, 2)
+    box_normal.pack_start(@namingNormalEntry, expand: false, fill: true, padding: 0)
+    box_normal.pack_start(@example_normal_label, expand: false, fill: true, padding: 0)
+
+    box_various = Gtk::Box.new(:vertical, 2)
+    box_various.pack_start(@namingVariousEntry, expand: false, fill: true, padding: 0)
+    box_various.pack_start(@example_various_label, expand: false, fill: true, padding: 0)
+
+    box_image = Gtk::Box.new(:vertical, 2)
+    box_image.pack_start(@namingImageEntry, expand: false, fill: true, padding: 0)
+    box_image.pack_start(@example_image_label, expand: false, fill: true, padding: 0)
+
 #packing table
     @table100.attach(@basedir_label, 0, 0, 1, 1)
     @table100.attach(@basedirEntry, 1, 0, 1, 1)
@@ -763,25 +776,19 @@ It is recommended to enable this option.")
     @table100.attach(@browseBasedirButton, 2, 0, 1, 1)
 
     @table100.attach(@naming_normal_label, 0, 1, 1, 1)
-    @table100.attach(@namingNormalEntry, 1, 1, 1, 1)
-    @namingNormalEntry.hexpand = true
+    @table100.attach(box_normal, 1, 1, 1, 1)
+    box_normal.hexpand = true
     @table100.attach(@configureNormalButton, 2, 1, 1, 1)
-    @table100.attach(@example_normal_label, 1, 2, 2, 1)
-    @example_normal_label.hexpand = true
 
-    @table100.attach(@naming_various_label, 0, 3, 1, 1)
-    @table100.attach(@namingVariousEntry, 1, 3, 1, 1)
-    @namingVariousEntry.hexpand = true
-    @table100.attach(@configureVariousButton, 2, 3, 1, 1)
-    @table100.attach(@example_various_label, 1, 4, 2, 1)
-    @example_various_label.hexpand = true
+    @table100.attach(@naming_various_label, 0, 2, 1, 1)
+    @table100.attach(box_various, 1, 2, 1, 1)
+    box_various.hexpand = true
+    @table100.attach(@configureVariousButton, 2, 2, 1, 1)
 
-    @table100.attach(@naming_image_label, 0, 5, 1, 1)
-    @table100.attach(@namingImageEntry, 1, 5, 1, 1)
-    @namingImageEntry.hexpand = true
-    @table100.attach(@configureImageButton, 2, 5, 1, 1)
-    @table100.attach(@example_image_label, 1, 6, 2, 1)
-    @example_image_label.hexpand = true
+    @table100.attach(@naming_image_label, 0, 3, 1, 1)
+    @table100.attach(box_image, 1, 3, 1, 1)
+    box_image.hexpand = true
+    @table100.attach(@configureImageButton, 2, 3, 1, 1)
 
     @frame100 = newFrame(_('File Naming Scheme'), child=@table100)
   end
