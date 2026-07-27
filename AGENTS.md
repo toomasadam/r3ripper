@@ -99,8 +99,14 @@
 *   **Per-Scheme Live Preview Labels**: Removed the single legacy context-sensitive `@example_label` and `@expander100` expander. Replaced with dedicated, simultaneous live path preview labels directly beneath each of the three scheme fields (`Standard`, `Various artists`, `Single file image`), updating in real-time as paths or schemes are edited.
 *   **Test Suite Expansion**: Added unit test specs in `spec/gtk2/gtkNamingDialog_spec.rb` and `spec/gtk2/gtkPreferences_spec.rb` covering sample path rendering, tag insertion, and per-scheme live preview labels (296 examples passing).
 
+### 13. GTK3 Programs of Choice Controls Modernization
+*   **Application Preset Dropdowns**: Added `Gtk::ComboBoxText` selectors for `Log file viewer` (`xdg-open`, `gnome-text-editor`, `gedit`, `kate`, `mousepad`, `xed`, `leafpad`, `code`) and `File manager` (`xdg-open`, `nautilus`, `dolphin`, `thunar`, `pcmanfm`, `nemo`, `caja`).
+*   **Executable File Choosers**: Added **`Browse...`** push buttons (`Gtk::FileChooserDialog`) scoped to `/usr/bin` for picking binary executables visually.
+*   **Quick Reset Controls**: Added **`Use Default`** push buttons (`Gtk::Button`) to quickly reset commands to `xdg-open`.
+*   **Test Suite Expansion**: Added unit test specs in `spec/gtk2/gtkPreferences_spec.rb` covering preset selection and default reset buttons (297 examples passing).
+
 ## Current Project Status
 *   **Core Engine**: Stable and verified on Ruby 3.4+.
 *   **CLI Interface**: Fully functional (`bin/rubyripper_cli` or `bundle exec ./bin/rubyripper_cli`).
 *   **Modernized GUI**: Fully functional on GTK3 with GNOME HIG compliance (`bin/rubyripper_gtk2` or `bundle exec ./bin/rubyripper_gtk2`).
-*   **Test Suite**: Modern RSpec 3, 100% passing (296 examples).
+*   **Test Suite**: Modern RSpec 3, 100% passing (297 examples).

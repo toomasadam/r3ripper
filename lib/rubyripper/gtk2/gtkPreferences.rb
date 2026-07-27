@@ -856,18 +856,103 @@ It is recommended to enable this option.")
 #log file viewer 	| entry
 #file manager 	| entry
   def buildFrameProgramsOfChoice
-    @table110 = newTable(rows=2, columns=2)
-#creating objects
-    @editor_label = Gtk::Label.new(_("Log file viewer:")) ; @editor_label.halign = :start
-    @filemanager_label = Gtk::Label.new(_("File manager:")) ; @filemanager_label.halign = :start
+    @table110 = newTable(rows=2, columns=5)
+
+    @editor_label = Gtk::Label.new(_("Log file viewer:")) ; @editor_label.halign = :start ; @editor_label.valign = :center
+    @filemanager_label = Gtk::Label.new(_("File manager:")) ; @filemanager_label.halign = :start ; @filemanager_label.valign = :center
+
     @editorEntry = Gtk::Entry.new
     @filemanagerEntry = Gtk::Entry.new
-#packing objects
+
+    @editorPresetCombo = Gtk::ComboBoxText.new
+    @editorPresetCombo.append_text(_('Select program...'))
+    [
+      { label: N_('Default (xdg-open)'), cmd: 'xdg-open' },
+      { label: N_('GNOME Text Editor'), cmd: 'gnome-text-editor' },
+      { label: N_('Gedit'), cmd: 'gedit' },
+      { label: N_('Kate'), cmd: 'kate' },
+      { label: N_('Mousepad'), cmd: 'mousepad' },
+      { label: N_('Xed'), cmd: 'xed' },
+      { label: N_('Leafpad'), cmd: 'leafpad' },
+      { label: N_('VS Code'), cmd: 'code' }
+    ].each do |app|
+      @editorPresetCombo.append_text(_(app[:label]) + " (#{app[:cmd]})")
+    end
+    @editorPresetCombo.active = 0
+    @editorPresetCombo.signal_connect('changed') do
+      idx = @editorPresetCombo.active
+      editor_cmds = ['xdg-open', 'gnome-text-editor', 'gedit', 'kate', 'mousepad', 'xed', 'leafpad', 'code']
+      if idx > 0 && editor_cmds[idx - 1]
+        @editorEntry.text = editor_cmds[idx - 1]
+      end
+    end
+
+    @filemanagerPresetCombo = Gtk::ComboBoxText.new
+    @filemanagerPresetCombo.append_text(_('Select program...'))
+    [
+      { label: N_('Default (xdg-open)'), cmd: 'xdg-open' },
+      { label: N_('Files (Nautilus)'), cmd: 'nautilus' },
+      { label: N_('Dolphin'), cmd: 'dolphin' },
+      { label: N_('Thunar'), cmd: 'thunar' },
+      { label: N_('PCManFM'), cmd: 'pcmanfm' },
+      { label: N_('Nemo'), cmd: 'nemo' },
+      { label: N_('Caja'), cmd: 'caja' }
+    ].each do |app|
+      @filemanagerPresetCombo.append_text(_(app[:label]) + " (#{app[:cmd]})")
+    end
+    @filemanagerPresetCombo.active = 0
+    @filemanagerPresetCombo.signal_connect('changed') do
+      idx = @filemanagerPresetCombo.active
+      fm_cmds = ['xdg-open', 'nautilus', 'dolphin', 'thunar', 'pcmanfm', 'nemo', 'caja']
+      if idx > 0 && fm_cmds[idx - 1]
+        @filemanagerEntry.text = fm_cmds[idx - 1]
+      end
+    end
+
+    @browseEditorButton = Gtk::Button.new(label: _('Browse...'))
+    @browseFileManagerButton = Gtk::Button.new(label: _('Browse...'))
+    @defaultEditorButton = Gtk::Button.new(label: _('Use Default'))
+    @defaultFileManagerButton = Gtk::Button.new(label: _('Use Default'))
+
+    @browseEditorButton.signal_connect('clicked') { show_app_chooser_dialog(@editorEntry, _('Choose Log File Viewer Executable')) }
+    @browseFileManagerButton.signal_connect('clicked') { show_app_chooser_dialog(@filemanagerEntry, _('Choose File Manager Executable')) }
+    @defaultEditorButton.signal_connect('clicked') { @editorEntry.text = 'xdg-open' }
+    @defaultFileManagerButton.signal_connect('clicked') { @filemanagerEntry.text = 'xdg-open' }
+
+    # packing
     @table110.attach(@editor_label, 0, 0, 1, 1)
-    @table110.attach(@filemanager_label, 0, 1, 1, 1)
     @table110.attach(@editorEntry, 1, 0, 1, 1)
+    @editorEntry.hexpand = true
+    @table110.attach(@editorPresetCombo, 2, 0, 1, 1)
+    @table110.attach(@browseEditorButton, 3, 0, 1, 1)
+    @table110.attach(@defaultEditorButton, 4, 0, 1, 1)
+
+    @table110.attach(@filemanager_label, 0, 1, 1, 1)
     @table110.attach(@filemanagerEntry, 1, 1, 1, 1)
+    @filemanagerEntry.hexpand = true
+    @table110.attach(@filemanagerPresetCombo, 2, 1, 1, 1)
+    @table110.attach(@browseFileManagerButton, 3, 1, 1, 1)
+    @table110.attach(@defaultFileManagerButton, 4, 1, 1, 1)
+
     @frame110 = newFrame(_('Programs of Choice'), child=@table110)
+  end
+
+  def show_app_chooser_dialog(entry, title_str)
+    parent_window = (@display && @display.toplevel.is_a?(Gtk::Window)) ? @display.toplevel : nil
+    dialog = Gtk::FileChooserDialog.new(
+      title: title_str,
+      parent: parent_window,
+      action: :open,
+      buttons: [
+        [_("Cancel"), Gtk::ResponseType::CANCEL],
+        [_("Select"), Gtk::ResponseType::ACCEPT]
+      ]
+    )
+    dialog.current_folder = '/usr/bin'
+    if dialog.run == Gtk::ResponseType::ACCEPT
+      entry.text = dialog.filename
+    end
+    dialog.destroy
   end
 
 #Small table for debugging
