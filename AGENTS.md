@@ -78,10 +78,11 @@
     *   Added tooltips explaining CDDB protocol handshake identity parameter roles (`Username` & `Hostname`).
 *   **CLI Preferences Modernization (`CliPreferences`)**:
     *   Updated menu labels and option prompts from `Freedb...` to **`GnuDB...`**.
-*   **Test Suite Expansion**: Added unit test specs in `spec/gtk2/gtkPreferences_spec.rb` for GnuDB frame initialization, controls, and server reset behavior (278 examples passing).
+*   **Active Audio Codecs Button Modernization**: Replaced deprecated `Gtk::Stock::REMOVE` and `Gtk::Stock::ADD` buttons in `GtkPreferences` with explicit HIG-compliant labeled push buttons (`Remove` & `Add`), resolving unlabelled/blank buttons in GTK3.
+*   **Test Suite Expansion**: Added unit test specs in `spec/gtk2/gtkPreferences_spec.rb` for GnuDB frame initialization, controls, server reset behavior, and codec button labels (279 examples passing).
 
 ## Current Project Status
 *   **Core Engine**: Stable and verified on Ruby 3.4+.
 *   **CLI Interface**: Fully functional (`bin/rubyripper_cli` or `bundle exec ./bin/rubyripper_cli`).
 *   **Modernized GUI**: Fully functional on GTK3 with GNOME HIG compliance (`bin/rubyripper_gtk2` or `bundle exec ./bin/rubyripper_gtk2`).
-*   **Test Suite**: Modern RSpec 3, 100% passing (278 examples).
+*   **Test Suite**: Modern RSpec 3, 100% passing (279 examples).

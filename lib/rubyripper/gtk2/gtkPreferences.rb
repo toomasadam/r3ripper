@@ -483,11 +483,11 @@ It is recommended to enable this option.")
       @codecRows[codec] << Gtk::Entry.new()
       @codecRows[codec][1].text = @prefs.send('settings' + codec.capitalize).to_s
     end
-    @codecRows[codec] << Gtk::Button.new(stock: Gtk::Stock::REMOVE)
+    @codecRows[codec] << Gtk::Button.new(label: _('Remove'))
     addTooltipForOtherCodec(@codecRows[codec][1]) if codec == 'other'
 
     # connect the remove button signal
-    @codecRows[codec][2].signal_connect("button_release_event") do |a, b|
+    @codecRows[codec][2].signal_connect("clicked") do
       @codecRows[codec].each{|object| @selectCodecsTable.remove(object)}
       @codecRows.delete(codec)
       @prefs.send(codec + '=', false)
@@ -536,10 +536,10 @@ It is recommended to enable this option.")
     if @addCodecLabel.nil?
       @addCodecLabel = Gtk::Label.new(_('Codec'))
       @addCodecLabel.halign = :start
-      @addCodecButton = Gtk::Button.new(stock: Gtk::Stock::ADD)
+      @addCodecButton = Gtk::Button.new(label: _('Add'))
     
       # create the signal for the button
-      @addCodecButton.signal_connect("button_release_event") do |a, b|
+      @addCodecButton.signal_connect("clicked") do
         
         label = @addCodecComboBox.active_text
         if not label.nil?

@@ -24,8 +24,9 @@ describe GtkPreferences do
     allow(prefs).to receive(:namingNormal).and_return('%a/%album/%tn - %t')
     allow(prefs).to receive(:namingVarious).and_return('%album/%tn - %a - %t')
     allow(prefs).to receive(:namingImage).and_return('%a - %album')
-    allow(prefs).to receive(:editor).and_return('')
-    allow(prefs).to receive(:filemanager).and_return('')
+    allow(prefs).to receive(:codecs).and_return(['flac'])
+    allow(prefs).to receive(:allCodecs).and_return(['flac', 'wavpack'])
+    allow(prefs).to receive(:settingsFlac).and_return('-5')
   end
 
   it 'initializes GnuDB Options frame and controls correctly' do
@@ -45,5 +46,16 @@ describe GtkPreferences do
     server_entry.text = 'http://custom.server.org/cddb'
     reset_button.clicked
     expect(server_entry.text).to eq('http://gnudb.gnudb.org/~cddb/cddb.cgi')
+  end
+
+  it 'uses labeled push buttons for codec remove and add actions' do
+    gtk_prefs = GtkPreferences.new(prefs, deps)
+    gtk_prefs.start
+    codec_rows = gtk_prefs.instance_variable_get(:@codecRows)
+    remove_button = codec_rows['flac'][2]
+    add_button = gtk_prefs.instance_variable_get(:@addCodecButton)
+
+    expect(remove_button.label).to eq('Remove')
+    expect(add_button.label).to eq('Add')
   end
 end
