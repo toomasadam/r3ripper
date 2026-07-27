@@ -30,7 +30,7 @@ class GtkPreferences
 
   def initialize(prefs=nil, deps=nil)
     @prefs = prefs ? prefs : Preferences::Main.instance
-    @deps = deps ? deps : Dependency.new
+    @deps = deps ? deps : Dependency.instance
     @codec_labels = {'flac' => 'FLAC', 'wavpack' => 'WavPack', 'nero' => 'Nero AAC',
                      'fraunhofer' => 'Fraunhofer AAC', 'other' => _('Other')}
   end

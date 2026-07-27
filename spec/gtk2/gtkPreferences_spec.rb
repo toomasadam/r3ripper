@@ -3,6 +3,7 @@ require 'rubyripper/gtk2/gtkPreferences'
 
 describe GtkPreferences do
   let(:prefs) { double('Preferences::Main').as_null_object }
+  let(:deps) { double('Dependency').as_null_object }
 
   before do
     allow(prefs).to receive(:cdrom).and_return('/dev/cdrom')
@@ -28,7 +29,7 @@ describe GtkPreferences do
   end
 
   it 'initializes GnuDB Options frame and controls correctly' do
-    gtk_prefs = GtkPreferences.new(prefs)
+    gtk_prefs = GtkPreferences.new(prefs, deps)
     gtk_prefs.start
     expect(gtk_prefs.instance_variable_get(:@frame91).label).to eq('GnuDB Options')
     expect(gtk_prefs.instance_variable_get(:@freedb_server_label).text).to eq('GnuDB server:')
@@ -36,7 +37,7 @@ describe GtkPreferences do
   end
 
   it 'resets GnuDB server entry when Reset to Default button is clicked' do
-    gtk_prefs = GtkPreferences.new(prefs)
+    gtk_prefs = GtkPreferences.new(prefs, deps)
     gtk_prefs.start
     server_entry = gtk_prefs.instance_variable_get(:@freedbServerEntry)
     reset_button = gtk_prefs.instance_variable_get(:@resetGnudbServerButton)
