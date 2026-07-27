@@ -52,7 +52,9 @@ describe GtkPreferences do
     gtk_prefs = GtkPreferences.new(prefs, deps)
     gtk_prefs.start
     codec_rows = gtk_prefs.instance_variable_get(:@codecRows)
-    remove_button = codec_rows['flac'][2]
+    configure_button = codec_rows['flac'][2]
+    remove_button = codec_rows['flac'][3]
+    expect(configure_button.label).to eq('Configure...')
     expect(remove_button.label).to eq('Remove')
 
     add_combo = gtk_prefs.instance_variable_get(:@addCodecComboBox)

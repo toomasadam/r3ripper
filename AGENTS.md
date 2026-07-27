@@ -81,8 +81,16 @@
 *   **Active Audio Codecs Workflow Modernization**: Streamlined codec selection in `GtkPreferences` by automatically adding chosen codecs upon combo box selection (`changed` signal) and removing the redundant `Add` push button. Replaced deprecated `Gtk::Stock::REMOVE` with HIG-compliant labeled push button (`Remove`).
 *   **Test Suite Expansion**: Added unit test specs in `spec/gtk2/gtkPreferences_spec.rb` for GnuDB frame initialization, controls, server reset behavior, and codec auto-addition UX (279 examples passing).
 
+### 11. GTK3 Visual Codec Configuration Dialog
+*   **GTK3 Codec Options Dialog (`GtkCodecDialog`)**: Added a modal GTK3 configuration dialog to visually select and configure audio encoder options per active codec (`flac`, `opus`, `mp3`, `ogg`, `wavpack`):
+    *   **Codec-Specific Controls**: Exposed primary encoder knobs (FLAC compression level 0–8 & verify flag `-V`; Opus bitrate & VBR/CVBR/Hard-VBR modes; LAME MP3 VBR quality vs CBR bitrate; Ogg Vorbis quality level -1–10; WavPack compression mode & bitstream verification).
+    *   **Custom Parameters & Real-Time Preview**: Added live option string generator and custom parameter entry for power users.
+    *   **Bidirectional Option Parsing**: Robust parsing of CLI flag tokens into visual UI controls on dialog open and formatting back to clean parameter strings on apply.
+*   **Preferences Integration**: Added `Configure...` push button (`Gtk::Button`) next to each configurable active audio codec entry in `GtkPreferences`.
+*   **Test Suite Expansion**: Added unit test specs in `spec/gtk2/gtkCodecDialog_spec.rb` covering option string parsing, flag formatting, and UI generation for all supported codecs (290 examples passing).
+
 ## Current Project Status
 *   **Core Engine**: Stable and verified on Ruby 3.4+.
 *   **CLI Interface**: Fully functional (`bin/rubyripper_cli` or `bundle exec ./bin/rubyripper_cli`).
 *   **Modernized GUI**: Fully functional on GTK3 with GNOME HIG compliance (`bin/rubyripper_gtk2` or `bundle exec ./bin/rubyripper_gtk2`).
-*   **Test Suite**: Modern RSpec 3, 100% passing (279 examples).
+*   **Test Suite**: Modern RSpec 3, 100% passing (290 examples).

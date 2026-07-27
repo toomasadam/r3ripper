@@ -468,7 +468,7 @@ It is recommended to enable this option.")
   def buildFrameSelectAudioCodecs # Select audio codecs frame   
     @codecRows = Hash.new    
     @prefs.codecs.each{|codec| createCodecRow(codec)}
-    @selectCodecsTable = newTable(@codecRows.size + 1, columns = 3)
+    @selectCodecsTable = newTable(@codecRows.size + 1, columns = 4)
     createCodecsTable()
     @frame70 = newFrame(_('Active Audio Codecs'), child=@selectCodecsTable)
   end
@@ -483,16 +483,32 @@ It is recommended to enable this option.")
       @codecRows[codec] << Gtk::Entry.new()
       @codecRows[codec][1].text = @prefs.send('settings' + codec.capitalize).to_s
     end
-    @codecRows[codec] << Gtk::Button.new(label: _('Remove'))
-    addTooltipForOtherCodec(@codecRows[codec][1]) if codec == 'other'
 
-    # connect the remove button signal
-    @codecRows[codec][2].signal_connect("clicked") do
+    if ['flac', 'opus', 'mp3', 'lame', 'ogg', 'vorbis', 'wavpack'].include?(codec)
+      cfg_btn = Gtk::Button.new(label: _('Configure...'))
+      entry = @codecRows[codec][1]
+      cfg_btn.signal_connect('clicked') { show_codec_dialog(codec, entry) }
+      @codecRows[codec] << cfg_btn
+    end
+
+    remove_btn = Gtk::Button.new(label: _('Remove'))
+    remove_btn.signal_connect("clicked") do
       @codecRows[codec].each{|object| @selectCodecsTable.remove(object)}
       @codecRows.delete(codec)
       @prefs.send(codec + '=', false)
       updateCodecsView()
     end
+    @codecRows[codec] << remove_btn
+
+    addTooltipForOtherCodec(@codecRows[codec][1]) if codec == 'other'
+  end
+
+  def show_codec_dialog(codec, entry)
+    require 'rubyripper/gtk2/gtkCodecDialog'
+    parent_window = (@display && @display.toplevel.is_a?(Gtk::Window)) ? @display.toplevel : nil
+    dialog = GtkCodecDialog.new(parent_window, codec, entry.text)
+    result = dialog.run
+    entry.text = result if result
   end
 
   def getLabelForCodec(codec)
@@ -515,7 +531,12 @@ It is recommended to enable this option.")
       @selectCodecsTable.attach(row[0], 0, top, 1, 1)
       @selectCodecsTable.attach(row[1], 1, top, 1, 1)
       row[1].hexpand = true
-      @selectCodecsTable.attach(row[2], 2, top, 1, 1)  
+      if row.length > 3
+        @selectCodecsTable.attach(row[2], 2, top, 1, 1)
+        @selectCodecsTable.attach(row[3], 3, top, 1, 1)
+      else
+        @selectCodecsTable.attach(row[2], 2, top, 2, 1)
+      end
       top += 1
     end
     
@@ -553,7 +574,7 @@ It is recommended to enable this option.")
     # put the row into the grid
     top = @codecRows.size
     @selectCodecsTable.attach(@addCodecLabel, 0, top, 1, 1)
-    @selectCodecsTable.attach(@addCodecComboBox, 1, top, 2, 1)
+    @selectCodecsTable.attach(@addCodecComboBox, 1, top, 3, 1)
     @addCodecComboBox.hexpand = true
   end
 
