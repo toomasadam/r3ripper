@@ -724,9 +724,9 @@ It is recommended to enable this option.")
     @naming_various_label = Gtk::Label.new(_('Various artists:')) ; @naming_various_label.halign = :start ; @naming_various_label.valign = :start
     @naming_image_label = Gtk::Label.new(_('Single file image:')) ; @naming_image_label.halign = :start ; @naming_image_label.valign = :start
 
-    @example_normal_label = Gtk::Label.new('') ; @example_normal_label.halign = :start ; @example_normal_label.wrap = true
-    @example_various_label = Gtk::Label.new('') ; @example_various_label.halign = :start ; @example_various_label.wrap = true
-    @example_image_label = Gtk::Label.new('') ; @example_image_label.halign = :start ; @example_image_label.wrap = true
+    @example_normal_label = Gtk::Label.new('') ; @example_normal_label.halign = :start ; @example_normal_label.xalign = 0.0 ; @example_normal_label.justify = :left ; @example_normal_label.wrap = true
+    @example_various_label = Gtk::Label.new('') ; @example_various_label.halign = :start ; @example_various_label.xalign = 0.0 ; @example_various_label.justify = :left ; @example_various_label.wrap = true
+    @example_image_label = Gtk::Label.new('') ; @example_image_label.halign = :start ; @example_image_label.xalign = 0.0 ; @example_image_label.justify = :left ; @example_image_label.wrap = true
 
 #creating objects 2nd & 3rd column
     @basedirEntry = Gtk::Entry.new
