@@ -134,6 +134,7 @@ class GtkPreferences
     @namingNormalEntry.text = @prefs.namingNormal.to_s
     @namingVariousEntry.text = @prefs.namingVarious.to_s
     @namingImageEntry.text = @prefs.namingImage.to_s
+    updateAllFileExamples()
     @verbose.active = @prefs.verbose
     @debug.active = @prefs.debug
     @editorEntry.text = @prefs.editor.to_s
@@ -716,19 +717,16 @@ It is recommended to enable this option.")
   end
 
   def buildFrameFilenamingScheme # Naming scheme frame
-    @table100 = newTable(rows=6, columns=3)
+    @table100 = newTable(rows=7, columns=3)
 #creating objects 1st column
     @basedir_label = Gtk::Label.new(_('Base directory:')) ; @basedir_label.halign = :start
     @naming_normal_label = Gtk::Label.new(_('Standard:')) ; @naming_normal_label.halign = :start
     @naming_various_label = Gtk::Label.new(_('Various artists:')) ; @naming_various_label.halign = :start
     @naming_image_label = Gtk::Label.new(_('Single file image:')) ; @naming_image_label.halign = :start
-    @example_label = Gtk::Label.new('') ; @example_label.halign = :start ; @example_label.wrap = true
-    @expander100 = Gtk::Expander.new(_('Show options for "File naming scheme"'))
-#configure expander
-    @legend_label = Gtk::Label.new("%a=" + _("Artist") + " %g=" + _("Genre") + " %t=" + _("Track name") +
-                                     " %f=" + _("Codec") + "\n%b=" + _("Album") + " %y=" + _("Year") +
-                                    " %n=" + _("Track") + " %va=" + _("Various artists"))
-    @expander100.add(@legend_label)
+
+    @example_normal_label = Gtk::Label.new('') ; @example_normal_label.halign = :start ; @example_normal_label.wrap = true
+    @example_various_label = Gtk::Label.new('') ; @example_various_label.halign = :start ; @example_various_label.wrap = true
+    @example_image_label = Gtk::Label.new('') ; @example_image_label.halign = :start ; @example_image_label.wrap = true
 
 #creating objects 2nd & 3rd column
     @basedirEntry = Gtk::Entry.new
@@ -741,8 +739,8 @@ It is recommended to enable this option.")
     @configureVariousButton = Gtk::Button.new(label: _('Configure...'))
     @configureImageButton = Gtk::Button.new(label: _('Configure...'))
 
-    @basedirEntry.signal_connect("key_release_event"){showFileNormal() ; false}
-    @basedirEntry.signal_connect("button_release_event"){showFileNormal() ; false}
+    @basedirEntry.signal_connect("key_release_event"){updateAllFileExamples() ; false}
+    @basedirEntry.signal_connect("button_release_event"){updateAllFileExamples() ; false}
     @namingNormalEntry.signal_connect("key_release_event"){showFileNormal() ; false}
     @namingNormalEntry.signal_connect("button_release_event"){showFileNormal() ; false}
     @namingNormalEntry.signal_connect("focus_out_event"){if not File.dirname(@namingNormalEntry.text) =~ /%a|%b/ ; @namingNormalEntry.text = "%a (%y) %b/" + @namingNormalEntry.text; preventStupidness() end; false}
@@ -768,21 +766,23 @@ It is recommended to enable this option.")
     @table100.attach(@namingNormalEntry, 1, 1, 1, 1)
     @namingNormalEntry.hexpand = true
     @table100.attach(@configureNormalButton, 2, 1, 1, 1)
+    @table100.attach(@example_normal_label, 1, 2, 2, 1)
+    @example_normal_label.hexpand = true
 
-    @table100.attach(@naming_various_label, 0, 2, 1, 1)
-    @table100.attach(@namingVariousEntry, 1, 2, 1, 1)
+    @table100.attach(@naming_various_label, 0, 3, 1, 1)
+    @table100.attach(@namingVariousEntry, 1, 3, 1, 1)
     @namingVariousEntry.hexpand = true
-    @table100.attach(@configureVariousButton, 2, 2, 1, 1)
+    @table100.attach(@configureVariousButton, 2, 3, 1, 1)
+    @table100.attach(@example_various_label, 1, 4, 2, 1)
+    @example_various_label.hexpand = true
 
-    @table100.attach(@naming_image_label, 0, 3, 1, 1)
-    @table100.attach(@namingImageEntry, 1, 3, 1, 1)
+    @table100.attach(@naming_image_label, 0, 5, 1, 1)
+    @table100.attach(@namingImageEntry, 1, 5, 1, 1)
     @namingImageEntry.hexpand = true
-    @table100.attach(@configureImageButton, 2, 3, 1, 1)
+    @table100.attach(@configureImageButton, 2, 5, 1, 1)
+    @table100.attach(@example_image_label, 1, 6, 2, 1)
+    @example_image_label.hexpand = true
 
-    @table100.attach(@example_label, 0, 4, 3, 1)
-    @example_label.hexpand = true
-    @table100.attach(@expander100, 0, 5, 3, 1)
-    @expander100.hexpand = true
     @frame100 = newFrame(_('File Naming Scheme'), child=@table100)
   end
 
@@ -800,7 +800,7 @@ It is recommended to enable this option.")
     dialog.current_folder = File.expand_path(@basedirEntry.text.to_s) rescue nil
     if dialog.run == Gtk::ResponseType::ACCEPT
       @basedirEntry.text = dialog.filename
-      showFileNormal()
+      updateAllFileExamples()
     end
     dialog.destroy
   end
@@ -821,17 +821,21 @@ It is recommended to enable this option.")
   end
   
   def showFileNormal
-    @example_label.text = _("Example file name: ") + Preferences.showFilenameNormal( @basedirEntry.text, @namingNormalEntry.text)
+    @example_normal_label.text = _("e.g. ") + Preferences.showFilenameNormal(@basedirEntry.text, @namingNormalEntry.text)
   end
   
   def showFileVarious
-    @example_label.text = _("Example file name: ") + Preferences.showFilenameVarious(
-    @basedirEntry.text, @namingVariousEntry.text)
+    @example_various_label.text = _("e.g. ") + Preferences.showFilenameVarious(@basedirEntry.text, @namingVariousEntry.text)
   end
   
   def showFileImage
-    @example_label.text = _("Example file name: ") + Preferences.showFilenameVarious(
-    @basedirEntry.text, @namingImageEntry.text)
+    @example_image_label.text = _("e.g. ") + Preferences.showFilenameVarious(@basedirEntry.text, @namingImageEntry.text)
+  end
+
+  def updateAllFileExamples
+    showFileNormal()
+    showFileVarious()
+    showFileImage()
   end
 
   # Would you believe this actually prevents bug reports?

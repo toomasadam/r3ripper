@@ -65,10 +65,15 @@ describe GtkPreferences do
     expect(codec_rows.key?('wavpack')).to be true
   end
 
-  it 'initializes File Naming Scheme Browse and Configure buttons' do
+  it 'initializes File Naming Scheme Browse, Configure buttons, and per-scheme live preview labels' do
     gtk_prefs = GtkPreferences.new(prefs, deps)
     gtk_prefs.start
     expect(gtk_prefs.instance_variable_get(:@browseBasedirButton).label).to eq('Browse...')
     expect(gtk_prefs.instance_variable_get(:@configureNormalButton).label).to eq('Configure...')
+    expect(gtk_prefs.instance_variable_get(:@expander100)).to be_nil
+
+    expect(gtk_prefs.instance_variable_get(:@example_normal_label).text).to include('Judas Priest')
+    expect(gtk_prefs.instance_variable_get(:@example_various_label).text).to include('Kid Rock')
+    expect(gtk_prefs.instance_variable_get(:@example_image_label).text).to include('Kid Rock')
   end
 end

@@ -96,7 +96,8 @@
     *   **Quick Tag Insertion Bar**: Interactive tag insertion buttons (`[+ Artist]`, `[+ Album]`, `[+ Year]`, `[+ Track #]`, `[+ Title]`, `[+ Genre]`, `[+ Codec]`, `[+ Various]`) inserting format tokens directly at cursor focus.
     *   **Live Path Preview**: Real-time sample file path generator rendering realistic metadata output paths (`Pink Floyd (1973) The Dark Side of the Moon/01 - Speak to Me.flac`).
 *   **Preferences Integration**: Added `Configure...` push buttons (`Gtk::Button`) next to `Standard:`, `Various artists:`, and `Single file image:` fields in `GtkPreferences`.
-*   **Test Suite Expansion**: Added unit test specs in `spec/gtk2/gtkNamingDialog_spec.rb` covering sample path rendering, tag insertion, and dialog state (296 examples passing).
+*   **Per-Scheme Live Preview Labels**: Removed the single legacy context-sensitive `@example_label` and `@expander100` expander. Replaced with dedicated, simultaneous live path preview labels directly beneath each of the three scheme fields (`Standard`, `Various artists`, `Single file image`), updating in real-time as paths or schemes are edited.
+*   **Test Suite Expansion**: Added unit test specs in `spec/gtk2/gtkNamingDialog_spec.rb` and `spec/gtk2/gtkPreferences_spec.rb` covering sample path rendering, tag insertion, and per-scheme live preview labels (296 examples passing).
 
 ## Current Project Status
 *   **Core Engine**: Stable and verified on Ruby 3.4+.
