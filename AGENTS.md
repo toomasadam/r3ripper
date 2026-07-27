@@ -89,8 +89,17 @@
 *   **Preferences Integration**: Added `Configure...` push button (`Gtk::Button`) next to each configurable active audio codec entry in `GtkPreferences`.
 *   **Test Suite Expansion**: Added unit test specs in `spec/gtk2/gtkCodecDialog_spec.rb` covering option string parsing, flag formatting, and UI generation for all supported codecs (290 examples passing).
 
+### 12. GTK3 File Naming Scheme Builder & Folder Chooser Modernization
+*   **Base Directory Folder Chooser**: Added a **`Browse...`** push button (`Gtk::Button`) next to `Base directory:` in `GtkPreferences` to open native GTK folder chooser dialogs (`Gtk::FileChooserDialog`).
+*   **GTK3 Naming Scheme Dialog (`GtkNamingDialog`)**: Added an interactive modal GTK3 configuration builder for file naming patterns:
+    *   **Preset Templates**: Built-in dropdown presets (`Artist/Album/Track - Title`, `Artist (Year) Album/Track - Title`, `Genre/Artist/Album/Track - Title`, `Artist - Album/Track. Title`).
+    *   **Quick Tag Insertion Bar**: Interactive tag insertion buttons (`[+ Artist]`, `[+ Album]`, `[+ Year]`, `[+ Track #]`, `[+ Title]`, `[+ Genre]`, `[+ Codec]`, `[+ Various]`) inserting format tokens directly at cursor focus.
+    *   **Live Path Preview**: Real-time sample file path generator rendering realistic metadata output paths (`Pink Floyd (1973) The Dark Side of the Moon/01 - Speak to Me.flac`).
+*   **Preferences Integration**: Added `Configure...` push buttons (`Gtk::Button`) next to `Standard:`, `Various artists:`, and `Single file image:` fields in `GtkPreferences`.
+*   **Test Suite Expansion**: Added unit test specs in `spec/gtk2/gtkNamingDialog_spec.rb` covering sample path rendering, tag insertion, and dialog state (296 examples passing).
+
 ## Current Project Status
 *   **Core Engine**: Stable and verified on Ruby 3.4+.
 *   **CLI Interface**: Fully functional (`bin/rubyripper_cli` or `bundle exec ./bin/rubyripper_cli`).
 *   **Modernized GUI**: Fully functional on GTK3 with GNOME HIG compliance (`bin/rubyripper_gtk2` or `bundle exec ./bin/rubyripper_gtk2`).
-*   **Test Suite**: Modern RSpec 3, 100% passing (290 examples).
+*   **Test Suite**: Modern RSpec 3, 100% passing (296 examples).

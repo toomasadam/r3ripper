@@ -64,4 +64,11 @@ describe GtkPreferences do
     add_combo.active = 1 # Select WavPack
     expect(codec_rows.key?('wavpack')).to be true
   end
+
+  it 'initializes File Naming Scheme Browse and Configure buttons' do
+    gtk_prefs = GtkPreferences.new(prefs, deps)
+    gtk_prefs.start
+    expect(gtk_prefs.instance_variable_get(:@browseBasedirButton).label).to eq('Browse...')
+    expect(gtk_prefs.instance_variable_get(:@configureNormalButton).label).to eq('Configure...')
+  end
 end

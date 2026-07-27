@@ -716,34 +716,31 @@ It is recommended to enable this option.")
   end
 
   def buildFrameFilenamingScheme # Naming scheme frame
-    @table100 = newTable(rows=6, columns=2)
+    @table100 = newTable(rows=6, columns=3)
 #creating objects 1st column
-    @basedir_label = Gtk::Label.new(_('Base directory:')) ; @basedir_label.halign = :start #halign=:start
+    @basedir_label = Gtk::Label.new(_('Base directory:')) ; @basedir_label.halign = :start
     @naming_normal_label = Gtk::Label.new(_('Standard:')) ; @naming_normal_label.halign = :start
     @naming_various_label = Gtk::Label.new(_('Various artists:')) ; @naming_various_label.halign = :start
     @naming_image_label = Gtk::Label.new(_('Single file image:')) ; @naming_image_label.halign = :start
-    @example_label =Gtk::Label.new('') ; @example_label.halign = :start ; @example_label.wrap = true
+    @example_label = Gtk::Label.new('') ; @example_label.halign = :start ; @example_label.wrap = true
     @expander100 = Gtk::Expander.new(_('Show options for "File naming scheme"'))
 #configure expander
-    #@artist_label = Gtk::Label.new("%a = artist   %b = album   %f = codec   %g = genre\n%va = various artists   %n = track   %t = trackname   %y = year")
     @legend_label = Gtk::Label.new("%a=" + _("Artist") + " %g=" + _("Genre") + " %t=" + _("Track name") +
                                      " %f=" + _("Codec") + "\n%b=" + _("Album") + " %y=" + _("Year") +
                                     " %n=" + _("Track") + " %va=" + _("Various artists"))
     @expander100.add(@legend_label)
-#packing 1st column
-    @table100.attach(@basedir_label, 0, 0, 1, 1)
-    @table100.attach(@naming_normal_label, 0, 1, 1, 1)
-    @table100.attach(@naming_various_label, 0, 2, 1, 1)
-    @table100.attach(@naming_image_label, 0, 3, 1, 1)
-    @table100.attach(@example_label, 0, 4, 2, 1) #width = 2 columns
-    @example_label.hexpand = true
-    @table100.attach(@expander100, 0, 5, 2, 1)
-    @expander100.hexpand = true
-#creating objects 2nd column and connect signals to them
+
+#creating objects 2nd & 3rd column
     @basedirEntry = Gtk::Entry.new
     @namingNormalEntry = Gtk::Entry.new
     @namingVariousEntry = Gtk::Entry.new
     @namingImageEntry = Gtk::Entry.new
+
+    @browseBasedirButton = Gtk::Button.new(label: _('Browse...'))
+    @configureNormalButton = Gtk::Button.new(label: _('Configure...'))
+    @configureVariousButton = Gtk::Button.new(label: _('Configure...'))
+    @configureImageButton = Gtk::Button.new(label: _('Configure...'))
+
     @basedirEntry.signal_connect("key_release_event"){showFileNormal() ; false}
     @basedirEntry.signal_connect("button_release_event"){showFileNormal() ; false}
     @namingNormalEntry.signal_connect("key_release_event"){showFileNormal() ; false}
@@ -755,16 +752,72 @@ It is recommended to enable this option.")
     @namingImageEntry.signal_connect("key_release_event"){showFileImage() ; false}
     @namingImageEntry.signal_connect("button_release_event"){showFileImage() ; false}
     @namingImageEntry.signal_connect("focus_out_event"){if not File.dirname(@namingImageEntry.text) =~ /%a|%b/ ; @namingImageEntry.text = "%a (%y) %b/" + @namingImageEntry.text; preventStupidness() end; false}
-#packing 2nd column
+
+    @browseBasedirButton.signal_connect("clicked") { show_basedir_dialog }
+    @configureNormalButton.signal_connect("clicked") { show_naming_dialog('standard', @namingNormalEntry) }
+    @configureVariousButton.signal_connect("clicked") { show_naming_dialog('various', @namingVariousEntry) }
+    @configureImageButton.signal_connect("clicked") { show_naming_dialog('image', @namingImageEntry) }
+
+#packing table
+    @table100.attach(@basedir_label, 0, 0, 1, 1)
     @table100.attach(@basedirEntry, 1, 0, 1, 1)
     @basedirEntry.hexpand = true
+    @table100.attach(@browseBasedirButton, 2, 0, 1, 1)
+
+    @table100.attach(@naming_normal_label, 0, 1, 1, 1)
     @table100.attach(@namingNormalEntry, 1, 1, 1, 1)
     @namingNormalEntry.hexpand = true
+    @table100.attach(@configureNormalButton, 2, 1, 1, 1)
+
+    @table100.attach(@naming_various_label, 0, 2, 1, 1)
     @table100.attach(@namingVariousEntry, 1, 2, 1, 1)
     @namingVariousEntry.hexpand = true
+    @table100.attach(@configureVariousButton, 2, 2, 1, 1)
+
+    @table100.attach(@naming_image_label, 0, 3, 1, 1)
     @table100.attach(@namingImageEntry, 1, 3, 1, 1)
     @namingImageEntry.hexpand = true
+    @table100.attach(@configureImageButton, 2, 3, 1, 1)
+
+    @table100.attach(@example_label, 0, 4, 3, 1)
+    @example_label.hexpand = true
+    @table100.attach(@expander100, 0, 5, 3, 1)
+    @expander100.hexpand = true
     @frame100 = newFrame(_('File Naming Scheme'), child=@table100)
+  end
+
+  def show_basedir_dialog
+    parent_window = (@display && @display.toplevel.is_a?(Gtk::Window)) ? @display.toplevel : nil
+    dialog = Gtk::FileChooserDialog.new(
+      title: _("Choose Base Directory"),
+      parent: parent_window,
+      action: :select_folder,
+      buttons: [
+        [_("Cancel"), Gtk::ResponseType::CANCEL],
+        [_("Select"), Gtk::ResponseType::ACCEPT]
+      ]
+    )
+    dialog.current_folder = File.expand_path(@basedirEntry.text.to_s) rescue nil
+    if dialog.run == Gtk::ResponseType::ACCEPT
+      @basedirEntry.text = dialog.filename
+      showFileNormal()
+    end
+    dialog.destroy
+  end
+
+  def show_naming_dialog(scheme_type, entry)
+    require 'rubyripper/gtk2/gtkNamingDialog'
+    parent_window = (@display && @display.toplevel.is_a?(Gtk::Window)) ? @display.toplevel : nil
+    dialog = GtkNamingDialog.new(parent_window, scheme_type, entry.text)
+    result = dialog.run
+    if result
+      entry.text = result
+      case scheme_type
+      when 'various' then showFileVarious()
+      when 'image' then showFileImage()
+      else showFileNormal()
+      end
+    end
   end
   
   def showFileNormal
