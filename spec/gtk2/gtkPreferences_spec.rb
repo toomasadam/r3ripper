@@ -74,6 +74,6 @@ describe GtkPreferences do
 
     expect(gtk_prefs.instance_variable_get(:@example_normal_label).text).to include('Pink Floyd')
     expect(gtk_prefs.instance_variable_get(:@example_various_label).text).to include('Dick Dale & His Del-Tones')
-    expect(gtk_prefs.instance_variable_get(:@example_image_label).text).to include('Dick Dale & His Del-Tones')
+    expect(gtk_prefs.instance_variable_get(:@example_image_label).text).to include('Pink Floyd')
   end
 end

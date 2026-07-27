@@ -829,7 +829,7 @@ It is recommended to enable this option.")
   end
   
   def showFileImage
-    @example_image_label.text = _("e.g. ") + Preferences.showFilenameVarious(@basedirEntry.text, @namingImageEntry.text)
+    @example_image_label.text = _("e.g. ") + Preferences.showFilenameNormal(@basedirEntry.text, @namingImageEntry.text)
   end
 
   def updateAllFileExamples
