@@ -75,14 +75,25 @@ class GtkNamingDialog
     return '' if scheme.nil? || scheme.strip.empty?
 
     sample = scheme.dup
-    sample.gsub!('%va', 'Various Artists')
-    sample.gsub!('%a', scheme_type == 'various' ? 'Various Artists' : 'Pink Floyd')
-    sample.gsub!('%b', 'The Dark Side of the Moon')
-    sample.gsub!('%y', '1973')
-    sample.gsub!('%g', 'Progressive Rock')
-    sample.gsub!('%n', '01')
-    sample.gsub!('%t', 'Speak to Me')
-    sample.gsub!('%f', 'flac')
+    if scheme_type == 'various'
+      sample.gsub!('%va', 'Various Artists')
+      sample.gsub!('%a', 'Dick Dale & His Del-Tones')
+      sample.gsub!('%b', 'Pulp Fiction (Music from the Motion Picture)')
+      sample.gsub!('%y', '1994')
+      sample.gsub!('%g', 'Soundtrack')
+      sample.gsub!('%n', '01')
+      sample.gsub!('%t', 'Misirlou')
+      sample.gsub!('%f', 'flac')
+    else
+      sample.gsub!('%va', 'Various Artists')
+      sample.gsub!('%a', 'Pink Floyd')
+      sample.gsub!('%b', 'The Dark Side of the Moon')
+      sample.gsub!('%y', '1973')
+      sample.gsub!('%g', 'Progressive Rock')
+      sample.gsub!('%n', '01')
+      sample.gsub!('%t', 'Speak to Me')
+      sample.gsub!('%f', 'flac')
+    end
 
     ext = scheme_type == 'image' ? '' : '.flac'
     base = base_dir.to_s.empty? ? '~/Music' : base_dir.to_s

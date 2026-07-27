@@ -10,7 +10,7 @@ describe GtkNamingDialog do
 
     it 'renders sample path for various artists scheme' do
       path = GtkNamingDialog.render_sample_path('%b/%n - %a - %t', 'various', '/home/user/Music')
-      expect(path).to eq('/home/user/Music/The Dark Side of the Moon/01 - Various Artists - Speak to Me.flac')
+      expect(path).to eq('/home/user/Music/Pulp Fiction (Music from the Motion Picture)/01 - Dick Dale & His Del-Tones - Misirlou.flac')
     end
 
     it 'renders sample path for single file image scheme' do
