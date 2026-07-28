@@ -11,8 +11,8 @@ This document provides architectural context, development standards, and design 
 ```
 r3ripper/
 ├── bin/
-│   ├── r3ripper             # CLI executable entry point (legacy alias: r3ripper_cli, rubyripper_cli)
-│   └── r3ripper_gui         # GTK+ 3 GUI executable entry point (legacy alias: r3ripper_gtk2, rubyripper_gtk2)
+│   ├── r3ripper             # CLI executable entry point (legacy alias: rubyripper_cli)
+│   └── r3ripper_gui         # GTK+ 3 GUI executable entry point (legacy alias: rubyripper_gtk2)
 ├── lib/
 │   └── r3ripper/
 │       ├── cli/             # CLI menu handlers (CliPreferences, CliDisc, etc.)
