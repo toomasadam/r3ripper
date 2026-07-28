@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
     `git ls-files -z`.split("\x0").reject { |f| f.match(%r{\A(?:test|spec|features)/}) }
   end
   spec.bindir        = "bin"
-  spec.executables   = ["r3ripper_cli", "r3ripper_gtk2", "rubyripper_cli", "rubyripper_gtk2"]
+  spec.executables   = ["r3ripper", "r3ripper_gui", "r3ripper_cli", "r3ripper_gtk2", "rubyripper_cli", "rubyripper_gtk2"]
   spec.require_paths = ["lib"]
 
   spec.add_dependency "gettext"

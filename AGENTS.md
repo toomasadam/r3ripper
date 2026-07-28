@@ -11,10 +11,10 @@ This document provides architectural context, development standards, and design 
 ```
 r3ripper/
 ├── bin/
-│   ├── rubyripper_cli       # CLI executable entry point
-│   └── rubyripper_gtk2      # GTK+ 3 GUI executable entry point
+│   ├── r3ripper             # CLI executable entry point (legacy alias: r3ripper_cli, rubyripper_cli)
+│   └── r3ripper_gui         # GTK+ 3 GUI executable entry point (legacy alias: r3ripper_gtk2, rubyripper_gtk2)
 ├── lib/
-│   └── rubyripper/
+│   └── r3ripper/
 │       ├── cli/             # CLI menu handlers (CliPreferences, CliDisc, etc.)
 │       ├── codecs/          # Audio encoder wrappers (FLAC, Opus, MP3, Ogg, WavPack)
 │       ├── datamodel/       # Data structures & track/disc models
@@ -24,13 +24,14 @@ r3ripper/
 │       ├── modules/         # Utility modules and helpers
 │       ├── preferences/     # Settings persistence and default preference loading
 │       ├── system/          # System execution & OS-specific drive discovery
-│       └── base.rb          # Core application orchestration
+│       ├── r3ripper.rb      # Main R3ripper orchestration class
+│       └── base.rb          # Core environment and version setup
 ├── spec/                    # RSpec 3 unit test suite
 │   ├── cli/                 # Unit tests for CLI components
 │   ├── gtk2/                # Unit tests for GTK3 dialogs and UI controls
 │   └── ...                  # Core logic, metadata, and codec tests
 ├── Gemfile                  # Dependency manifest (Ruby 3.4+)
-└── rubyripper.gemspec       # Gem specification
+└── r3ripper.gemspec         # Gem specification
 ```
 
 ---
@@ -49,11 +50,11 @@ r3ripper/
     *Requirement*: All unit tests must pass with 0 failures before finalizing any changes.
 *   **Run CLI Interface**:
     ```bash
-    bundle exec ./bin/rubyripper_cli
+    bundle exec ./bin/r3ripper
     ```
 *   **Run GTK3 GUI Interface**:
     ```bash
-    bundle exec ./bin/rubyripper_gtk2
+    bundle exec ./bin/r3ripper_gui
     ```
 
 ---
