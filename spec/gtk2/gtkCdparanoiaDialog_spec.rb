@@ -1,4 +1,4 @@
-require 'rubyripper/gtk2/gtkCdparanoiaDialog'
+require 'r3ripper/gtk2/gtkCdparanoiaDialog'
 
 describe GtkCdparanoiaDialog do
   describe '.parse_option_string' do

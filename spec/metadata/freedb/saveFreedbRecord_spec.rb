@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-require 'rubyripper/metadata/freedb/saveFreedbRecord'
+require 'r3ripper/metadata/freedb/saveFreedbRecord'
 
 describe SaveFreedbRecord do
 

@@ -1,5 +1,5 @@
-require 'rubyripper/disc/ripStrategy'
-require 'rubyripper/datamodel/disc'
+require 'r3ripper/disc/ripStrategy'
+require 'r3ripper/datamodel/disc'
 
 describe RipStrategy do
 

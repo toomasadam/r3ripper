@@ -1,0 +1,91 @@
+#!/usr/bin/env ruby
+#    Rubyripper - A secure ripper for Linux/BSD/OSX
+#    Copyright (C) 2007 - 2013  Bouke Woudstra (boukewoudstra@gmail.com)
+#
+#    This file is part of Rubyripper. Rubyripper is free software: you can
+#    redistribute it and/or modify it under the terms of the GNU General
+#    Public License as published by the Free Software Foundation, either
+#    version 3 of the License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+require 'singleton'
+require 'r3ripper/preferences/data'
+require 'r3ripper/preferences/cleanup'
+require 'r3ripper/preferences/setDefaults'
+require 'r3ripper/preferences/load'
+require 'r3ripper/preferences/save'
+
+module Preferences
+
+  class Main
+    include Singleton unless $run_specs
+    
+    attr_reader :data
+    attr_accessor :filename
+
+    def initialize(out=nil)
+      @data = Data.new
+      @filename = getDefaultFilename()
+      @out = out ? out : $stdout
+    end
+
+    # load the preferences after setting the defaults
+    def load(customFilename="")
+      Cleanup.new()
+      SetDefaults.new()
+      Load.new(customFilename, @out)
+    end
+
+    # save the preferences
+    def save()
+      Save.new() unless @data.testdisc
+    end
+
+   private
+
+    # if the method is not found try to look it up in the data object
+    def method_missing(name, *args)
+      @data.send(name, *args)
+    end
+
+    # return the default filename
+    def getDefaultFilename
+      dir = ENV['XDG_CONFIG_HOME'] || File.join(ENV['HOME'], '.config')
+      new_file = File.join(dir, 'r3ripper/settings')
+      legacy_file = File.join(dir, 'rubyripper/settings')
+      return new_file if File.exist?(new_file) || !File.exist?(legacy_file)
+      legacy_file
+    end
+  end
+
+  # A separate help function to make it faster
+  def self.showFilenameNormal(basedir, layout)
+    filename = File.expand_path(File.join(basedir, layout))
+    filename = "%s.ext" % [filename]
+    {'%va' => 'Various Artists', '%a' => 'Pink Floyd', '%b' => 'The Dark Side of the Moon',
+    '%f' => 'flac', '%g' => 'Progressive Rock', '%y' => '1973', '%n' => '01', '%t' => 'Speak to Me',
+    '%i' => 'inputfile', '%o' => 'outputfile'}.each do |key, value|
+        filename.gsub!(key, value)
+    end
+    return filename
+  end
+
+  # A separate help function to make it faster
+  def self.showFilenameVarious(basedir, layout)
+    filename = File.expand_path(File.join(basedir, layout))
+    filename = "%s.ext" % [filename]
+    {'%va' => 'Various Artists', '%b' => 'Pulp Fiction (Music from the Motion Picture)', '%f' => 'flac',
+    '%g' => 'Soundtrack', '%y' => '1994', '%n' => '01', '%a' => 'Dick Dale & His Del-Tones',
+    '%t' => 'Misirlou', '%i' => 'inputfile', '%o' => 'outputfile'}.each do |key, value|
+        filename.gsub!(key, value)
+    end
+    return filename
+  end
+end

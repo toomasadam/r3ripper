@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-require 'rubyripper/calcPeakLevel'
+require 'r3ripper/calcPeakLevel'
 
 # maximum volume for 16-bit audio is 96 decibel
 describe CalcPeakLevel do

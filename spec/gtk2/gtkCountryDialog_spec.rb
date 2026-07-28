@@ -1,4 +1,4 @@
-require 'rubyripper/gtk2/gtkCountryDialog'
+require 'r3ripper/gtk2/gtkCountryDialog'
 
 describe GtkCountryDialog do
   describe '.parse_country_string' do

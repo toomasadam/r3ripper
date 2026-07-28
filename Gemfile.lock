@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rubyripper (0.7.0.pre.a1)
+    r3ripper (0.7.0.pre.a1)
       base64
       gettext
       json
@@ -193,7 +193,6 @@ PLATFORMS
   arm-linux-gnu
   arm-linux-musl
   arm64-darwin
-  ruby
   x86-linux-gnu
   x86-linux-musl
   x86_64-darwin
@@ -205,10 +204,10 @@ DEPENDENCIES
   cucumber
   gtk3
   json
+  r3ripper!
   rake
   rspec (~> 3.0)
   rubocop
-  rubyripper!
 
 BUNDLED WITH
    2.6.9

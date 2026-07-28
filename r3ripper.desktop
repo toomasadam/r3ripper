@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=RubyRipperReborn
+GenericName=Secure Audio Disc Ripper
+GenericName[nl]=Veilige Audio CD Ripper
+Icon=rubyripper
+Exec=r3ripper_gtk2
+Categories=Audio;AudioVideo;

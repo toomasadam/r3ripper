@@ -1,5 +1,5 @@
 require 'gtk3'
-require 'rubyripper/gtk2/gtkPreferences'
+require 'r3ripper/gtk2/gtkPreferences'
 
 describe GtkPreferences do
   let(:prefs) { double('Preferences::Main').as_null_object }

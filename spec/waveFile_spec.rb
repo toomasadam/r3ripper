@@ -1,4 +1,4 @@
-require 'rubyripper/waveFile'
+require 'r3ripper/waveFile'
 
 describe WaveFile do
 

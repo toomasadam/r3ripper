@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-require 'rubyripper/metadata/freedb/loadFreedbRecord'
+require 'r3ripper/metadata/freedb/loadFreedbRecord'
 
 describe LoadFreedbRecord do
 

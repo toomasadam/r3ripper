@@ -1,5 +1,5 @@
 require 'gtk3'
-require 'rubyripper/gtk2/gtkNamingDialog'
+require 'r3ripper/gtk2/gtkNamingDialog'
 
 describe GtkNamingDialog do
   describe '.render_sample_path' do

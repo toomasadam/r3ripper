@@ -1,5 +1,5 @@
 require 'gtk3'
-require 'rubyripper/gtk2/gtkCodecDialog'
+require 'r3ripper/gtk2/gtkCodecDialog'
 
 describe GtkCodecDialog do
   describe '.parse_option_string' do
