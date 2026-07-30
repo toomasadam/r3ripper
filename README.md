@@ -15,10 +15,13 @@ Rubyripper ensures your rips are bit-perfect by:
 ## Key Features
 
 *   **Modern Core**: Updated for Ruby 3.4+ and contemporary system libraries.
-*   **Modern GUI**: Ported to GTK+ 3 for compatibility with modern desktop environments.
-*   **Survivable Metadata**: Queries **GnuDB** (successor to Freedb) and **MusicBrainz** for automatic disc info.
-*   **Simultaneous Multi-Codec Encoding**: Rip once, encode to FLAC, MP3, Vorbis, AAC, and WavPack all at the same time using multiple CPU threads.
-*   **Advanced Audio Handling**: Support for drive offsets, normalization, ReplayGain, and EAC-compliant cuesheets.
+*   **Modern GUI**: Built with GTK+ 3 layout containers (`Gtk::Grid`, `Gtk::Box`) adhering to GNOME Human Interface Guidelines.
+*   **AccurateRip Verification**: Native AccurateRip v1 and v2 CRC checksum calculations with online database queries (`www.accuraterip.com`) for bit-perfect verification.
+*   **CUETools Database (CTDB) Support**: Disc and track verification against the online CUETools Database (`db.cuetools.net`).
+*   **Drive Auto-Discovery & Auto-Offset Lookup**: Automatic detection of connected optical drives and drive read offset lookup via AccurateRip.
+*   **Survivable Metadata**: Queries **GnuDB** (successor to Freedb) and **MusicBrainz** for automatic disc metadata retrieval.
+*   **Simultaneous Multi-Codec Encoding**: Rip once, encode to FLAC, MP3, Vorbis, AAC, Opus, and WavPack simultaneously using multi-threaded encoding.
+*   **Advanced Audio Handling**: Support for drive offsets, sample padding, normalization, ReplayGain, and EAC-compliant cue sheets.
 
 ## Installation
 
@@ -27,7 +30,7 @@ Rubyripper ensures your rips are bit-perfect by:
 You will need the following system tools:
 *   `cdparanoia` (Required for ripping)
 *   `cd-discid` (Recommended for metadata)
-*   Encoders: `flac`, `lame`, `vorbis-tools`, etc.
+*   Encoders: `flac`, `lame`, `vorbis-tools`, `opus-tools`, `wavpack`, etc.
 
 **Development Headers (Required for building gems):**
 Most modern Linux distributions require development packages to build Ruby native extensions:
@@ -37,11 +40,11 @@ Most modern Linux distributions require development packages to build Ruby nativ
 
 ### Ruby Dependencies
 
-Rubyripper uses Bundler to manage its Ruby environment.
+RubyRipperReborn uses Bundler to manage its Ruby environment.
 
 ```bash
 # Clone the repository
-git clone https://github.com/youruser/r3ripper.git
+git clone https://github.com/toomasadam/r3ripper.git
 cd r3ripper
 
 # For FULL installation (CLI + GUI)
@@ -59,19 +62,19 @@ bundle install
 ### Command Line Interface (CLI)
 
 ```bash
-./bin/rubyripper_cli
+./bin/r3ripper
 # Or via Bundler:
-bundle exec ./bin/rubyripper_cli
+bundle exec ./bin/r3ripper
 ```
 
 ### Graphical User Interface (GUI)
 
-The GUI has been modernized to use GTK+ 3.
+The GUI is built with GTK+ 3.
 
 ```bash
-./bin/rubyripper_gtk2
+./bin/r3ripper_gui
 # Or via Bundler:
-bundle exec ./bin/rubyripper_gtk2
+bundle exec ./bin/r3ripper_gui
 ```
 
 ## Development & Testing
