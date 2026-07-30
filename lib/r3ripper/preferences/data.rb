@@ -62,6 +62,9 @@ module Preferences
     # Throw away the log if no errors are found
     attr_accessor :noLog
 
+    # Perform AccurateRip verification
+    attr_accessor :accuraterip
+
     # TOC ANALYSIS PREFERENCES
     # Create a cuesheet
     attr_accessor :createCue

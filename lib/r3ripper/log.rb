@@ -17,6 +17,7 @@
 
 require 'r3ripper/preferences/main'
 require 'r3ripper/modules/audioCalculations'
+require 'r3ripper/accuraterip/checksum'
 
 # The Log class is responsible for
 # * updating the log files
@@ -225,6 +226,28 @@ class Log
       @short_summary += _("The exact positions of the suspicious chunks\ncan be found in the ripping log\n")
     end
     @logfiles.each{|logfile| logfile.close} #close all the files
+  end
+
+  def log_accuraterip(verifier)
+    return unless @prefs.accuraterip && verifier
+
+    add("\n=== AccurateRip Verification ===\n")
+    if verifier.db_entries.empty?
+      add(_("Signatures for this disc were not found in the AccurateRip database.\n"))
+    else
+      verifier.results.each do |track_num, res|
+        v1_str = res[:v1_crc] ? AccurateRip::Checksum.format_crc(res[:v1_crc]) : 'N/A'
+        v2_str = res[:v2_crc] ? AccurateRip::Checksum.format_crc(res[:v2_crc]) : 'N/A'
+        if res[:status] == :accurate
+          version_str = res[:version] == :v2 ? 'v2' : 'v1'
+          add("Track %02d: %s (%s, confidence %d, CRC %s)\n" % [track_num, _("Accurately ripped"), version_str, res[:confidence], version_str == 'v2' ? v2_str : v1_str])
+        else
+          add("Track %02d: %s (v1 CRC %s, v2 CRC %s)\n" % [track_num, _("NOT accurately ripped"), v1_str, v2_str])
+        end
+      end
+      add(_("AccurateRip status: %d of %d tracks accurately ripped.\n") % [verifier.accurate_tracks_count, verifier.total_tracks_count])
+    end
+    add("\n")
   end
 
   # delete the logfiles if no errors occured
