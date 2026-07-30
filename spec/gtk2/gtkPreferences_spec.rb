@@ -36,6 +36,7 @@ describe GtkPreferences do
     expect(gtk_prefs.instance_variable_get(:@freedb_server_label).text).to eq('GnuDB server:')
     expect(gtk_prefs.instance_variable_get(:@firstHit).label).to eq('Always use first GnuDB hit')
     expect(gtk_prefs.instance_variable_get(:@accuraterip).label).to eq('Verify tracks with AccurateRip')
+    expect(gtk_prefs.instance_variable_get(:@cuetools).label).to eq('Verify tracks with CUETools Database')
   end
 
   it 'resets GnuDB server entry when Reset to Default button is clicked' do

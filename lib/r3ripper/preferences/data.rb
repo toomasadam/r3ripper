@@ -65,6 +65,9 @@ module Preferences
     # Perform AccurateRip verification
     attr_accessor :accuraterip
 
+    # Perform CUETools Database verification
+    attr_accessor :cuetools
+
     # TOC ANALYSIS PREFERENCES
     # Create a cuesheet
     attr_accessor :createCue

@@ -103,6 +103,7 @@ class GtkPreferences
     @eject.active = @prefs.eject
     @noLog.active = @prefs.noLog
     @accuraterip.active = @prefs.accuraterip
+    @cuetools.active = @prefs.cuetools
 #toc settings
     @createCue.active = @prefs.createCue
     @image.active = @prefs.image
@@ -172,6 +173,7 @@ class GtkPreferences
     @prefs.eject = @eject.active?
     @prefs.noLog = @noLog.active?
     @prefs.accuraterip = @accuraterip.active?
+    @prefs.cuetools = @cuetools.active?
 #toc settings
     @prefs.createCue = @createCue.active?
     @prefs.image = @image.active?
@@ -331,12 +333,13 @@ It is recommended to enable this option.")
   end
 
   def buildFrameRippingRelated
-    @table60 = newTable(rows=4, columns=3)
+    @table60 = newTable(rows=5, columns=3)
 #create objects
     @rip_label = Gtk::Label.new(_("Pass cdparanoia options:")) ; @rip_label.halign = :start
     @eject= Gtk::CheckButton.new(_('Eject CD when finished'))
     @noLog = Gtk::CheckButton.new(_('Only keep log file if correction is needed'))
     @accuraterip = Gtk::CheckButton.new(_('Verify tracks with AccurateRip'))
+    @cuetools = Gtk::CheckButton.new(_('Verify tracks with CUETools Database'))
     @ripEntry= Gtk::Entry.new ; @ripEntry.width_request = 120
     @configureCdparanoiaButton = Gtk::Button.new(label: _('Configure...'))
 #pack objects
@@ -346,6 +349,7 @@ It is recommended to enable this option.")
     @table60.attach(@eject, 0, 1, 3, 1)
     @table60.attach(@noLog, 0, 2, 3, 1)
     @table60.attach(@accuraterip, 0, 3, 3, 1)
+    @table60.attach(@cuetools, 0, 4, 3, 1)
     @configureCdparanoiaButton.signal_connect("clicked") { show_cdparanoia_dialog }
     @frame60 = newFrame(_('Ripping Related'), child=@table60)
 #pack all frames into a single page

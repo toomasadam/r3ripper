@@ -46,6 +46,7 @@ module Preferences
       @data.eject = true
       @data.noLog = false
       @data.accuraterip = true
+      @data.cuetools = true
     end
 
     def setTocAnalysisDefaults

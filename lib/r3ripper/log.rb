@@ -250,6 +250,26 @@ class Log
     add("\n")
   end
 
+  def log_cuetools(verifier)
+    return unless @prefs.cuetools && verifier
+
+    add("\n=== CUETools Database Verification ===\n")
+    if verifier.db_entries.empty?
+      add(_("Signatures for this disc were not found in the CUETools Database.\n"))
+    else
+      verifier.results.each do |track_num, res|
+        crc_str = res[:crc] ? AccurateRip::Checksum.format_crc(res[:crc]) : 'N/A'
+        if res[:status] == :accurate
+          add("Track %02d: %s (confidence %d, CRC %s)\n" % [track_num, _("Accurately ripped"), res[:confidence], crc_str])
+        else
+          add("Track %02d: %s (CRC %s)\n" % [track_num, _("NOT accurately ripped"), crc_str])
+        end
+      end
+      add(_("CUETools DB status: %d of %d tracks accurately ripped.\n") % [verifier.accurate_tracks_count, verifier.total_tracks_count])
+    end
+    add("\n")
+  end
+
   # delete the logfiles if no errors occured
   def deleteLogfiles
     if @problem_tracks.empty? && !@encodingErrors
