@@ -87,6 +87,7 @@ class Dependency
 
   # find the default drive for the OS
   def cdrom ; getCdrom() ; end
+  def available_drives ; getAvailableDrives() ; end
 
   # A help function to check if an application is installed?
   def installed?(app)
@@ -272,7 +273,7 @@ calculation unless %s is installed.") % ['Discid'],
     return false
   end
 
-  def available_drives
+  def getAvailableDrives
     drives = []
     if platform.match?(/linux|bsd/)
       drives << '/dev/cdrom' if @file.exist?('/dev/cdrom')

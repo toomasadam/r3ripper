@@ -269,7 +269,11 @@ class GtkPreferences
     @cdrom_label.halign = :start
     @cdrom_offset_label = Gtk::Label.new(_("CD-ROM offset:"))
     @cdrom_offset_label.halign = :start
-    @cdromEntry = Gtk::Entry.new ; @cdromEntry.width_request = 120
+    @cdromCombo = Gtk::ComboBoxText.new(entry: true)
+    @cdromCombo.width_request = 160
+    drives = @deps.respond_to?(:available_drives) ? @deps.available_drives : [@prefs.cdrom]
+    drives.each { |d| @cdromCombo.append_text(d.to_s) }
+    @cdromEntry = @cdromCombo.child
     @cdromOffsetSpin = Gtk::SpinButton.new(-1500.0, 1500.0, 1.0)
     @cdromOffsetSpin.value = 0.0
     @autoDetectOffsetButton = Gtk::Button.new(label: _('Auto-detect offset'))
@@ -285,7 +289,7 @@ It is recommended to enable this option.")
     @padMissingSamples.sensitive = false
     @table40.attach(@cdrom_label, 0, 0, 1, 1)
     @table40.attach(@cdrom_offset_label, 0, 1, 1, 1)
-    @table40.attach(@cdromEntry, 1, 0, 1, 1)
+    @table40.attach(@cdromCombo, 1, 0, 1, 1)
     @table40.attach(@cdromOffsetSpin, 1, 1, 1, 1)
     @table40.attach(@autoDetectOffsetButton, 2, 1, 1, 1)
     @table40.attach(@offset_button, 2, 2, 1, 1)

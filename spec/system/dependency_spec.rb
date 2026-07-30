@@ -82,5 +82,11 @@ describe Dependency do
       expect(file).to receive(:exist?).with("/dev/sr9").and_return(true)   
       expect(deps.cdrom()).to eq('/dev/sr9')
     end
+
+    it "should return all available drives via available_drives" do
+      allow(file).to receive(:exist?).with("/dev/cdrom").and_return(true)
+      allow(file).to receive(:exist?).with("/dev/sr0").and_return(true)
+      expect(deps.available_drives).to eq(['/dev/cdrom', '/dev/sr0'])
+    end
   end
 end

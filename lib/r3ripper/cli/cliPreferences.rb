@@ -158,8 +158,16 @@ private
   def loopSubMenuRipping
     case choice = showSubMenuRipping()
       when 99 then loopMainMenu()
-      when 1 then @prefs.cdrom = @string.get(_("Ripping drive"),
-        @prefs.cdrom)
+      when 1 then
+        drives = @deps.respond_to?(:available_drives) ? @deps.available_drives : [@prefs.cdrom]
+        choices = drives.map { |d| [d, d] }
+        choices << ['custom', _("Custom drive path...")]
+        selected = multipleChoice(choices)
+        if selected == 'custom'
+          @prefs.cdrom = @string.get(_("Ripping drive"), @prefs.cdrom)
+        else
+          @prefs.cdrom = selected
+        end
       when 2 then @prefs.offset = @int.get(_("Drive offset"), 0)
       when 3 then switchBool('padMissingSamples')
       when 4 then @prefs.rippersettings = \
