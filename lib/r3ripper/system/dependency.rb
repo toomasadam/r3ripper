@@ -271,4 +271,22 @@ calculation unless %s is installed.") % ['Discid'],
     (0..9).each{|num| return "/dev/sr#{num}" if @file.exist?("/dev/sr#{num}")}
     return false
   end
+
+  def available_drives
+    drives = []
+    if platform.match?(/linux|bsd/)
+      drives << '/dev/cdrom' if @file.exist?('/dev/cdrom')
+      drives << '/dev/dvdrom' if @file.exist?('/dev/dvdrom')
+      (0..9).each { |num| drives << "/dev/sr#{num}" if @file.exist?("/dev/sr#{num}") }
+    elsif platform.match?(/freebsd/)
+      (0..9).each { |num| drives << "/dev/cd#{num}" if @file.exist?("/dev/cd#{num}") }
+      (0..9).each { |num| drives << "/dev/acd#{num}" if @file.exist?("/dev/acd#{num}") }
+    elsif platform.match?(/openbsd/)
+      drives << '/dev/cd0c' if @file.exist?('/dev/cd0c')
+    elsif platform.match?(/darwin/)
+      drives << '/dev/disk1' if @file.exist?('/dev/disk1')
+    end
+    drives.uniq!
+    drives.empty? ? [cdrom] : drives
+  end
 end

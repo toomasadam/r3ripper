@@ -263,7 +263,7 @@ class GtkPreferences
 
   # 1st frame on secure ripping tab
   def buildFrameCdromDevice
-    @table40 = newTable(rows=3, columns=3)
+    @table40 = newTable(rows=4, columns=3)
 #creating objects
     @cdrom_label = Gtk::Label.new(_("CD-ROM device:"))
     @cdrom_label.halign = :start
@@ -272,6 +272,7 @@ class GtkPreferences
     @cdromEntry = Gtk::Entry.new ; @cdromEntry.width_request = 120
     @cdromOffsetSpin = Gtk::SpinButton.new(-1500.0, 1500.0, 1.0)
     @cdromOffsetSpin.value = 0.0
+    @autoDetectOffsetButton = Gtk::Button.new(label: _('Auto-detect offset'))
     @offset_button = Gtk::LinkButton.new("http://www.accuraterip.com/driveoffsets.htm", _('List with offsets'))
     @offset_button.tooltip_text = _("A website which lists the offset for most drives.\nYour drive model can be found in each log file.")
 #pack objects
@@ -286,7 +287,8 @@ It is recommended to enable this option.")
     @table40.attach(@cdrom_offset_label, 0, 1, 1, 1)
     @table40.attach(@cdromEntry, 1, 0, 1, 1)
     @table40.attach(@cdromOffsetSpin, 1, 1, 1, 1)
-    @table40.attach(@offset_button, 2, 1, 1, 1)
+    @table40.attach(@autoDetectOffsetButton, 2, 1, 1, 1)
+    @table40.attach(@offset_button, 2, 2, 1, 1)
 #connect signal
     @table40.attach(@padMissingSamples, 0, 2, 2, 1)
     @offset_button.signal_connect("clicked") {Thread.new{`#{@prefs.browser} #{@offset_button.uri}`}}
