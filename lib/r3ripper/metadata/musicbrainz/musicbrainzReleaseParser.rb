@@ -113,6 +113,7 @@ private
   # tease out the useful data
   def analyzeResult
     @md.discid = @freedbDiscid
+    @md.releaseMbid = @musicbrainzRelease.attributes['id'] if @musicbrainzRelease && @musicbrainzRelease.attributes
     @md.artist = String.new
     numArtists = 0
     variousArtists = false

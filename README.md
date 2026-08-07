@@ -19,9 +19,10 @@ Rubyripper ensures your rips are bit-perfect by:
 *   **AccurateRip Verification**: Native AccurateRip v1 and v2 CRC checksum calculations with online database queries (`www.accuraterip.com`) for bit-perfect verification.
 *   **CUETools Database (CTDB) Support**: Disc and track verification against the online CUETools Database (`db.cuetools.net`).
 *   **Drive Auto-Discovery & Auto-Offset Lookup**: Automatic detection of connected optical drives and drive read offset lookup via AccurateRip.
-*   **Survivable Metadata**: Queries **GnuDB** (successor to Freedb) and **MusicBrainz** for automatic disc metadata retrieval.
+*   **Survivable Metadata & Automatic Cover Art**: Queries **GnuDB** (successor to Freedb) and **MusicBrainz** for disc metadata, with automatic album cover artwork retrieval from the **MusicBrainz Cover Art Archive (CAA)**.
+*   **Folder Artwork & Embedded Tags**: Automatically saves album artwork (`cover.jpg`) to destination folders and embeds cover art directly into output audio formats (FLAC, MP3, Opus, WavPack).
 *   **Simultaneous Multi-Codec Encoding**: Rip once, encode to FLAC, MP3, Vorbis, AAC, Opus, and WavPack simultaneously using multi-threaded encoding.
-*   **Advanced Audio Handling**: Support for drive offsets, sample padding, normalization, ReplayGain, and EAC-compliant cue sheets.
+*   **Advanced Audio & GTK3 UI**: Support for drive offsets, sample padding, normalization, ReplayGain, EAC-compliant cue sheets, and a visual album artwork preview in the GTK3 interface.
 
 ## Installation
 

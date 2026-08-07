@@ -44,6 +44,9 @@ attr_reader :status
     if @getMusicBrainz.status == 'ok'
       @parser.parse(@getMusicBrainz.musicbrainzRelease, @disc.musicbrainzDiscid, @disc.freedbDiscid)
       @status = @parser.status
+      if @status == 'ok' && @md.releaseMbid
+        fetch_cover_art()
+      end
     elsif @getMusicBrainz.status == 'multipleReleases'
       #multiple records
       # This will require showing USEFUL info (more info than a
@@ -58,6 +61,14 @@ attr_reader :status
   # MusicBrainz doesn't require dumb various artist detection.
   def undoVarArtist ; end
   def redoVarArtist ; end
+
+  private
+
+  def fetch_cover_art
+    require 'r3ripper/metadata/cover_art'
+    cover_art = Metadata::CoverArt.new(@prefs)
+    @md.coverArtPath = cover_art.fetch(@md.releaseMbid)
+  end
 
   private
 

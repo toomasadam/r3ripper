@@ -23,7 +23,7 @@ module Metadata
     def self._(txt) ; GetText._(txt) ; end 
     
     attr_accessor :artist, :album, :genre, :year, :tracklist, :varArtist,
-      :extraDiscInfo, :discid, :discNumber
+      :extraDiscInfo, :discid, :discNumber, :coverArtPath, :releaseMbid
 
     DEFAULT_METADATA = _('Unknown')
     DEFAULT_TRACKNAME = _('Track %s')
@@ -36,6 +36,8 @@ module Metadata
       @year = DEFAULT_YEAR
       @extraDiscInfo = ''
       @discid = ''
+      @coverArtPath = nil
+      @releaseMbid = nil
       @tracklist = Hash.new
       @varArtist = Hash.new
     end

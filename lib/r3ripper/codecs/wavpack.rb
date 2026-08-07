@@ -31,7 +31,8 @@ module Codecs
         :trackname => "-w TITLE=",
         :tracknumber => "-w TRACKNUMBER=",
         :tracktotal => "-w TRACKTOTAL=",
-        :cuesheet => "-w CUESHEET="
+        :cuesheet => "-w CUESHEET=",
+        :coverArt => "--write-binary-tag \"Cover Art (Front)=\""
       }
     end
 

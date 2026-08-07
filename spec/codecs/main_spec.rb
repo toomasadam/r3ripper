@@ -297,6 +297,29 @@ describe Codecs::Main do
       expect(@codec.setTagsAfterEncoding(1)).to eq('')
     end
   end
+
+  context "When embedding cover art" do
+    before(:each) do
+      @codec = Codecs::Main.new('flac', disc, scheme, tags, prefs, md, file)
+    end
+
+    it "includes --picture tag if embedCoverArt is enabled and cover art file exists" do
+      allow(prefs).to receive(:settingsFlac).and_return('--best')
+      allow(prefs).to receive(:image).and_return(false)
+      allow(prefs).to receive(:embedCoverArt).and_return(true)
+      allow(scheme).to receive(:getTempFile).with(1).and_return('input_1.wav')
+      allow(scheme).to receive(:getFile).with('flac', 1).and_return('/home/flac/1-test.flac')
+      allow(disc).to receive(:audiotracks).and_return(10)
+      allow(md).to receive(:various?).and_return(false)
+      allow(md).to receive(:discNumber).and_return(nil)
+      allow(disc).to receive(:freedbDiscid).and_return(nil)
+      allow(md).to receive(:coverArtPath).and_return('/tmp/cover.jpg')
+      allow(file).to receive(:exist?).with('/tmp/cover.jpg').and_return(true)
+
+      cmd = @codec.command(1)
+      expect(cmd).to include('--picture="/tmp/cover.jpg"')
+    end
+  end
 end
 
 

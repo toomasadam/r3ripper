@@ -129,10 +129,19 @@ module Codecs
           when :tracknumber then add(value, "#{track}") unless @prefs.image
           when :tracktotal then add(value, "#{@disc.audiotracks}")
           when :tracknumberTotal then add(value, "#{track}/#{@disc.audiotracks}")
+          when :coverArt then addCoverArt(value)
         end
         result << tag unless tag.nil? || tag.strip().empty?
       end
       result.join(" ")
+    end
+
+    def addCoverArt(value)
+      if @prefs.respond_to?(:embedCoverArt) && @prefs.embedCoverArt == true && @md && @md.respond_to?(:coverArtPath) && @md.coverArtPath && !@md.coverArtPath.to_s.empty? && @file.exist?(@md.coverArtPath)
+        add(value, "\"#{@md.coverArtPath}\"")
+      else
+        ''
+      end
     end
     
     def addCuesheet(value)

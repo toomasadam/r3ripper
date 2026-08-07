@@ -62,6 +62,23 @@ class FileScheme
     createTempDir()
     setFileNames()
     createPlaylists()
+    saveCoverArtToOutputDir()
+  end
+  
+  # copy cover art to destination codec directories
+  def saveCoverArtToOutputDir
+    return unless @prefs.respond_to?(:fetchCoverArt) && @prefs.fetchCoverArt
+    return if @md.nil? || @md.coverArtPath.nil? || !File.exist?(@md.coverArtPath)
+
+    filename = (@prefs.respond_to?(:coverArtFilename) && @prefs.coverArtFilename && !@prefs.coverArtFilename.empty?) ? @prefs.coverArtFilename : 'cover.jpg'
+    @dir.values.uniq.each do |out_dir|
+      dest_file = File.join(out_dir, filename)
+      begin
+        @file.copy(@md.coverArtPath, dest_file)
+      rescue => e
+        puts "DEBUG: Failed to copy cover art to #{dest_file}: #{e.message}" if @prefs.respond_to?(:debug) && @prefs.debug
+      end
+    end
   end
   
   # clean temporary Dir (when finished)

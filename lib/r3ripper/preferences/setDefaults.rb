@@ -32,7 +32,14 @@ module Preferences
       setCodecDefaults()
       setFreedbDefaults()
       setMusicBrainzDefaults()
+      setArtworkDefaults()
       setOtherDefaults()
+    end
+
+    def setArtworkDefaults
+      @data.fetchCoverArt = true
+      @data.coverArtFilename = 'cover.jpg'
+      @data.embedCoverArt = true
     end
 
     def setRippingDefaults

@@ -31,7 +31,8 @@ module Codecs
         :encoder => "--tv TENC=",
         :discId => "--tc DISCID=",
         :trackname => "--tt",
-        :tracknumberTotal => "--tn"
+        :tracknumberTotal => "--tn",
+        :coverArt => "--ti"
       }
     end
 

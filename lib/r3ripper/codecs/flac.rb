@@ -31,7 +31,8 @@ module Codecs
         :trackname => "--tag TITLE=",
         :tracknumber => "--tag TRACKNUMBER=",
         :tracktotal => "--tag TRACKTOTAL=",
-        :cuesheet => "--cuesheet="
+        :cuesheet => "--cuesheet=",
+        :coverArt => "--picture="
       }
     end
 

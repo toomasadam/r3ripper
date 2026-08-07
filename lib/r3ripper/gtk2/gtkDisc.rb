@@ -114,6 +114,7 @@ class GtkDisc
     @albumEntry = Gtk::Entry.new()
     @genreEntry = Gtk::Entry.new()
     @yearEntry = Gtk::Entry.new()
+    @coverImage = Gtk::Image.new()
   end
 
   def configDiscValues()
@@ -160,6 +161,8 @@ class GtkDisc
     @discInfoTable.attach(@yearLabel, 2, 1, 1, 1)
     @discInfoTable.attach(@genreEntry, 3, 0, 1, 1) #4th column
     @discInfoTable.attach(@yearEntry, 3, 1, 1, 1)
+
+    @discInfoTable.attach(@coverImage, 4, 0, 1, 4) #5th column for artwork thumbnail
 
     @discInfoTable.attach(@varCheckbox, 0, 3, 4, 1)
     @discInfoTable.attach(@freezeCheckbox, 0, 2, 2, 1)
@@ -281,6 +284,17 @@ class GtkDisc
     end
     
     @varCheckbox.active = true if @md.various?
+
+    if @coverImage && @md.respond_to?(:coverArtPath) && @md.coverArtPath && File.exist?(@md.coverArtPath)
+      begin
+        pixbuf = GdkPixbuf::Pixbuf.new(file: @md.coverArtPath, width: 80, height: 80)
+        @coverImage.pixbuf = pixbuf
+      rescue => e
+        @coverImage.clear if @coverImage.respond_to?(:clear)
+      end
+    elsif @coverImage && @coverImage.respond_to?(:clear)
+      @coverImage.clear
+    end
   end
 
   def updateTracks

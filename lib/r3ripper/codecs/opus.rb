@@ -30,7 +30,8 @@ module Codecs
         :discId => "--comment DISCID=",
         :trackname => "--title",
         :tracknumber => "--comment TRACKNUMBER=",
-        :tracktotal => "--comment TRACKTOTAL="
+        :tracktotal => "--comment TRACKTOTAL=",
+        :coverArt => "--picture"
       }
     end
 

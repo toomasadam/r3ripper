@@ -79,6 +79,7 @@ class GtkPreferences
     buildFrameChooseMetadataProvider()
     buildFrameFreedbOptions()
     buildFrameMusicbrainzOptions()
+    buildFrameArtworkOptions()
     packMetadataFrames()
   end
   
@@ -131,6 +132,9 @@ class GtkPreferences
     @chooseLatestRelease.active = @prefs.preferMusicBrainzDate == 'later'
     @chooseOriginalYear.active = @prefs.useEarliestDate
     @chooseReleaseYear.active = !@prefs.useEarliestDate
+    @fetchCoverArt.active = @prefs.fetchCoverArt
+    @coverArtFilenameEntry.text = @prefs.coverArtFilename.to_s
+    @embedCoverArt.active = @prefs.embedCoverArt
 #other
     @basedirEntry.text = @prefs.basedir.to_s
     @namingNormalEntry.text = @prefs.namingNormal.to_s
@@ -202,6 +206,9 @@ class GtkPreferences
     @prefs.preferMusicBrainzCountries = @entryPreferredCountry.text
     @prefs.preferMusicBrainzDate = @chooseOriginalRelease.active? ? 'earlier' : 'later'
     @prefs.useEarliestDate = @chooseOriginalYear.active?
+    @prefs.fetchCoverArt = @fetchCoverArt.active?
+    @prefs.coverArtFilename = @coverArtFilenameEntry.text
+    @prefs.embedCoverArt = @embedCoverArt.active?
 #other
     @prefs.basedir = @basedirEntry.text
     @prefs.namingNormal = @namingNormalEntry.text
@@ -723,10 +730,25 @@ It is recommended to enable this option.")
     @frame92.children.each{|child| child.sensitive = @metadataChoice.active != 2}
   end
   
+  def buildFrameArtworkOptions
+    @tableArtwork = newTable(rows=3, columns=3)
+    @fetchCoverArt = Gtk::CheckButton.new(_('Fetch cover artwork automatically'))
+    @coverArtFilenameLabel = Gtk::Label.new(_('Folder artwork filename:'))
+    @coverArtFilenameLabel.halign = :start
+    @coverArtFilenameEntry = Gtk::Entry.new()
+    @embedCoverArt = Gtk::CheckButton.new(_('Embed cover artwork in audio files'))
+
+    @tableArtwork.attach(@fetchCoverArt, 0, 0, 3, 1)
+    @tableArtwork.attach(@coverArtFilenameLabel, 0, 1, 1, 1)
+    @tableArtwork.attach(@coverArtFilenameEntry, 1, 1, 2, 1)
+    @tableArtwork.attach(@embedCoverArt, 0, 2, 3, 1)
+    @frameArtwork = newFrame(_('Artwork & Cover Art'), child=@tableArtwork)
+  end
+
   def packMetadataFrames
     @metadataChoice.signal_connect("changed"){updateMetadataProviderView()}
     @page3 = Gtk::Box.new(:vertical) #One Box to rule them all
-    [@frame90, @frame91, @frame92].each{|frame| @page3.pack_start(frame, expand: false, fill: false, padding: 0)}
+    [@frame90, @frame91, @frame92, @frameArtwork].each{|frame| @page3.pack_start(frame, expand: false, fill: false, padding: 0)}
     @page3_label = Gtk::Label.new(_("Metadata"))
     @display.append_page(@page3, @page3_label)
   end

@@ -191,6 +191,16 @@ module Preferences
     # LP release dates to CD release dates)
     attr_accessor :useEarliestDate
 
+    # ARTWORK PREFERENCES
+    # Fetch cover art automatically
+    attr_accessor :fetchCoverArt
+
+    # Filename for folder artwork (e.g., cover.jpg)
+    attr_accessor :coverArtFilename
+
+    # Embed cover art into encoded audio metadata tags
+    attr_accessor :embedCoverArt
+
     # OTHER PREFERENCES
     # Base output directory for all your rips
     attr_accessor :basedir
